@@ -26,11 +26,13 @@ importers:
       '@liuli-util/vite-plugin-css-dts': ^0.2.0
       '@picocss/pico': ^1.5.7
       '@types/dom-speech-recognition': ^0.0.1
+      '@types/lodash-es': ^4.17.6
       '@types/react': ^18.0.26
       '@types/react-dom': ^18.0.9
       '@vitejs/plugin-react': ^3.0.0
       chatgpt: ^5.0.6
       classnames: ^2.3.2
+      lodash-es: ^4.17.21
       microsoft-cognitiveservices-speech-sdk: ^1.26.0
       mobx: ^6.8.0
       mobx-react-lite: ^3.4.1
@@ -46,6 +48,7 @@ importers:
       '@picocss/pico': 1.5.7
       chatgpt: 5.0.6
       classnames: 2.3.2
+      lodash-es: 4.17.21
       microsoft-cognitiveservices-speech-sdk: 1.26.0
       mobx: 6.8.0
       mobx-react-lite: 3.4.1_woojb62cqeyk443mbl7msrwu2e
@@ -56,6 +59,7 @@ importers:
     devDependencies:
       '@liuli-util/vite-plugin-css-dts': 0.2.0_vite@4.1.4
       '@types/dom-speech-recognition': 0.0.1
+      '@types/lodash-es': 4.17.6
       '@types/react': 18.0.28
       '@types/react-dom': 18.0.11
       '@vitejs/plugin-react': 3.1.0_vite@4.1.4
@@ -3217,7 +3221,6 @@ packages:
 
   /lodash-es/4.17.21:
     resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
-    dev: true
 
   /lodash.camelcase/4.3.0:
     resolution: {integrity: sha512-TwuEnCnxbc3rAvhf/LbG7tJUDzhqXyFnv3dtzLOPgCG/hODL7WFnsbwktkD7yUV0RrreP/l1PALq/YSg6VvjlA==}

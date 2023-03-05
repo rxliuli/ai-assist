@@ -6,17 +6,17 @@ import { useMount } from 'react-use'
 
 interface Message {
   id: string
-  source: 'person' | 'bot'
-  text: string
+  role: 'user' | 'assistant'
+  content: string
   state: 'loading' | 'success' | 'error'
 }
 
 const ChatMessage = observer((props: { message: Message }) => {
   return (
     <li className={css.message}>
-      <span>{props.message.source === 'person' ? 'You' : 'Bot'}:</span>
+      <span>{props.message.role === 'user' ? 'You' : 'Bot'}:</span>
       <div>
-        <ReactMarkdown>{props.message.text}</ReactMarkdown>
+        <ReactMarkdown>{props.message.content}</ReactMarkdown>
       </div>
     </li>
   )
@@ -30,7 +30,7 @@ export const ChatView = observer(function () {
 
   async function onSend() {
     const msg = state.msg
-    state.messages.push({ id: Math.random().toString(), text: msg, source: 'person', state: 'success' })
+    state.messages.push({ id: Math.random().toString(), content: msg, role: 'user', state: 'success' })
     state.msg = ''
     const resp = await fetch('/chat-stream', {
       method: 'post',
@@ -44,7 +44,7 @@ export const ChatView = observer(function () {
         },
       ]),
     })
-    state.messages.push({ id: Math.random().toString(), text: '', source: 'bot', state: 'success' })
+    state.messages.push({ id: Math.random().toString(), content: '', role: 'assistant', state: 'success' })
     const m = state.messages[state.messages.length - 1]
     const reader = resp.body!.getReader()
     let chunk = await reader.read()
@@ -52,7 +52,7 @@ export const ChatView = observer(function () {
     const r: string[] = []
     while (!chunk.done) {
       const s = textDecoder.decode(chunk.value)
-      m.text += s
+      m.content += s
       chunk = await reader.read()
     }
   }
