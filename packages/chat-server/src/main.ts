@@ -7,7 +7,6 @@ import { ChatCompletionRequestMessage } from 'openai'
 import { chat } from './services/chat'
 import { logger } from './constants/logger'
 import { chatStream } from './services/chat-stream'
-import { Stream } from 'node:stream'
 
 const app = new Application()
 const router = new Router()
