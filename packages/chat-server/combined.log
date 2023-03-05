@@ -12,3 +12,7 @@
 {"0":{"content":"你是谁？","role":"user"},"level":"info","message":"chat result"}
 {"0":{"content":"你可以做什么？例如帮我写一首诗？","role":"user"},"level":"info","message":"chat params"}
 {"0":{"content":"你可以做什么？例如帮我写一首诗？","role":"user"},"level":"info","message":"chat result"}
+{"0":{"content":"","role":"user"},"level":"info","message":"chat params"}
+{"0":{"content":"","role":"user"},"level":"info","message":"chat params"}
+{"0":{"content":"","role":"user"},"level":"info","message":"chat result"}
+{"0":{"content":"","role":"user"},"level":"info","message":"chat result"}

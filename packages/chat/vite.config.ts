@@ -7,6 +7,8 @@ export default defineConfig({
   server: {
     proxy: {
       '/chat': 'http://localhost:8080',
+      '/chat-stream': 'http://localhost:8080',
+      '/stream-example': 'http://localhost:8080',
     },
   },
 })

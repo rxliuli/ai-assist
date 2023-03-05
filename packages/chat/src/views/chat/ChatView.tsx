@@ -2,6 +2,7 @@ import { observer, useLocalObservable } from 'mobx-react-lite'
 import css from './ChatView.module.css'
 import classNames from 'classnames'
 import ReactMarkdown from 'react-markdown'
+import { useMount } from 'react-use'
 
 interface Message {
   id: string
@@ -31,7 +32,7 @@ export const ChatView = observer(function () {
     const msg = state.msg
     state.messages.push({ id: Math.random().toString(), text: msg, source: 'person', state: 'success' })
     state.msg = ''
-    const resp = await fetch('/chat', {
+    const resp = await fetch('/chat-stream', {
       method: 'post',
       headers: {
         'Content-Type': 'application/json',
@@ -43,8 +44,17 @@ export const ChatView = observer(function () {
         },
       ]),
     })
-    const res = await resp.text()
-    state.messages.push({ id: Math.random().toString(), text: res, source: 'bot', state: 'success' })
+    state.messages.push({ id: Math.random().toString(), text: '', source: 'bot', state: 'success' })
+    const m = state.messages[state.messages.length - 1]
+    const reader = resp.body!.getReader()
+    let chunk = await reader.read()
+    const textDecoder = new TextDecoder()
+    const r: string[] = []
+    while (!chunk.done) {
+      const s = textDecoder.decode(chunk.value)
+      m.text += s
+      chunk = await reader.read()
+    }
   }
 
   async function onKeyDown(event: React.KeyboardEvent) {
@@ -60,6 +70,7 @@ export const ChatView = observer(function () {
   function onInput(event: React.FormEvent<HTMLTextAreaElement>) {
     state.msg = event.currentTarget.value
   }
+
   return (
     <div className={classNames('container', css.chat)}>
       <ul className={css.messages}>
