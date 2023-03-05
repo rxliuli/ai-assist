@@ -34,7 +34,7 @@ interface Message {
 const ChatMessage = observer((props: { message: Message }) => {
   return (
     <li className={css.message}>
-      <span>{props.message.role === 'user' ? 'You' : 'Bot'}:</span>
+      <span>{props.message.role === 'user' ? '你' : 'AI'}:</span>
       <div>
         <ReactMarkdown>{props.message.content}</ReactMarkdown>
       </div>
@@ -46,6 +46,7 @@ export const ChatView = observer(function () {
   const state = useLocalObservable(() => ({
     msg: '',
     messages: (safeLocalStorageGet('ai-assist-chat-history') ?? []) as Message[],
+    inputFlag: true,
   }))
   useObserver(() => {
     localStorage.setItem('ai-assist-chat-history', JSON.stringify(state.messages))
@@ -91,12 +92,8 @@ export const ChatView = observer(function () {
   }
 
   async function onKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (
-      event.key === 'Enter' &&
-      !event.shiftKey &&
-      event.currentTarget.tagName !== 'TEXTAREA' &&
-      event.currentTarget.tagName !== 'INPUT'
-    ) {
+    // console.log('event.target', event.key, event.shiftKey, (event.target as any).tagName, state.inputFlag)
+    if (event.key === 'Enter' && !event.shiftKey && state.inputFlag) {
       if (state.msg.trim().length === 0) {
         event.preventDefault()
         return
@@ -135,7 +132,15 @@ export const ChatView = observer(function () {
           <button onClick={onCopy}>复制</button>
         </div>
         <div className={css.newMessage}>
-          <textarea className={css.input} rows={1} value={state.msg} onInput={onInput} onKeyDown={onKeyDown}></textarea>
+          <textarea
+            className={css.input}
+            rows={1}
+            value={state.msg}
+            onInput={onInput}
+            onCompositionStart={() => (state.inputFlag = false)}
+            onCompositionEnd={() => (state.inputFlag = true)}
+            onKeyDown={onKeyDown}
+          ></textarea>
           <button onClick={onSend}>发送</button>
         </div>
       </footer>

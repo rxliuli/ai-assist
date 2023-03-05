@@ -86,7 +86,7 @@ export const SpeakView = observer(() => {
       <ul className={css.content}>
         {store.messages.map((it) => (
           <li className={css.message} key={it.id}>
-            <span>{it.role === 'user' ? '你' : '机器人'}: </span>
+            <span>{it.role === 'user' ? '你' : 'AI'}: </span>
             <div>
               <ReactMarkdown>{it.content}</ReactMarkdown>
             </div>
