@@ -13,6 +13,8 @@
     "@picocss/pico": "^1.5.7",
     "chatgpt": "^5.0.6",
     "classnames": "^2.3.2",
+    "clipboardy": "^3.0.0",
+    "gpt3-tokenizer": "^1.1.5",
     "lodash-es": "^4.17.21",
     "microsoft-cognitiveservices-speech-sdk": "^1.26.0",
     "mobx": "^6.8.0",
@@ -23,6 +25,7 @@
     "react-use": "^17.4.0"
   },
   "devDependencies": {
+    "@dqbd/tiktoken": "^0.4.0",
     "@liuli-util/vite-plugin-css-dts": "^0.2.0",
     "@types/dom-speech-recognition": "^0.0.1",
     "@types/lodash-es": "^4.17.6",

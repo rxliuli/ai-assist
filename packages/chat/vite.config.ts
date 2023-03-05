@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react(), cssdts()],
   server: {
     proxy: {
-      '/api/': 'http://localhost:8080',
+      '/api/': 'https://chat.liuli.moe',
     },
   },
 })

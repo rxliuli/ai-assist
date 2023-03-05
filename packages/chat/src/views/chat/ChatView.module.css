@@ -7,6 +7,7 @@
 .messages {
   overflow-y: auto;
   padding: 1rem;
+  margin-bottom: 0;
 }
 
 .message {
@@ -15,13 +16,32 @@
   gap: 8px;
 }
 
-.footer {
+.message > * {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.operations {
+  display: flex;
+  overflow-x: auto;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.operations button {
+  width: fit-content;
+  margin-bottom: 0;
+  font-size: calc(1rem, 0.8);
+  padding: 2px 4px;
+}
+
+.newMessage {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 8px;
 }
 
-.footer .input {
+.newMessage .input {
   max-height: 200px;
   overflow-y: hidden;
   resize: none;
