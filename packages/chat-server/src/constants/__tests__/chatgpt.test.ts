@@ -1,4 +1,4 @@
-import { it } from 'vitest'
+import { expect, it } from 'vitest'
 import { openai } from '../chatgpt'
 
 it('should work', async () => {
@@ -11,5 +11,5 @@ it('should work', async () => {
       },
     ],
   })
-  console.log(r.statusText)
-}, 10_000)
+  expect(r.data.choices[0].message?.content).not.undefined
+})
