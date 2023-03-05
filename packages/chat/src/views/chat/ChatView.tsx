@@ -1,8 +1,9 @@
-import { observer, useLocalObservable } from 'mobx-react-lite'
+import { observer, useLocalObservable, useObserver } from 'mobx-react-lite'
 import css from './ChatView.module.css'
 import classNames from 'classnames'
 import ReactMarkdown from 'react-markdown'
-import { useMount } from 'react-use'
+import { useLocalStorage } from 'react-use'
+import { safeLocalStorageGet } from '../../utils/safeLocalStorageGet'
 
 interface Message {
   id: string
@@ -25,14 +26,17 @@ const ChatMessage = observer((props: { message: Message }) => {
 export const ChatView = observer(function () {
   const state = useLocalObservable(() => ({
     msg: '',
-    messages: [] as Message[],
+    messages: (safeLocalStorageGet('ai-assist-chat-history') ?? []) as Message[],
   }))
+  useObserver(() => {
+    localStorage.setItem('ai-assist-chat-history', JSON.stringify(state.messages))
+  })
 
   async function onSend() {
     const msg = state.msg
     state.messages.push({ id: Math.random().toString(), content: msg, role: 'user', state: 'success' })
     state.msg = ''
-    const resp = await fetch('/chat-stream', {
+    const resp = await fetch('/api/chat-stream', {
       method: 'post',
       headers: {
         'Content-Type': 'application/json',
@@ -49,7 +53,6 @@ export const ChatView = observer(function () {
     const reader = resp.body!.getReader()
     let chunk = await reader.read()
     const textDecoder = new TextDecoder()
-    const r: string[] = []
     while (!chunk.done) {
       const s = textDecoder.decode(chunk.value)
       m.content += s

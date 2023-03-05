@@ -144,6 +144,34 @@
           }
         }
       }
+    },
+    "/get-region-and-token": {
+      "description": "getRegionAndToken",
+      "get": {
+        "summary": "getRegionAndToken",
+        "operationId": "getRegionAndToken",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "region": {
+                      "type": "string"
+                    },
+                    "token": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["region", "token"]
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

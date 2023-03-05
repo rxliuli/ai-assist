@@ -1,67 +1,15 @@
 import classNames from 'classnames'
-import { last, takeRight } from 'lodash-es'
-import { observer, useLocalStore, useObserver } from 'mobx-react-lite'
+import { last } from 'lodash-es'
+import { observer, useLocalStore } from 'mobx-react-lite'
 import ReactMarkdown from 'react-markdown'
+import { useMount } from 'react-use'
 import css from './SpeakView.module.css'
+import { azureSpeech } from './speech/azure'
 
-globalThis.SpeechRecognition = globalThis.SpeechRecognition ?? globalThis.webkitSpeechRecognition
-
-function speechToText(callback: (interimTranscripts: string[]) => void) {
-  const recognition = new window.SpeechRecognition()
-  const p = new Promise<string>((resolve, reject) => {
-    recognition.continuous = true
-    recognition.interimResults = true
-
-    const interimTranscripts: string[] = []
-    const finalTranscripts: string[] = []
-    recognition.onresult = function (event) {
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript
-        if (event.results[i].isFinal) {
-          finalTranscripts.push(transcript)
-          resolve(finalTranscripts.join(', '))
-        } else {
-          interimTranscripts.push(transcript)
-        }
-      }
-
-      callback(interimTranscripts)
-      // console.log('Interim transcripts:', interimTranscripts.join(', '))
-      // console.log('Final transcripts:', finalTranscripts.join(', '))
-    }
-
-    recognition.onerror = function (event) {
-      reject(event.error)
-    }
-
-    recognition.onend = function () {
-      resolve(finalTranscripts.join(', '))
-    }
-
-    recognition.start()
-  })
-
-  return {
-    value: () => p,
-    stop: () => recognition.stop(),
-  }
-}
-
-function textToSpeech(msg: string) {
-  let u = new SpeechSynthesisUtterance()
-  u.lang = 'zh-CN'
-  u.text = msg
-  const voices = speechSynthesis.getVoices().filter((it) => it.lang === 'zh-CN')
-  u.voice = voices[1]
-  speechSynthesis.speak(u)
-  return new Promise((resolve, reject) => {
-    u.addEventListener('end', resolve)
-    u.addEventListener('error', reject)
-  })
-}
+const speech = azureSpeech
 
 async function sendMessage(input: string) {
-  const resp = await fetch('/chat', {
+  const resp = await fetch('/api/chat', {
     method: 'post',
     headers: {
       'Content-Type': 'application/json',
@@ -76,18 +24,6 @@ async function sendMessage(input: string) {
   return await resp.text()
 }
 
-function safeLocalStorageGet(key: string): any {
-  const v = localStorage.getItem(key)
-  if (!v) {
-    return
-  }
-  try {
-    return JSON.parse(v)
-  } catch (e) {
-    return
-  }
-}
-
 export const SpeakView = observer(() => {
   const store = useLocalStore(() => ({
     loading: false,
@@ -97,7 +33,8 @@ export const SpeakView = observer(() => {
     } | null,
     buttonText: '点击开始识别',
     timer: null as null | number,
-    messages: (safeLocalStorageGet('ai-assist-chat-speak-cache') ?? []) as {
+    messages: [] as {
+      id: string
       role: 'user' | 'assistant'
       content: string
     }[],
@@ -108,10 +45,8 @@ export const SpeakView = observer(() => {
     console.log('onSpeechToText start', store.recognition)
     if (!store.recognition) {
       store.buttonText = '正在识别...'
-      store.messages.push({ role: 'user', content: '' })
-      store.recognition = speechToText(
-        (interimTranscripts) => (last(store.messages)!.content = last(interimTranscripts)!),
-      )
+      store.messages.push({ id: Date.now().toString(), role: 'user', content: '' })
+      store.recognition = await speech.speechToText((msg) => (last(store.messages)!.content = msg))
       return
     }
     try {
@@ -129,8 +64,8 @@ export const SpeakView = observer(() => {
       const r = await sendMessage(input)
       console.log('chatgpt result', r)
       store.buttonText = '正在回答...'
-      store.messages.push({ role: 'assistant', content: r })
-      await textToSpeech(r)
+      store.messages.push({ id: Date.now().toString(), role: 'assistant', content: r })
+      await speech.textToSpeech(r)
       store.buttonText = '正在回答...'
     } finally {
       store.loading = false
@@ -139,28 +74,25 @@ export const SpeakView = observer(() => {
     }
   }
 
-  useObserver(() => {
-    const cache = takeRight(store.messages, 100)
-    localStorage.setItem('ai-assist-chat-speak-cache', JSON.stringify(cache))
+  useMount(async () => {
+    await azureSpeech.initConfig()
   })
-
-  const current = useObserver(() => store.messages[store.messages.length - 1])
 
   return (
     <div className={classNames('container', css.speak)}>
       <header>
         <h2 className={css.title}>语音机器人</h2>
       </header>
-      <div className={css.content}>
-        {current && (
-          <div className={css.message}>
-            <span>{current.role === 'user' ? '你' : '机器人'}: </span>
+      <ul className={css.content}>
+        {store.messages.map((it) => (
+          <li className={css.message} key={it.id}>
+            <span>{it.role === 'user' ? '你' : '机器人'}: </span>
             <div>
-              <ReactMarkdown>{current.content}</ReactMarkdown>
+              <ReactMarkdown>{it.content}</ReactMarkdown>
             </div>
-          </div>
-        )}
-      </div>
+          </li>
+        ))}
+      </ul>
       <footer>
         <button onClick={onSpeechToText}>{store.buttonText}</button>
       </footer>

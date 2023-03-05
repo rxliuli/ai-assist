@@ -7,31 +7,36 @@ import { ChatCompletionRequestMessage } from 'openai'
 import { chat } from './services/chat'
 import { logger } from './constants/logger'
 import { chatStream } from './services/chat-stream'
+import { getRegionAndToken } from './services/speak'
+import serve from 'koa-static'
+import path from 'path'
+import mount from 'koa-mount'
+import { fileURLToPath } from 'url'
 
 const app = new Application()
 const router = new Router()
-router.get('/ping', (ctx) => {
+router.get('/api/ping', (ctx) => {
   ctx.body = 'pong'
 })
 
-router.post('/translate', async (ctx) => {
+router.post('/api/translate', async (ctx) => {
   const params = ctx.request.body as TranslateParams
-  logger.info('translate params', params)
+  logger.info('translate params', JSON.stringify(params))
   const r = await translate(params)
-  logger.info('translate result', params)
+  logger.info('translate result', r)
   ctx.body = r
 })
 
-router.post('/chat', async (ctx) => {
+router.post('/api/chat', async (ctx) => {
   const params = ctx.request.body as Array<ChatCompletionRequestMessage>
-  console.log('chat params', params)
-  logger.info('chat params', params)
+  logger.info('chat params', JSON.stringify(params))
   const r = await chat(params)
-  logger.info('chat result', params)
+  logger.info('chat result', r)
   ctx.body = r
 })
-router.post('/chat-stream', async (ctx) => {
+router.post('/api/chat-stream', async (ctx) => {
   const params = ctx.request.body as Array<ChatCompletionRequestMessage>
+  logger.info('chat params', JSON.stringify(params))
   const stream = chatStream(params)
   // 设置响应头
   ctx.set('Content-Type', 'application/octet-stream')
@@ -39,8 +44,19 @@ router.post('/chat-stream', async (ctx) => {
   // 将可读流作为响应体
   ctx.body = stream
 })
+router.get('/api/get-region-and-token', async (ctx) => {
+  const r = await getRegionAndToken()
+  logger.info('getRegionAndToken result', JSON.stringify(r))
+  ctx.body = r
+})
 
-app.use(cors()).use(bodyParser()).use(router.routes())
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+app
+  .use(cors())
+  .use(bodyParser())
+  .use(router.routes())
+  .use(mount('/', serve(path.resolve(__dirname, 'public'))))
 
 app.listen(8080)
 
