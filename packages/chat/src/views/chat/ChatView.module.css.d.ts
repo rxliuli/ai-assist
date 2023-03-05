@@ -1,0 +1,11 @@
+declare const css: {
+  chat: string
+  messages: string
+  message: string
+  footer: string
+  footer: string
+  input: string
+}
+
+export default css
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIkM6XFxVc2Vyc1xccnhsaXVsaVxcQ29kZVxcd2ViXFxhaS1hc3Npc3RcXHBhY2thZ2VzXFxjaGF0XFxzcmNcXHZpZXdzXFxjaGF0XFxDaGF0Vmlldy5tb2R1bGUuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7SUFBQyxJQUFLO0lBTUwsUUFBUztJQUtULE9BQVE7SUFZUixNQUFPO0lBQVAsTUFBTztJQUFDLEtBQU0iLCJmaWxlIjoiQzpcXFVzZXJzXFxyeGxpdWxpXFxDb2RlXFx3ZWJcXGFpLWFzc2lzdFxccGFja2FnZXNcXGNoYXRcXHNyY1xcdmlld3NcXGNoYXRcXENoYXRWaWV3Lm1vZHVsZS5jc3MuZC50cyJ9

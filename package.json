@@ -1,5 +1,6 @@
 {
-  "name": "joplin-utils",
+  "name": "@ai-assist/all",
+  "type": "module",
   "private": true,
   "license": "MIT",
   "scripts": {
@@ -20,13 +21,13 @@
     ]
   },
   "devDependencies": {
-    "@commitlint/cli": "^17.1.2",
-    "@commitlint/config-conventional": "^17.1.0",
+    "@commitlint/cli": "^17.4.4",
+    "@commitlint/config-conventional": "^17.4.4",
     "@liuli-util/prettier-standard-config": "^0.3.0",
-    "lint-staged": "^13.0.3",
-    "prettier": "^2.7.1",
+    "lint-staged": "^13.1.2",
+    "prettier": "^2.8.4",
     "rimraf": "^3.0.2",
-    "simple-git-hooks": "^2.8.0"
+    "simple-git-hooks": "^2.8.1"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged",
