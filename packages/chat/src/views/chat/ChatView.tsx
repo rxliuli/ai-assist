@@ -1,13 +1,15 @@
-import { observer, useLocalObservable, useObserver } from 'mobx-react-lite'
+import { observer, useLocalObservable, useLocalStore, useObserver } from 'mobx-react-lite'
 import css from './ChatView.module.css'
 import classNames from 'classnames'
 import ReactMarkdown from 'react-markdown'
 import { safeLocalStorageGet } from '../../utils/safeLocalStorageGet'
 import GPT3Tokenizer from 'gpt3-tokenizer'
 import { pick } from 'lodash-es'
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import { useMount } from 'react-use'
 import clipboardy from 'clipboardy'
+import { Session } from './utils/db'
+import { Link } from '@liuli-util/react-router'
 
 function sliceMessages(messages: Pick<Message, 'role' | 'content'>[], max: number) {
   const tokenizer = new GPT3Tokenizer({ type: 'gpt3' })
@@ -42,29 +44,25 @@ const ChatMessage = observer((props: { message: Message }) => {
   )
 })
 
-export const ChatView = observer(function () {
+export const ChatMessages = observer(function (props: { messages: Message[] }) {
   const state = useLocalObservable(() => ({
     msg: '',
-    messages: (safeLocalStorageGet('ai-assist-chat-history') ?? []) as Message[],
     inputFlag: true,
   }))
-  useObserver(() => {
-    localStorage.setItem('ai-assist-chat-history', JSON.stringify(state.messages))
-  })
 
   const messagesRef = useRef<HTMLUListElement>(null)
-  useMount(() => {
+  useMount(async () => {
     messagesRef.current?.lastElementChild?.scrollIntoView({ behavior: 'auto' })
   })
 
   async function onSend() {
     const msg = state.msg
-    state.messages.push({ id: Math.random().toString(), content: msg, role: 'user' })
+    props.messages.push({ id: Math.random().toString(), content: msg, role: 'user' })
     state.msg = ''
     await new Promise((resolve) => setTimeout(resolve, 0))
     messagesRef.current!.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'end' })
     const list = sliceMessages(
-      state.messages.map((it) => pick(it, 'role', 'content')),
+      props.messages.map((it) => pick(it, 'role', 'content')),
       3000,
     )
     console.log('sendMessages ', list)
@@ -78,8 +76,8 @@ export const ChatView = observer(function () {
     if (resp.status !== 200) {
       return
     }
-    state.messages.push({ id: Math.random().toString(), content: '', role: 'assistant' })
-    const m = state.messages[state.messages.length - 1]
+    props.messages.push({ id: Math.random().toString(), content: '', role: 'assistant' })
+    const m = props.messages[props.messages.length - 1]
     const reader = resp.body!.getReader()
     let chunk = await reader.read()
     const textDecoder = new TextDecoder()
@@ -107,14 +105,14 @@ export const ChatView = observer(function () {
   }
 
   function onClear() {
-    state.messages = []
+    props.messages = []
   }
   async function onCopy() {
-    if (state.messages.length === 0) {
+    if (props.messages.length === 0) {
       window.alert('没有消息')
       return
     }
-    const r = state.messages.map((it) => it.content).join('\n')
+    const r = props.messages.map((it) => it.content).join('\n')
     await clipboardy.write(r)
     window.alert('复制成功')
   }
@@ -122,7 +120,7 @@ export const ChatView = observer(function () {
   return (
     <div className={classNames('container', css.chat)}>
       <ul className={css.messages} ref={messagesRef}>
-        {state.messages.map((it) => (
+        {props.messages.map((it) => (
           <ChatMessage key={it.id} message={it}></ChatMessage>
         ))}
       </ul>
@@ -144,6 +142,41 @@ export const ChatView = observer(function () {
           <button onClick={onSend}>发送</button>
         </div>
       </footer>
+    </div>
+  )
+})
+
+const ChatSidebar = observer((props: { sessions: Session[]; activeSessionId: string }) => {
+  return (
+    <div className={classNames('container', css.sidebar)}>
+      <ul>
+        <li>New Chat</li>
+        {props.sessions.map((it) => (
+          <li
+            key={it.id}
+            className={classNames(css.session, {
+              [css.active]: it.id === props.activeSessionId,
+            })}
+          >
+            {it.name}
+          </li>
+        ))}
+      </ul>
+      <footer></footer>
+    </div>
+  )
+})
+
+export const ChatHomeView = observer(() => {
+  const store = useLocalStore(() => ({
+    activeSessionId: '',
+    sessions: [] as Session[],
+    messages: [] as Message[],
+  }))
+  return (
+    <div className={css.chatHome}>
+      <ChatSidebar sessions={store.sessions} activeSessionId={store.activeSessionId}></ChatSidebar>
+      <ChatMessages messages={store.messages}></ChatMessages>
     </div>
   )
 })

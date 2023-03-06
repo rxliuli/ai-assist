@@ -1,3 +1,25 @@
+/* 整体 */
+
+.chatHome {
+  height: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr;
+}
+
+/* 侧边栏 */
+
+.sidebar {
+  width: 240px;
+}
+.session {
+  cursor: pointer;
+  text-decoration: none;
+}
+.session.active {
+  background-color: #f0f0f0;
+}
+
+/* #region 消息 */
 .chat {
   height: 100%;
   display: grid;
@@ -46,3 +68,4 @@
   overflow-y: hidden;
   resize: none;
 }
+/* #endregion */

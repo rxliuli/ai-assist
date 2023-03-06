@@ -15,6 +15,7 @@
     "classnames": "^2.3.2",
     "clipboardy": "^3.0.0",
     "gpt3-tokenizer": "^1.1.5",
+    "idb": "^7.1.1",
     "lodash-es": "^4.17.21",
     "microsoft-cognitiveservices-speech-sdk": "^1.26.0",
     "mobx": "^6.8.0",
