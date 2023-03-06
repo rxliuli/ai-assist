@@ -6,7 +6,7 @@ import ReactMarkdown from 'react-markdown'
 import GPT3Tokenizer from 'gpt3-tokenizer'
 import { pick } from 'lodash-es'
 import { useRef, useState } from 'react'
-import { useMount } from 'react-use'
+import { useMedia, useMediaDevices, useMount } from 'react-use'
 import clipboardy from 'clipboardy'
 import { initDatabase, Message, MessageService, Session, SessionService } from './utils/db'
 import { v4 } from 'uuid'
@@ -54,6 +54,9 @@ export const ChatMessages = observer(function (props: {
   const state = useLocalObservable(() => ({
     msg: '',
     inputFlag: true,
+    get lineCount() {
+      return Math.min(Math.max(this.msg.split('\n').length, 1), 4)
+    },
   }))
 
   const messagesRef = useRef<HTMLUListElement>(null)
@@ -105,6 +108,9 @@ export const ChatMessages = observer(function (props: {
       messagesRef.current!.lastElementChild?.scrollIntoView({ behavior: 'auto' })
       chunk = await reader.read()
     }
+    new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
+      messagesRef.current!.lastElementChild?.scrollIntoView({ behavior: 'auto' })
+    })
     if (!props.activeSessionId) {
       const session: Session = { id: sessionId, name: 'New Chat', date: new Date().toISOString() }
       props.onCreateSession(session)
@@ -114,9 +120,10 @@ export const ChatMessages = observer(function (props: {
     props.onNotifiCreateMessage(m)
   }
 
+  const query = useMedia('(max-width: 768px)', false)
   async function onKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
     // console.log('event.target', event.key, event.shiftKey, (event.target as any).tagName, state.inputFlag)
-    if (event.key === 'Enter' && !event.shiftKey && state.inputFlag) {
+    if (event.key === 'Enter' && !event.shiftKey && state.inputFlag && !query) {
       event.preventDefault()
       await onSend()
     }
@@ -149,7 +156,7 @@ export const ChatMessages = observer(function (props: {
         <div className={css.newMessage}>
           <textarea
             className={css.input}
-            rows={1}
+            rows={state.lineCount}
             value={state.msg}
             onInput={onInput}
             onCompositionStart={() => (state.inputFlag = false)}
@@ -331,10 +338,10 @@ export const ChatHomeView = observer(() => {
           <svg
             stroke="currentColor"
             fill="none"
-            stroke-width="1.5"
+            strokeWidth="1.5"
             viewBox="0 0 24 24"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            strokeLinecap="round"
+            strokeLinejoin="round"
             height="1em"
             width="1em"
             xmlns="http://www.w3.org/2000/svg"
@@ -350,10 +357,10 @@ export const ChatHomeView = observer(() => {
           <svg
             stroke="currentColor"
             fill="none"
-            stroke-width="1.5"
+            strokeWidth="1.5"
             viewBox="0 0 24 24"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            strokeLinecap="round"
+            strokeLinejoin="round"
             height="1em"
             width="1em"
             xmlns="http://www.w3.org/2000/svg"

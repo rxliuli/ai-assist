@@ -4,10 +4,11 @@ import { cssdts } from '@liuli-util/vite-plugin-css-dts'
 
 export default defineConfig({
   base: './',
-  plugins: [react(), cssdts()],
+  plugins: [react({ fastRefresh: false }), cssdts()],
   server: {
     proxy: {
-      '/api/': 'https://chat.liuli.moe',
+      '/api/': 'http://localhost:8080/',
+      // '/api/': 'http://chat.ai-assist.moe/',
     },
   },
 })
