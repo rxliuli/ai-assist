@@ -4,12 +4,13 @@ import { sortBy } from 'lodash-es'
 export interface Session {
   id: string
   name: string
-  date: number
+  date: string
 }
 
 export interface ISessionService {
   list(): Promise<Session[]>
   remove(id: string): Promise<void>
+  add(session: Session): Promise<void>
   put(session: Session): Promise<void>
 }
 
@@ -18,7 +19,7 @@ export interface Message {
   sessionId: string
   role: 'user' | 'assistant'
   content: string
-  date: number
+  date: string
 }
 
 export interface IMessageService {
@@ -56,9 +57,12 @@ export class SessionService implements ISessionService {
   async put(session: Session): Promise<void> {
     await this.db.put('session', session)
   }
+  async add(session: Session): Promise<void> {
+    await this.db.add('session', session)
+  }
   async list(): Promise<Session[]> {
     const list = await this.db.getAll('session')
-    return sortBy(list, (it) => -it.date)
+    return sortBy(list, (it) => -new Date(it.date).getTime())
   }
   async remove(id: string): Promise<void> {
     await this.db.delete('session', id)
