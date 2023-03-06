@@ -49,7 +49,6 @@ export const ChatMessages = observer(function (props: {
   onChangeActiveSessionId(id: string): void
   onCreateSession(session: Session): void
   onNotifiCreateMessage(session: Message): void
-  onUpdateSessionName(session: Pick<Session, 'id' | 'name'>): void
 }) {
   const state = useLocalObservable(() => ({
     msg: '',
@@ -97,6 +96,23 @@ export const ChatMessages = observer(function (props: {
     if (resp.status !== 200) {
       return
     }
+    let titleRes: Promise<string> = Promise.resolve('新会话')
+    if (!props.activeSessionId) {
+      titleRes = fetch('/api/chat', {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify([
+          {
+            role: 'user',
+            content:
+              'Please summarize the following content into a topic, no more than 10 words, please use the original language of the following content\n' +
+              userMsg.content,
+          },
+        ] as Message[]),
+      }).then((res) => res.text())
+    }
     props.messages.push({ id: v4(), sessionId, content: '', role: 'assistant', date: new Date().toISOString() })
     const m = props.messages[props.messages.length - 1]
     const reader = resp.body!.getReader()
@@ -112,7 +128,7 @@ export const ChatMessages = observer(function (props: {
       messagesRef.current!.lastElementChild?.scrollIntoView({ behavior: 'auto' })
     })
     if (!props.activeSessionId) {
-      const session: Session = { id: sessionId, name: 'New Chat', date: new Date().toISOString() }
+      const session: Session = { id: sessionId, name: await titleRes, date: new Date().toISOString() }
       props.onCreateSession(session)
       props.onChangeActiveSessionId(sessionId)
     }
@@ -374,7 +390,6 @@ export const ChatHomeView = observer(() => {
         activeSessionId={store.activeSessionId}
         messages={store.messages}
         onCreateSession={onCreateSession}
-        onUpdateSessionName={(session) => (store.sessions.find((it) => it.id === session.id)!.name = session.name)}
         onChangeActiveSessionId={(id) => onChangeActiveSessionId(id, false)}
         onNotifiCreateMessage={onNotifiCreateMessage}
       ></ChatMessages>
