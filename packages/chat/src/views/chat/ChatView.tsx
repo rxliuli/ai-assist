@@ -5,7 +5,7 @@ import classNames from 'classnames'
 import ReactMarkdown from 'react-markdown'
 import GPT3Tokenizer from 'gpt3-tokenizer'
 import { pick } from 'lodash-es'
-import { useRef, useState } from 'react'
+import { ReactElement, useRef, useState } from 'react'
 import { useMedia, useMediaDevices, useMount } from 'react-use'
 import clipboardy from 'clipboardy'
 import { initDatabase, Message, MessageService, Session, SessionService } from './utils/db'
@@ -207,6 +207,28 @@ export const ChatMessages = observer(function (props: {
   )
 })
 
+const LinkListItem = (props: {
+  className?: string
+  onClick(ev: React.MouseEvent): void
+  left?: ReactElement<ReactSVG>
+  right?: ReactElement<ReactSVG>
+  children: string
+}) => {
+  return (
+    <a className={classNames(css.session, props.className)} onClick={props.onClick}>
+      {props.left}
+      <span className={classNames(css.ellipsis, css.name)}>{props.children}</span>
+      {props.right}
+    </a>
+  )
+}
+
+const links: {
+  value: string
+  label: string
+  link: string
+}[] = [{ value: 'github', label: 'GitHub', link: 'https://github.com/rxliuli/ai-assist' }]
+
 const ChatSidebar = observer(
   (props: {
     sessions: Session[]
@@ -227,42 +249,48 @@ const ChatSidebar = observer(
           className={classNames('container', css.sidebar)}
           onClick={(ev) => props.showSidebar && ev.stopPropagation()}
         >
-          <a
-            className={classNames(css.session, css.create)}
+          <LinkListItem
+            className={classNames(css.create)}
             onClick={() => {
               props.onChangeActiveSessionId()
               props.onCloseShowSidebar()
             }}
           >
-            <span>新会话</span>
-          </a>
+            新会话
+          </LinkListItem>
           <ul className={css.sessions}>
             {props.sessions.map((it) => (
-              <li
-                key={it.id}
-                onClick={() => {
-                  props.onChangeActiveSessionId(it.id)
-                  props.onCloseShowSidebar()
-                }}
-              >
-                <a
-                  className={classNames(css.session, {
+              <li key={it.id}>
+                <LinkListItem
+                  onClick={() => {
+                    props.onChangeActiveSessionId(it.id)
+                    props.onCloseShowSidebar()
+                  }}
+                  className={classNames({
                     [css.active]: it.id === props.activeSessionId,
                   })}
+                  right={
+                    <ReactSVG
+                      src={deleteSvg}
+                      onClick={(ev) => {
+                        ev.stopPropagation()
+                        props.onDeleteSession(it.id)
+                      }}
+                    ></ReactSVG>
+                  }
                 >
-                  <span className={css.ellipsis}>{it.name}</span>
-                  <ReactSVG
-                    src={deleteSvg}
-                    onClick={(ev) => {
-                      ev.stopPropagation()
-                      props.onDeleteSession(it.id)
-                    }}
-                  ></ReactSVG>
-                </a>
+                  {it.name}
+                </LinkListItem>
               </li>
             ))}
           </ul>
-          <footer></footer>
+          <footer>
+            {links.map((it) => (
+              <LinkListItem key={it.value} onClick={() => window.open(it.link, '_blank')}>
+                {it.label}
+              </LinkListItem>
+            ))}
+          </footer>
           <button className={css.close} onClick={props.onCloseShowSidebar}>
             <ReactSVG src={closeSvg}></ReactSVG>
           </button>

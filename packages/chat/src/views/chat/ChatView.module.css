@@ -115,10 +115,12 @@ a.session {
   border-radius: 0.375rem;
   font-size: 14px;
   text-decoration: none;
-  display: grid;
-  grid-template-columns: 1fr auto;
+  display: flex;
   align-items: center;
   gap: 4px;
+}
+a.session .name {
+  flex-grow: 1;
 }
 .session.create {
   border: solid 1px rgb(207, 204, 200, 0.1);
