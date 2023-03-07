@@ -117,7 +117,7 @@ export const ChatMessages = observer(function (props: {
         },
         body: JSON.stringify([
           {
-            role: 'user',
+            role: 'system',
             content:
               'Please summarize the following content into a topic, no more than 10 words, do not add punctuation at the end, please use the original language of the following content',
           },
