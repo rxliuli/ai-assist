@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" height="48" width="48" viewBox="0 0 20 20">
+<g stroke-linejoin="round" stroke="#111" stroke-width=".7" fill="#aab">
+<rect transform="matrix(-.9023 -.4311 -.4311 .9023 0 0)" height="3.8" width="1.5" y="-6.4" x="-15.8"/>
+<rect transform="matrix(.9023 -.4311 .4311 .9023 0 0)" height="3.8" width="1.5" y="2.1" x="2"/>
+<rect height="16" width="15.8" y="2.7" x="2.1" stroke-width="1"/>
+<g fill="#f87">
+<ellipse rx="2.7" ry="2.5" cy="7.5" cx="6.6"/>
+<ellipse rx="2.7" ry="2.5" cy="7.5" cx="13.5"/>
+<circle r="0.5" cy="7.3" cx="6.7"/>
+<circle r="0.5" cy="7.3" cx="13.7"/>
+</g>
+<rect height="4.3" width="11.4" y="12.4" x="4.4" fill="#eee"/>
+<path fill="none" d="m6.503 12.32v4.26m6.757-4.26v4.26m-4.547-4.26v4.26m2.277-4.26v4.26m-6.571-2.22h11.24"/>
+</g>
+</svg>

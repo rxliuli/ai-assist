@@ -62,7 +62,7 @@ export class SessionService implements ISessionService {
   }
   async list(): Promise<Session[]> {
     const list = await this.db.getAll('session')
-    return sortBy(list, (it) => -new Date(it.date).getTime())
+    return sortBy(list, (it) => -new Date(it.date).valueOf())
   }
   async remove(id: string): Promise<void> {
     await this.db.delete('session', id)
@@ -72,7 +72,7 @@ export class SessionService implements ISessionService {
 export class MessageService implements IMessageService {
   constructor(private readonly db: IDBPDatabase<AllDBSchema>) {}
   async list(sessionId: string): Promise<Message[]> {
-    return await this.db.getAllFromIndex('message', 'sessionId', sessionId)
+    return sortBy(await this.db.getAllFromIndex('message', 'sessionId', sessionId), (it) => new Date(it.date).valueOf())
   }
   async remove(id: string): Promise<void> {
     await this.db.delete('message', id)

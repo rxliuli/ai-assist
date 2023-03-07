@@ -36,7 +36,12 @@ const ChatMessage = observer((props: { message: Message }) => {
       <div className={classNames('container', css.message)}>
         <span>{props.message.role === 'user' ? '你' : 'AI'}:</span>
         <div className={css.messageContent}>
-          <ReactMarkdown>{props.message.content}</ReactMarkdown>
+          {props.message.role === 'user' ? (
+            <div className={css.user}>{props.message.content}</div>
+          ) : (
+            // <div className={css.user}>{props.message.content}</div>
+            <ReactMarkdown>{props.message.content}</ReactMarkdown>
+          )}
         </div>
       </div>
     </li>
@@ -91,7 +96,13 @@ export const ChatMessages = observer(function (props: {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(list),
+      body: JSON.stringify([
+        {
+          role: 'system',
+          content: "Please return the message in markdown format, don't use h1,h2 etc headings",
+        },
+        ...list,
+      ]),
     })
     if (resp.status !== 200) {
       return
@@ -124,11 +135,13 @@ export const ChatMessages = observer(function (props: {
     while (!chunk.done) {
       const s = textDecoder.decode(chunk.value)
       m.content += s
-      messagesRef.current!.lastElementChild?.scrollIntoView({ behavior: 'auto' })
+      if (s.includes('\n')) {
+        messagesRef.current!.lastElementChild?.scrollIntoView({ behavior: 'auto', block: 'end' })
+      }
       chunk = await reader.read()
     }
     new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
-      messagesRef.current!.lastElementChild?.scrollIntoView({ behavior: 'auto' })
+      messagesRef.current!.lastElementChild?.scrollIntoView({ behavior: 'auto', block: 'end' })
     })
     if (!props.activeSessionId) {
       const session: Session = { id: sessionId, name: await titleRes, date: new Date().toISOString() }
@@ -156,7 +169,7 @@ export const ChatMessages = observer(function (props: {
       window.alert('没有消息')
       return
     }
-    const r = props.messages.map((it) => it.content).join('\n---\n')
+    const r = props.messages.map((it) => it.content).join('\n\n---\n\n')
     await clipboardy.write(r)
     window.alert('复制成功')
   }
@@ -168,7 +181,7 @@ export const ChatMessages = observer(function (props: {
           <ChatMessage key={it.id} message={it}></ChatMessage>
         ))}
       </ul>
-      <footer className={'container'}>
+      <footer className={classNames('container', css.footer)}>
         <div className={css.operations}>
           <button onClick={onCopy}>复制会话</button>
         </div>

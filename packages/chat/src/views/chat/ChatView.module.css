@@ -152,6 +152,9 @@ a.session {
   gap: 8px;
   padding: 1rem 1rem;
 }
+.message div.user {
+  white-space: pre-wrap;
+}
 .messageContent > p:last-of-type {
   margin-bottom: 0;
 }
