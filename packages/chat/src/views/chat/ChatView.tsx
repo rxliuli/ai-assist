@@ -11,8 +11,12 @@ import clipboardy from 'clipboardy'
 import { initDatabase, Message, MessageService, Session, SessionService } from './utils/db'
 import { v4 } from 'uuid'
 import { router } from '../../constants/router'
-import { useParams } from 'react-router-dom'
+import { useParams } from '@liuli-util/react-router'
+import { ReactSVG } from 'react-svg'
 import deleteSvg from './assets/delete.svg'
+import addSvg from './assets/add.svg'
+import closeSvg from './assets/close.svg'
+import menuSvg from './assets/menu.svg'
 
 function sliceMessages(messages: Pick<Message, 'role' | 'content'>[], max: number) {
   const tokenizer = new GPT3Tokenizer({ type: 'gpt3' })
@@ -247,48 +251,20 @@ const ChatSidebar = observer(
                   })}
                 >
                   <span className={css.ellipsis}>{it.name}</span>
-                  <svg
-                    stroke="currentColor"
-                    fill="none"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    height="1em"
-                    width="1em"
-                    xmlns="http://www.w3.org/2000/svg"
-                    data-darkreader-inline-stroke=""
+                  <ReactSVG
+                    src={deleteSvg}
                     onClick={(ev) => {
                       ev.stopPropagation()
                       props.onDeleteSession(it.id)
                     }}
-                  >
-                    <polyline points="3 6 5 6 21 6"></polyline>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                    <line x1="10" y1="11" x2="10" y2="17"></line>
-                    <line x1="14" y1="11" x2="14" y2="17"></line>
-                  </svg>
+                  ></ReactSVG>
                 </a>
               </li>
             ))}
           </ul>
           <footer></footer>
           <button className={css.close} onClick={props.onCloseShowSidebar}>
-            <svg
-              stroke="currentColor"
-              fill="none"
-              strokeWidth="1.5"
-              viewBox="0 0 24 24"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              height="1em"
-              width="1em"
-              xmlns="http://www.w3.org/2000/svg"
-              data-darkreader-inline-stroke=""
-            >
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
+            <ReactSVG src={closeSvg}></ReactSVG>
           </button>
         </div>
       </div>
@@ -368,39 +344,11 @@ export const ChatHomeView = observer(() => {
       ></ChatSidebar>
       <header className={css.header}>
         <button onClick={() => (store.showSidebar = true)}>
-          <svg
-            stroke="currentColor"
-            fill="none"
-            strokeWidth="1.5"
-            viewBox="0 0 24 24"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            height="1em"
-            width="1em"
-            xmlns="http://www.w3.org/2000/svg"
-            data-darkreader-inline-stroke=""
-          >
-            <line x1="3" y1="12" x2="21" y2="12"></line>
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <line x1="3" y1="18" x2="21" y2="18"></line>
-          </svg>
+          <ReactSVG src={menuSvg}></ReactSVG>
         </button>
         <span className={css.ellipsis}>{store.sessionName}</span>
         <button onClick={() => onChangeActiveSessionId(undefined, true)}>
-          <svg
-            stroke="currentColor"
-            fill="none"
-            strokeWidth="1.5"
-            viewBox="0 0 24 24"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            height="1em"
-            width="1em"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-          </svg>
+          <ReactSVG src={addSvg}></ReactSVG>
         </button>
       </header>
       <ChatMessages
