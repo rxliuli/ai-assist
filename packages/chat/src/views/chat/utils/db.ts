@@ -65,6 +65,8 @@ export class SessionService implements ISessionService {
     return sortBy(list, (it) => -new Date(it.date).valueOf())
   }
   async remove(id: string): Promise<void> {
+    const list = await this.db.getAllKeysFromIndex('message', 'sessionId', id)
+    await Promise.all(list.map((it) => this.db.delete('message', it)))
     await this.db.delete('session', id)
   }
 }
