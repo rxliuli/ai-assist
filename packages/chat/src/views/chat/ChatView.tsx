@@ -99,7 +99,8 @@ export const ChatMessages = observer(function (props: {
       body: JSON.stringify([
         {
           role: 'system',
-          content: "Please return the message in markdown format, don't use h1,h2 etc headings",
+          content:
+            "Please return the message in markdown format, don't use h1,h2 etc headings, please do not wrap pictures and links in code blocks",
         },
         ...list,
       ]),
