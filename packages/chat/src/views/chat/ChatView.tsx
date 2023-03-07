@@ -107,8 +107,11 @@ export const ChatMessages = observer(function (props: {
           {
             role: 'user',
             content:
-              'Please summarize the following content into a topic, no more than 10 words, please use the original language of the following content\n' +
-              userMsg.content,
+              'Please summarize the following content into a topic, no more than 10 words, do not add punctuation at the end, please use the original language of the following content',
+          },
+          {
+            role: 'user',
+            content: userMsg.content,
           },
         ] as Message[]),
       }).then((res) => res.text())
@@ -368,7 +371,7 @@ export const ChatHomeView = observer(() => {
             <line x1="3" y1="18" x2="21" y2="18"></line>
           </svg>
         </button>
-        <span>{store.sessionName}</span>
+        <span className={css.ellipsis}>{store.sessionName}</span>
         <button onClick={() => onChangeActiveSessionId(undefined, true)}>
           <svg
             stroke="currentColor"
