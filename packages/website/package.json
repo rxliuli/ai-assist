@@ -1,0 +1,19 @@
+{
+  "name": "@ai-assist/website",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "docs:dev": "vitepress dev",
+    "docs:build": "vitepress build",
+    "docs:preview": "vitepress preview",
+    "docs:deploy": "gh-pages -d .vitepress/dist --dotfiles"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "gh-pages": "^5.0.0",
+    "vitepress": "1.0.0-alpha.50"
+  }
+}
