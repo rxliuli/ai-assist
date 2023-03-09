@@ -10,9 +10,6 @@ export default defineConfig({
     cssdts(),
     VitePWA({
       registerType: 'autoUpdate',
-      devOptions: {
-        enabled: true,
-      },
       manifest: {
         id: 'ai-assist.chat',
         short_name: ' Chat',

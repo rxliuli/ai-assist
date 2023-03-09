@@ -4,6 +4,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
 .chatHome {
   height: 100%;
   display: grid;
@@ -107,7 +108,7 @@
   margin-bottom: 0;
   margin: 8px 0;
 }
-a.session {
+.session {
   cursor: pointer;
   color: rgb(207, 204, 200);
   padding: 8px;
@@ -117,14 +118,29 @@ a.session {
   text-decoration: none;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  height: 36px;
 }
-a.session .name {
+.session .name {
   flex-grow: 1;
+}
+.session .input {
+  flex-grow: 1;
+  padding: 0 4px;
+  height: 24px;
+  margin-bottom: 0;
+  font-size: 14px;
 }
 .session.create {
   border: solid 1px rgb(207, 204, 200, 0.1);
+  background-color: var(--primary);
+  color: #fff;
+  transition: background-color 0.2s ease-in-out;
 }
+.session.create:hover {
+  background-color: var(--primary-hover);
+}
+
 .session.active,
 .session:hover {
   background-color: #2e3234;
@@ -157,6 +173,10 @@ a.session .name {
 .message div.user {
   white-space: pre-wrap;
 }
+.messageContent {
+  width: 100%;
+  overflow: auto;
+}
 .messageContent > p:last-of-type {
   margin-bottom: 0;
 }
@@ -172,7 +192,7 @@ a.session .name {
 }
 
 .footer {
-  padding: 0 1rem;
+  padding: 0.5rem 1rem 0;
 }
 
 .operations {
@@ -187,6 +207,9 @@ a.session .name {
   margin-bottom: 0;
   font-size: calc(1rem, 0.8);
   padding: 2px 4px;
+  font-size: 14px;
+  background-color: #191f27;
+  border: none;
 }
 
 .newMessage {
@@ -202,3 +225,7 @@ a.session .name {
   resize: none;
 }
 /* #endregion */
+
+.hide {
+  display: none;
+}

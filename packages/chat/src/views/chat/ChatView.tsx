@@ -2,11 +2,10 @@ import { observer, useLocalObservable, useLocalStore, useObserver } from 'mobx-r
 import { toJS } from 'mobx'
 import css from './ChatView.module.css'
 import classNames from 'classnames'
-import ReactMarkdown from 'react-markdown'
 import GPT3Tokenizer from 'gpt3-tokenizer'
 import { pick } from 'lodash-es'
-import { ReactElement, useRef, useState } from 'react'
-import { useMedia, useMediaDevices, useMount } from 'react-use'
+import { ReactElement, useEffect, useRef, useState } from 'react'
+import { useMedia, useMount } from 'react-use'
 import clipboardy from 'clipboardy'
 import { initDatabase, Message, MessageService, Session, SessionService } from './utils/db'
 import { v4 } from 'uuid'
@@ -17,6 +16,8 @@ import deleteSvg from './assets/delete.svg'
 import addSvg from './assets/add.svg'
 import closeSvg from './assets/close.svg'
 import menuSvg from './assets/menu.svg'
+import editSvg from './assets/edit.svg'
+import { MarkdownContent } from './components/MarkdownContent'
 
 function sliceMessages(messages: Pick<Message, 'role' | 'content'>[], max: number) {
   const tokenizer = new GPT3Tokenizer({ type: 'gpt3' })
@@ -44,7 +45,7 @@ const ChatMessage = observer((props: { message: Message }) => {
             <div className={css.user}>{props.message.content}</div>
           ) : (
             // <div className={css.user}>{props.message.content}</div>
-            <ReactMarkdown>{props.message.content}</ReactMarkdown>
+            <MarkdownContent>{props.message.content}</MarkdownContent>
           )}
         </div>
       </div>
@@ -68,9 +69,9 @@ export const ChatMessages = observer(function (props: {
   }))
 
   const messagesRef = useRef<HTMLUListElement>(null)
-  useMount(async () => {
-    messagesRef.current?.lastElementChild?.scrollIntoView({ behavior: 'auto' })
-  })
+  useEffect(() => {
+    messagesRef.current?.lastElementChild?.scrollIntoView({ behavior: 'auto', block: 'end' })
+  }, [props.messages])
 
   async function onSend() {
     if (state.msg.trim().length === 0) {
@@ -140,9 +141,7 @@ export const ChatMessages = observer(function (props: {
     while (!chunk.done) {
       const s = textDecoder.decode(chunk.value)
       m.content += s
-      if (s.includes('\n')) {
-        messagesRef.current!.lastElementChild?.scrollIntoView({ behavior: 'auto', block: 'end' })
-      }
+      messagesRef.current!.lastElementChild?.scrollIntoView({ behavior: 'auto', block: 'end' })
       chunk = await reader.read()
     }
     new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
@@ -229,6 +228,80 @@ const links: {
   link: string
 }[] = [{ value: 'github', label: 'GitHub', link: 'https://github.com/rxliuli/ai-assist' }]
 
+const SessionItem = observer(
+  (props: {
+    active: boolean
+    className?: string
+    value: string
+    onClick(ev: React.MouseEvent): void
+    onChange(value: string): void
+    onDeleteSession(): void
+  }) => {
+    const store = useLocalStore(() => ({ value: props.value, edit: false, inputFlag: true }))
+    const inputRef = useRef<HTMLInputElement>(null)
+    async function onEdit() {
+      store.edit = true
+      await new Promise((resolve) => setTimeout(resolve, 0))
+      inputRef.current!.focus()
+    }
+    function onCancel() {
+      store.edit = false
+      store.value = props.value
+    }
+    const showEdit = useObserver(() => props.active && store.edit)
+
+    function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+      if (event.key === 'Enter' && !event.shiftKey && store.inputFlag) {
+        props.onChange(store.value)
+        onCancel()
+      }
+    }
+    return (
+      <>
+        <div
+          className={classNames(css.session, {
+            [css.active]: props.active,
+            [css.hide]: !showEdit,
+          })}
+        >
+          <input
+            ref={inputRef}
+            value={store.value}
+            onInput={(ev) => (store.value = ev.currentTarget.value)}
+            className={css.input}
+            // onBlur={onCancel}
+            onKeyDown={onKeyDown}
+            onCompositionStart={() => (store.inputFlag = false)}
+            onCompositionEnd={() => (store.inputFlag = true)}
+          ></input>
+          <ReactSVG src={closeSvg} onClick={onCancel}></ReactSVG>
+        </div>
+        <LinkListItem
+          onClick={props.onClick}
+          className={classNames({
+            [css.active]: props.active,
+            [css.hide]: showEdit,
+          })}
+          right={
+            <>
+              {props.active && <ReactSVG src={editSvg} onClick={onEdit}></ReactSVG>}
+              <ReactSVG
+                src={deleteSvg}
+                onClick={(ev) => {
+                  ev.stopPropagation()
+                  props.onDeleteSession()
+                }}
+              ></ReactSVG>
+            </>
+          }
+        >
+          {props.value}
+        </LinkListItem>
+      </>
+    )
+  },
+)
+
 const ChatSidebar = observer(
   (props: {
     sessions: Session[]
@@ -237,6 +310,7 @@ const ChatSidebar = observer(
     onDeleteSession(id: string): void
     showSidebar: boolean
     onCloseShowSidebar(): void
+    onEditSession(id: string, name: string): void
   }) => {
     return (
       <div
@@ -261,26 +335,16 @@ const ChatSidebar = observer(
           <ul className={css.sessions}>
             {props.sessions.map((it) => (
               <li key={it.id}>
-                <LinkListItem
+                <SessionItem
+                  value={it.name}
+                  onChange={(name) => props.onEditSession(it.id, name)}
                   onClick={() => {
                     props.onChangeActiveSessionId(it.id)
                     props.onCloseShowSidebar()
                   }}
-                  className={classNames({
-                    [css.active]: it.id === props.activeSessionId,
-                  })}
-                  right={
-                    <ReactSVG
-                      src={deleteSvg}
-                      onClick={(ev) => {
-                        ev.stopPropagation()
-                        props.onDeleteSession(it.id)
-                      }}
-                    ></ReactSVG>
-                  }
-                >
-                  {it.name}
-                </LinkListItem>
+                  active={it.id === props.activeSessionId}
+                  onDeleteSession={() => props.onDeleteSession(it.id)}
+                ></SessionItem>
               </li>
             ))}
           </ul>
@@ -360,6 +424,14 @@ export const ChatHomeView = observer(() => {
       store.messages = []
     }
   }
+  async function onEditSession(id: string, name: string) {
+    const session = store.sessions.find((it) => it.id === id)
+    if (!session) {
+      throw new Error('找不到 session ' + id)
+    }
+    session.name = name
+    await sessionService!.put(toJS(session))
+  }
   return (
     <div className={css.chatHome}>
       <ChatSidebar
@@ -369,6 +441,7 @@ export const ChatHomeView = observer(() => {
         onDeleteSession={onDeleteSession}
         showSidebar={store.showSidebar}
         onCloseShowSidebar={() => (store.showSidebar = false)}
+        onEditSession={onEditSession}
       ></ChatSidebar>
       <header className={css.header}>
         <button onClick={() => (store.showSidebar = true)}>

@@ -1,0 +1,27 @@
+.MarkdownContent > pre,
+.MarkdownContent > pre * {
+  background-color: #191f27 !important;
+}
+
+.MarkdownContent > pre {
+  position: relative;
+}
+
+.MarkdownContent .copy {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0.5rem;
+  cursor: pointer;
+  text-decoration: none;
+  border-bottom: none;
+}
+
+.inlineCode {
+  position: relative;
+}
+
+.copy svg {
+  width: 1em;
+  height: 1em;
+}
