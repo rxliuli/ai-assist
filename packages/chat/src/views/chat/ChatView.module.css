@@ -221,7 +221,7 @@
 
 .newMessage .input {
   max-height: 200px;
-  overflow-y: hidden;
+  overflow-y: auto;
   resize: none;
 }
 /* #endregion */
