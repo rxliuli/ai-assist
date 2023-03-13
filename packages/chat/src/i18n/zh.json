@@ -1,0 +1,8 @@
+{
+  "session.new": "新会话",
+  "session.copy": "复制会话",
+  "session.copy.success": "复制成功",
+  "session.copy.empty": "没有消息",
+  "message.send": "发送",
+  "message.you": "你"
+}

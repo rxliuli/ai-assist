@@ -18,6 +18,7 @@ import closeSvg from './assets/close.svg'
 import menuSvg from './assets/menu.svg'
 import editSvg from './assets/edit.svg'
 import { MarkdownContent } from './components/MarkdownContent'
+import { t } from '../../constants/i18n'
 
 function sliceMessages(messages: Pick<Message, 'role' | 'content'>[], max: number) {
   const tokenizer = new GPT3Tokenizer({ type: 'gpt3' })
@@ -39,7 +40,7 @@ const ChatMessage = observer((props: { message: Message }) => {
   return (
     <li className={css.messageBox}>
       <div className={classNames('container', css.message)}>
-        <span>{props.message.role === 'user' ? '你' : 'AI'}:</span>
+        <span>{props.message.role === 'user' ? t('message.you') : 'AI'}:</span>
         <div className={css.messageContent}>
           {props.message.role === 'user' ? (
             <div className={css.user}>{props.message.content}</div>
@@ -113,7 +114,7 @@ export const ChatMessages = observer(function (props: {
     if (resp.status !== 200) {
       return
     }
-    let titleRes: Promise<string> = Promise.resolve('新会话')
+    let titleRes: Promise<string> = Promise.resolve(t('session.new'))
     if (!props.activeSessionId) {
       titleRes = fetch('/api/chat', {
         method: 'post',
@@ -170,12 +171,12 @@ export const ChatMessages = observer(function (props: {
 
   async function onCopy() {
     if (props.messages.length === 0) {
-      window.alert('没有消息')
+      window.alert(t('session.copy.empty'))
       return
     }
     const r = props.messages.map((it) => it.content).join('\n\n---\n\n')
     await clipboardy.write(r)
-    window.alert('复制成功')
+    window.alert(t('session.copy.success'))
   }
 
   return (
@@ -187,7 +188,7 @@ export const ChatMessages = observer(function (props: {
       </ul>
       <footer className={classNames('container', css.footer)}>
         <div className={css.operations}>
-          <button onClick={onCopy}>复制会话</button>
+          <button onClick={onCopy}>{t('session.copy')}</button>
         </div>
         <div className={css.newMessage}>
           <textarea
@@ -199,7 +200,7 @@ export const ChatMessages = observer(function (props: {
             onCompositionEnd={() => (state.inputFlag = true)}
             onKeyDown={onKeyDown}
           ></textarea>
-          <button onClick={onSend}>发送</button>
+          <button onClick={onSend}>{t('message.send')}</button>
         </div>
       </footer>
     </div>
@@ -330,7 +331,7 @@ const ChatSidebar = observer(
               props.onCloseShowSidebar()
             }}
           >
-            新会话
+            {t('session.new')}
           </LinkListItem>
           <ul className={css.sessions}>
             {props.sessions.map((it) => (

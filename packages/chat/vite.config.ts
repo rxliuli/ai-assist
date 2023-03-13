@@ -2,12 +2,16 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { cssdts } from '@liuli-util/vite-plugin-css-dts'
 import { VitePWA } from 'vite-plugin-pwa'
+import { i18nextDtsGen } from '@liuli-util/rollup-plugin-i18next-dts-gen'
 
 export default defineConfig({
   base: './',
   plugins: [
     react({ fastRefresh: false }),
     cssdts(),
+    i18nextDtsGen({
+      dirs: ['src/i18n'],
+    }),
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {

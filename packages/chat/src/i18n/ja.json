@@ -1,0 +1,8 @@
+{
+  "session.new": "新しいチャット",
+  "session.copy": "チャットのコピー",
+  "session.copy.success": "コピーに成功しました",
+  "session.copy.empty": "メッセージはありません",
+  "message.send": "送信",
+  "message.you": "あなた"
+}
