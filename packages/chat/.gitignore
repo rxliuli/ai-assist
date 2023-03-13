@@ -11,7 +11,7 @@ node_modules
 dist
 dev-dist
 dist-ssr
-i18n/index.d.ts
+**/i18n/index.d.ts
 *.local
 
 # Editor directories and files

@@ -31,6 +31,7 @@
     "react-use": "^17.4.0",
     "rehype-katex": "^6.0.2",
     "remark-math": "^5.1.1",
+    "utility-types": "^3.10.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
@@ -39,6 +40,7 @@
     "@liuli-util/vite-plugin-css-dts": "^0.2.0",
     "@types/dom-speech-recognition": "^0.0.1",
     "@types/lodash-es": "^4.17.6",
+    "@types/node": "^18.14.6",
     "@types/react": "^18.0.26",
     "@types/react-copy-to-clipboard": "^5.0.4",
     "@types/react-dom": "^18.0.9",

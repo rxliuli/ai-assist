@@ -199,6 +199,7 @@ export const ChatMessages = observer(function (props: {
             onCompositionStart={() => (state.inputFlag = false)}
             onCompositionEnd={() => (state.inputFlag = true)}
             onKeyDown={onKeyDown}
+            autoFocus={true}
           ></textarea>
           <button onClick={onSend}>{t('message.send')}</button>
         </div>

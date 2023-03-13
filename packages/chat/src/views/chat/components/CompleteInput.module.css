@@ -1,0 +1,11 @@
+.hide {
+  display: none;
+}
+
+.prompt {
+}
+
+.prompt.active,
+.prompt:hover {
+  background-color: #2e3234;
+}

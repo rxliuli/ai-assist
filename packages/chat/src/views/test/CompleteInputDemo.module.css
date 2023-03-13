@@ -1,0 +1,9 @@
+.root {
+  height: 100%;
+  display: grid;
+  grid-template-rows: 1fr auto;
+}
+
+.root textarea {
+  resize: none;
+}
