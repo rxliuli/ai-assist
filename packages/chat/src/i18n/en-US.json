@@ -4,5 +4,6 @@
   "session.copy.success": "Copied successfully",
   "session.copy.empty": "No message to copy",
   "message.send": "Send",
+  "message.error.network": "Network error",
   "message.you": "You"
 }

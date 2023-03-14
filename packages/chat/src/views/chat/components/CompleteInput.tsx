@@ -28,6 +28,7 @@ interface CompleteInputProps {
   onChange: (value: string) => void
   onEnter: (value: string) => void
   prompts: Prompt[]
+  loading?: boolean
 }
 
 interface LabelValue {
@@ -154,9 +155,11 @@ export const CompleteInput = observer(
         }
       }
       if (ev.key === 'Enter' && !ev.shiftKey && store.inputFlag && !query) {
-        props.onEnter(store.value)
-        store.value = ''
-        props.onChange(store.value)
+        if (!props.loading) {
+          props.onEnter(store.value)
+          store.value = ''
+          props.onChange(store.value)
+        }
         ev.preventDefault()
         return
       }
@@ -197,7 +200,7 @@ export const CompleteInput = observer(
         <textarea
           className={css.textarea}
           ref={textareaRef}
-          {...omit(props, 'value', 'onChange', 'prompts', 'onEnter', 'onInput', 'className')}
+          {...omit(props, 'value', 'onChange', 'prompts', 'onEnter', 'onInput', 'className', 'loading')}
           value={store.value}
           onInput={onInput}
           onKeyDown={onKeyDown}

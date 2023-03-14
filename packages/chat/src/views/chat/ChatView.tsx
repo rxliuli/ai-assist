@@ -65,7 +65,8 @@ export const ChatMessages = observer(function (props: {
   onNotifiCreateMessage(session: Message): void
 }) {
   const store = useLocalObservable(() => ({
-    msg: '',
+    value: '',
+    loading: false,
   }))
 
   const messagesRef = useRef<HTMLUListElement>(null)
@@ -74,46 +75,33 @@ export const ChatMessages = observer(function (props: {
   }, [props.messages])
 
   async function onSend(msg: string) {
-    if (msg.trim().length === 0) {
+    if (store.loading) {
       return
     }
-    const sessionId = props.activeSessionId ?? v4()
+    store.loading = true
 
-    const userMsg: Message = {
-      id: v4(),
-      sessionId: sessionId,
-      content: msg,
-      role: 'user',
-      date: new Date().toISOString(),
-    }
-    props.messages.push(userMsg)
-    await new Promise((resolve) => setTimeout(resolve, 0))
-    messagesRef.current!.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'end' })
-    const list = sliceMessages(
-      props.messages.map((it) => pick(it, 'role', 'content')),
-      3000,
-    )
-    console.log('sendMessages ', list)
-    const resp = await fetch('/api/chat-stream', {
-      method: 'post',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify([
-        {
-          role: 'system',
-          content:
-            "Please return the message in markdown format, don't use h1,h2 etc headings, please do not wrap pictures and links in code blocks",
-        },
-        ...list,
-      ]),
-    })
-    if (resp.status !== 200) {
-      return
-    }
-    let titleRes: Promise<string> = Promise.resolve(t('session.new'))
-    if (!props.activeSessionId) {
-      titleRes = fetch('/api/chat', {
+    try {
+      if (msg.trim().length === 0) {
+        return
+      }
+      const sessionId = props.activeSessionId ?? v4()
+
+      const userMsg: Message = {
+        id: v4(),
+        sessionId: sessionId,
+        content: msg,
+        role: 'user',
+        date: new Date().toISOString(),
+      }
+      props.messages.push(userMsg)
+      await new Promise((resolve) => setTimeout(resolve, 0))
+      messagesRef.current!.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+      const list = sliceMessages(
+        props.messages.map((it) => pick(it, 'role', 'content')),
+        3000,
+      )
+      console.log('sendMessages ', list)
+      const resp = await fetch('/api/chat-stream', {
         method: 'post',
         headers: {
           'Content-Type': 'application/json',
@@ -122,36 +110,59 @@ export const ChatMessages = observer(function (props: {
           {
             role: 'system',
             content:
-              'Please summarize the following content into a topic, no more than 10 words, do not add punctuation at the end, please use the original language of the following content',
+              "Please return the message in markdown format, don't use h1,h2 etc headings, please do not wrap pictures and links in code blocks",
           },
-          {
-            role: 'user',
-            content: userMsg.content,
+          ...list,
+        ]),
+      })
+      if (resp.status !== 200) {
+        alert(t('message.error.network'))
+        return
+      }
+      let titleRes: Promise<string> = Promise.resolve(t('session.new'))
+      if (!props.activeSessionId) {
+        titleRes = fetch('/api/chat', {
+          method: 'post',
+          headers: {
+            'Content-Type': 'application/json',
           },
-        ] as Message[]),
-      }).then((res) => res.text())
+          body: JSON.stringify([
+            {
+              role: 'system',
+              content:
+                'Please summarize the following content into a topic, no more than 10 words, do not add punctuation at the end, please use the original language of the following content',
+            },
+            {
+              role: 'user',
+              content: userMsg.content,
+            },
+          ] as Message[]),
+        }).then((res) => res.text())
+      }
+      props.messages.push({ id: v4(), sessionId, content: '', role: 'assistant', date: new Date().toISOString() })
+      const m = props.messages[props.messages.length - 1]
+      const reader = resp.body!.getReader()
+      let chunk = await reader.read()
+      const textDecoder = new TextDecoder()
+      while (!chunk.done) {
+        const s = textDecoder.decode(chunk.value)
+        m.content += s
+        messagesRef.current!.lastElementChild?.scrollIntoView({ behavior: 'auto', block: 'end' })
+        chunk = await reader.read()
+      }
+      new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
+        messagesRef.current!.lastElementChild?.scrollIntoView({ behavior: 'auto', block: 'end' })
+      })
+      if (!props.activeSessionId) {
+        const session: Session = { id: sessionId, name: await titleRes, date: new Date().toISOString() }
+        props.onCreateSession(session)
+        props.onChangeActiveSessionId(sessionId)
+      }
+      props.onNotifiCreateMessage(userMsg)
+      props.onNotifiCreateMessage(m)
+    } finally {
+      store.loading = false
     }
-    props.messages.push({ id: v4(), sessionId, content: '', role: 'assistant', date: new Date().toISOString() })
-    const m = props.messages[props.messages.length - 1]
-    const reader = resp.body!.getReader()
-    let chunk = await reader.read()
-    const textDecoder = new TextDecoder()
-    while (!chunk.done) {
-      const s = textDecoder.decode(chunk.value)
-      m.content += s
-      messagesRef.current!.lastElementChild?.scrollIntoView({ behavior: 'auto', block: 'end' })
-      chunk = await reader.read()
-    }
-    new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
-      messagesRef.current!.lastElementChild?.scrollIntoView({ behavior: 'auto', block: 'end' })
-    })
-    if (!props.activeSessionId) {
-      const session: Session = { id: sessionId, name: await titleRes, date: new Date().toISOString() }
-      props.onCreateSession(session)
-      props.onChangeActiveSessionId(sessionId)
-    }
-    props.onNotifiCreateMessage(userMsg)
-    props.onNotifiCreateMessage(m)
   }
 
   async function onCopy() {
@@ -177,14 +188,17 @@ export const ChatMessages = observer(function (props: {
         </div>
         <div className={css.newMessage}>
           <CompleteInput
-            value={store.msg}
-            onChange={(value) => (store.msg = value)}
+            value={store.value}
+            onChange={(value) => (store.value = value)}
             onEnter={onSend}
             prompts={prompts}
             className={css.input}
             autoFocus={true}
+            loading={store.loading}
           ></CompleteInput>
-          <button onClick={() => onSend(store.msg)}>{t('message.send')}</button>
+          <button onClick={() => onSend(store.value)} aria-busy={store.loading}>
+            {t('message.send')}
+          </button>
         </div>
       </footer>
     </div>
