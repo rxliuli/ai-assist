@@ -199,15 +199,18 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  overflow-x: hidden;
 }
 
 .operations {
   display: flex;
   overflow-x: auto;
   gap: 8px;
+  flex-wrap: nowrap;
 }
 
 .operations button {
+  white-space: nowrap;
   width: fit-content;
   margin-bottom: 0;
   font-size: calc(1rem, 0.8);
