@@ -3,6 +3,10 @@
   "session.copy": "复制会话",
   "session.copy.success": "复制成功",
   "session.copy.empty": "没有消息",
+  "session.export": "导出会话",
+  "session.export.empty": "没有消息",
+  "session.import": "导入会话",
+  "session.import.error": "导入失败",
   "message.send": "发送",
   "message.error.network": "网络错误",
   "message.you": "你"

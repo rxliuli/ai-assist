@@ -22,6 +22,8 @@ import { langs, t } from '../../constants/i18n'
 import { CompleteInput } from './components/CompleteInput'
 import prompts from '../chat/constants/prompts.json'
 import { LanguageSelect } from './components/LanguageSelect'
+import saveAs from 'file-saver'
+import filenamify from 'filenamify'
 
 function sliceMessages(messages: Pick<Message, 'role' | 'content'>[], max: number) {
   const tokenizer = new GPT3Tokenizer({ type: 'gpt3' })
@@ -60,9 +62,12 @@ const ChatMessage = observer((props: { message: Message }) => {
 export const ChatMessages = observer(function (props: {
   messages: Message[]
   activeSessionId?: string
+  sessionName: string
   onChangeActiveSessionId(id: string): void
   onCreateSession(session: Session): void
   onNotifiCreateMessage(session: Message): void
+  onExport(): void
+  onImport(): void
 }) {
   const store = useLocalObservable(() => ({
     value: '',
@@ -158,7 +163,6 @@ export const ChatMessages = observer(function (props: {
         props.onCreateSession(session)
         props.onChangeActiveSessionId(sessionId)
       }
-      props.onNotifiCreateMessage(userMsg)
       props.onNotifiCreateMessage(m)
     } finally {
       store.loading = false
@@ -185,6 +189,8 @@ export const ChatMessages = observer(function (props: {
       <footer className={classNames('container', css.footer)}>
         <div className={css.operations}>
           <button onClick={onCopy}>{t('session.copy')}</button>
+          <button onClick={props.onExport}>{t('session.export')}</button>
+          <button onClick={props.onImport}>{t('session.import')}</button>
         </div>
         <div className={css.newMessage}>
           <CompleteInput
@@ -424,6 +430,56 @@ export const ChatHomeView = observer(() => {
     session.name = name
     await sessionService!.put(toJS(session))
   }
+
+  function onExport() {
+    if (store.messages.length === 0) {
+      window.alert(t('session.export.empty'))
+      return
+    }
+    const r = {
+      session: {
+        id: store.activeSessionId,
+        name: store.sessionName,
+      } as Session,
+      messages: store.messages,
+    }
+    saveAs(
+      new Blob([JSON.stringify(r, null, 2)], { type: 'application/json' }),
+      filenamify(store.sessionName) + '.json',
+    )
+  }
+
+  function onImport() {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = '.json'
+    input.onchange = async () => {
+      const file = input.files?.[0]
+      if (!file) {
+        return
+      }
+      const r = await file.text()
+      try {
+        const data = JSON.parse(r) as { session: Session; messages: Message[] }
+        if (!data.session || !data.messages) {
+          alert(t('session.import.error'))
+          return
+        }
+        const sessionId = v4()
+        const session: Session = { id: sessionId, name: data.session.name, date: new Date().toISOString() }
+        await sessionService!.add(session)
+        store.sessions.unshift(session)
+        const messages = data.messages.map((it) => ({ ...it, id: v4(), sessionId } as Message))
+        await messageService!.batchAdd(messages)
+        await onChangeActiveSessionId(sessionId, true)
+      } catch (e) {
+        alert(t('session.import.error'))
+        throw e
+      }
+    }
+    input.click()
+  }
+
   return (
     <div className={css.chatHome}>
       <ChatSidebar
@@ -446,10 +502,13 @@ export const ChatHomeView = observer(() => {
       </header>
       <ChatMessages
         activeSessionId={store.activeSessionId}
+        sessionName={store.sessionName}
         messages={store.messages}
         onCreateSession={onCreateSession}
         onChangeActiveSessionId={(id) => onChangeActiveSessionId(id, false)}
         onNotifiCreateMessage={onNotifiCreateMessage}
+        onExport={onExport}
+        onImport={onImport}
       ></ChatMessages>
     </div>
   )

@@ -205,14 +205,13 @@
   display: flex;
   overflow-x: auto;
   gap: 8px;
-  margin-bottom: 8px;
 }
 
 .operations button {
   width: fit-content;
   margin-bottom: 0;
   font-size: calc(1rem, 0.8);
-  padding: 2px 4px;
+  padding: 4px 8px;
   font-size: 14px;
   background-color: #191f27;
   border: none;

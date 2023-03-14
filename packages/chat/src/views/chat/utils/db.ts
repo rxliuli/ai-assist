@@ -82,6 +82,13 @@ export class MessageService implements IMessageService {
   async add(msg: Message): Promise<void> {
     await this.db.add('message', msg)
   }
+  async batchAdd(msgs: Message[]): Promise<void> {
+    const tx = this.db.transaction('message', 'readwrite')
+    for (const msg of msgs) {
+      await tx.objectStore('message').add(msg)
+    }
+    await tx.done
+  }
   async put(msg: Message): Promise<void> {
     await this.db.put('message', msg)
   }

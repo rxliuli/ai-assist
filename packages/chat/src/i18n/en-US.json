@@ -3,6 +3,10 @@
   "session.copy": "Copy Session",
   "session.copy.success": "Copied successfully",
   "session.copy.empty": "No message to copy",
+  "session.export": "Export session",
+  "session.export.empty": "No message",
+  "session.import": "Import session",
+  "session.import.error": "Import failed",
   "message.send": "Send",
   "message.error.network": "Network error",
   "message.you": "You"

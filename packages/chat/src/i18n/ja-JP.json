@@ -3,6 +3,10 @@
   "session.copy": "チャットのコピー",
   "session.copy.success": "コピーに成功しました",
   "session.copy.empty": "メッセージはありません",
+  "session.export": "チャットのエクスポート",
+  "session.export.empty": "メッセージなし",
+  "session.import": "チャットをインポート",
+  "session.import.error": "インポートに失敗しました",
   "message.send": "送信",
   "message.error.network": "ネットワークエラー",
   "message.you": "あなた"
