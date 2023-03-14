@@ -17,6 +17,7 @@ import addSvg from './assets/add.svg'
 import closeSvg from './assets/close.svg'
 import menuSvg from './assets/menu.svg'
 import editSvg from './assets/edit.svg'
+import sendSvg from './assets/send.svg'
 import { MarkdownContent } from './components/MarkdownContent'
 import { t } from '../../constants/i18n'
 import { CompleteInput } from './components/CompleteInput'
@@ -63,7 +64,7 @@ export const ChatMessages = observer(function (props: {
   onCreateSession(session: Session): void
   onNotifiCreateMessage(session: Message): void
 }) {
-  const state = useLocalObservable(() => ({
+  const store = useLocalObservable(() => ({
     msg: '',
   }))
 
@@ -72,11 +73,10 @@ export const ChatMessages = observer(function (props: {
     messagesRef.current?.lastElementChild?.scrollIntoView({ behavior: 'auto', block: 'end' })
   }, [props.messages])
 
-  async function onSend() {
-    if (state.msg.trim().length === 0) {
+  async function onSend(msg: string) {
+    if (msg.trim().length === 0) {
       return
     }
-    const msg = state.msg
     const sessionId = props.activeSessionId ?? v4()
 
     const userMsg: Message = {
@@ -87,7 +87,6 @@ export const ChatMessages = observer(function (props: {
       date: new Date().toISOString(),
     }
     props.messages.push(userMsg)
-    state.msg = ''
     await new Promise((resolve) => setTimeout(resolve, 0))
     messagesRef.current!.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'end' })
     const list = sliceMessages(
@@ -178,24 +177,14 @@ export const ChatMessages = observer(function (props: {
         </div>
         <div className={css.newMessage}>
           <CompleteInput
-            value={state.msg}
-            onChange={(value) => (state.msg = value)}
+            value={store.msg}
+            onChange={(value) => (store.msg = value)}
             onEnter={onSend}
             prompts={prompts}
             className={css.input}
             autoFocus={true}
           ></CompleteInput>
-          {/* <textarea
-            className={css.input}
-            rows={state.lineCount}
-            value={state.msg}
-            onInput={onInput}
-            onCompositionStart={() => (state.inputFlag = false)}
-            onCompositionEnd={() => (state.inputFlag = true)}
-            onKeyDown={onKeyDown}
-            autoFocus={true}
-          ></textarea> */}
-          <button onClick={onSend}>{t('message.send')}</button>
+          <button onClick={() => onSend(store.msg)}>{t('message.send')}</button>
         </div>
       </footer>
     </div>

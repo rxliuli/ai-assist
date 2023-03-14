@@ -23,7 +23,7 @@ export interface Prompt {
 interface CompleteInputProps {
   value: string
   onChange: (value: string) => void
-  onEnter: () => void
+  onEnter: (value: string) => void
   prompts: Prompt[]
 }
 
@@ -158,14 +158,16 @@ export const CompleteInput = observer(
         }
       }
       if (ev.key === 'Enter' && !ev.shiftKey && store.inputFlag && !query) {
-        props.onEnter()
+        props.onEnter(store.value)
+        store.value = ''
+        props.onChange(store.value)
         ev.preventDefault()
         return
       }
       props.onKeyDown?.(ev)
     }
     return (
-      <div>
+      <div className={props.className}>
         <ul
           className={classNames(css.prompts, {
             [css.hide]: !store.promptMode,
@@ -187,11 +189,14 @@ export const CompleteInput = observer(
           ))}
         </ul>
         <textarea
+          className={css.textarea}
           ref={textareaRef}
-          {...omit(props, 'value', 'onChange', 'prompts', 'onEnter', 'onInput')}
+          {...omit(props, 'value', 'onChange', 'prompts', 'onEnter', 'onInput', 'className')}
           value={store.value}
           onInput={onInput}
           onKeyDown={onKeyDown}
+          onCompositionStart={() => (store.inputFlag = false)}
+          onCompositionEnd={() => (store.inputFlag = true)}
         ></textarea>
       </div>
     )

@@ -15,7 +15,7 @@ export const CompleteInputDemo = observer(() => {
         value={store.value}
         onChange={(v) => (store.value = v)}
         prompts={prompts}
-        onEnter={() => console.log('enter')}
+        onEnter={(value) => console.log('enter', value)}
       ></CompleteInput>
     </div>
   )

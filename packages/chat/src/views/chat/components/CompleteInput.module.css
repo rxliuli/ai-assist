@@ -9,6 +9,7 @@
   bottom: 100%;
   margin-bottom: 0;
   width: 100%;
+  box-shadow: 0 0 5px #1d1f20;
 }
 
 .prompt {
@@ -20,4 +21,11 @@
 .prompt.active,
 .prompt:hover {
   background-color: #2e3234;
+}
+
+.textarea {
+  max-height: 200px;
+  overflow-y: auto;
+  resize: none;
+  margin-bottom: 0;
 }
