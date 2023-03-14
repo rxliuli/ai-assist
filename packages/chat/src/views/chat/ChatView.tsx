@@ -19,6 +19,8 @@ import menuSvg from './assets/menu.svg'
 import editSvg from './assets/edit.svg'
 import { MarkdownContent } from './components/MarkdownContent'
 import { t } from '../../constants/i18n'
+import { CompleteInput } from './components/CompleteInput'
+import prompts from '../chat/constants/prompts.json'
 
 function sliceMessages(messages: Pick<Message, 'role' | 'content'>[], max: number) {
   const tokenizer = new GPT3Tokenizer({ type: 'gpt3' })
@@ -63,10 +65,6 @@ export const ChatMessages = observer(function (props: {
 }) {
   const state = useLocalObservable(() => ({
     msg: '',
-    inputFlag: true,
-    get lineCount() {
-      return Math.min(Math.max(this.msg.split('\n').length, 1), 4)
-    },
   }))
 
   const messagesRef = useRef<HTMLUListElement>(null)
@@ -157,18 +155,6 @@ export const ChatMessages = observer(function (props: {
     props.onNotifiCreateMessage(m)
   }
 
-  const query = useMedia('(max-width: 768px)', false)
-  async function onKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
-    // console.log('event.target', event.key, event.shiftKey, (event.target as any).tagName, state.inputFlag)
-    if (event.key === 'Enter' && !event.shiftKey && state.inputFlag && !query) {
-      event.preventDefault()
-      await onSend()
-    }
-  }
-  function onInput(event: React.FormEvent<HTMLTextAreaElement>) {
-    state.msg = event.currentTarget.value
-  }
-
   async function onCopy() {
     if (props.messages.length === 0) {
       window.alert(t('session.copy.empty'))
@@ -191,7 +177,15 @@ export const ChatMessages = observer(function (props: {
           <button onClick={onCopy}>{t('session.copy')}</button>
         </div>
         <div className={css.newMessage}>
-          <textarea
+          <CompleteInput
+            value={state.msg}
+            onChange={(value) => (state.msg = value)}
+            onEnter={onSend}
+            prompts={prompts}
+            className={css.input}
+            autoFocus={true}
+          ></CompleteInput>
+          {/* <textarea
             className={css.input}
             rows={state.lineCount}
             value={state.msg}
@@ -200,7 +194,7 @@ export const ChatMessages = observer(function (props: {
             onCompositionEnd={() => (state.inputFlag = true)}
             onKeyDown={onKeyDown}
             autoFocus={true}
-          ></textarea>
+          ></textarea> */}
           <button onClick={onSend}>{t('message.send')}</button>
         </div>
       </footer>

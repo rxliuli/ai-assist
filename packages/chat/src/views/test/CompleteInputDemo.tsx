@@ -5,11 +5,8 @@ import css from './CompleteInputDemo.module.css'
 
 export const CompleteInputDemo = observer(() => {
   const store = useLocalStore(() => ({
-    value: '/',
+    value: '',
   }))
-  function onPrompt(prompt: Prompt) {
-    console.log(prompt)
-  }
   return (
     <div className={css.root}>
       <div></div>
@@ -18,8 +15,7 @@ export const CompleteInputDemo = observer(() => {
         value={store.value}
         onChange={(v) => (store.value = v)}
         prompts={prompts}
-        onPrompt={onPrompt}
-        rows={1}
+        onEnter={() => console.log('enter')}
       ></CompleteInput>
     </div>
   )

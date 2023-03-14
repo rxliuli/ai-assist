@@ -212,18 +212,25 @@
   border: none;
 }
 
+/* TODO 需要处理奇怪的对不齐的问题 */
 .newMessage {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 8px;
   align-items: end;
+  position: relative;
 }
 
 .newMessage .input {
   max-height: 200px;
   overflow-y: auto;
   resize: none;
+  margin-bottom: 0;
 }
+.newMessage button {
+  margin-bottom: 0;
+}
+
 /* #endregion */
 
 .hide {

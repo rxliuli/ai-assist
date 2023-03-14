@@ -2,7 +2,19 @@
   display: none;
 }
 
+.prompts {
+  background-color: #1d1f20;
+  padding-left: 0;
+  position: absolute;
+  bottom: 100%;
+  margin-bottom: 0;
+  width: 100%;
+}
+
 .prompt {
+  list-style: none;
+  padding: 4px 8px;
+  margin-bottom: 0;
 }
 
 .prompt.active,
