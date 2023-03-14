@@ -1,35 +1,34 @@
 import i18next from 'i18next'
 import { TranslateType } from '../i18n'
-import en from '../i18n/en.json'
-import zh from '../i18n/zh.json'
-import ja from '../i18n/ja.json'
+import enUS from '../i18n/en-US.json'
+import zhCN from '../i18n/zh-CN.json'
+import jaJP from '../i18n/ja-JP.json'
+import { Lang } from './langs'
 
-function getDefaultLanguage() {
-  const l = navigator.language
-  if (l.startsWith('zh')) {
-    return 'zh'
-  }
-  if (l.startsWith('ja')) {
-    return 'ja'
-  }
-  return 'en'
+export function getLanguage() {
+  return localStorage.getItem('chatLanguage') ?? navigator.language
 }
 
+export function setLanguage(lang: Lang) {
+  localStorage.setItem('chatLanguage', lang)
+  location.reload()
+}
+
+export const langs: { lang: Lang; label: string }[] = [
+  { lang: 'en-US', label: 'English' },
+  { lang: 'zh-CN', label: '简体中文' },
+  { lang: 'ja-JP', label: '日本語' },
+]
+
 await i18next.init({
-  lng: getDefaultLanguage(),
-  fallbackLng: 'en',
+  lng: getLanguage(),
+  fallbackLng: 'en-US',
   debug: true,
   resources: {
-    en: {
-      translation: en,
-    },
-    zh: {
-      translation: zh,
-    },
-    ja: {
-      translation: ja,
-    },
-  },
+    'en-US': { translation: enUS },
+    'zh-CN': { translation: zhCN },
+    'ja-JP': { translation: jaJP },
+  } as Record<Lang, { translation: any }>,
   keySeparator: false,
 })
 

@@ -5,7 +5,7 @@ import classNames from 'classnames'
 import GPT3Tokenizer from 'gpt3-tokenizer'
 import { pick } from 'lodash-es'
 import { ReactElement, useEffect, useRef, useState } from 'react'
-import { useMedia, useMount } from 'react-use'
+import { useMount } from 'react-use'
 import clipboardy from 'clipboardy'
 import { initDatabase, Message, MessageService, Session, SessionService } from './utils/db'
 import { v4 } from 'uuid'
@@ -17,11 +17,11 @@ import addSvg from './assets/add.svg'
 import closeSvg from './assets/close.svg'
 import menuSvg from './assets/menu.svg'
 import editSvg from './assets/edit.svg'
-import sendSvg from './assets/send.svg'
 import { MarkdownContent } from './components/MarkdownContent'
-import { t } from '../../constants/i18n'
+import { langs, t } from '../../constants/i18n'
 import { CompleteInput } from './components/CompleteInput'
 import prompts from '../chat/constants/prompts.json'
+import { LanguageSelect } from './components/LanguageSelect'
 
 function sliceMessages(messages: Pick<Message, 'role' | 'content'>[], max: number) {
   const tokenizer = new GPT3Tokenizer({ type: 'gpt3' })
@@ -207,12 +207,6 @@ const LinkListItem = (props: {
   )
 }
 
-const links: {
-  value: string
-  label: string
-  link: string
-}[] = [{ value: 'github', label: 'GitHub', link: 'https://github.com/rxliuli/ai-assist' }]
-
 const SessionItem = observer(
   (props: {
     active: boolean
@@ -333,12 +327,11 @@ const ChatSidebar = observer(
               </li>
             ))}
           </ul>
-          <footer>
-            {links.map((it) => (
-              <LinkListItem key={it.value} onClick={() => window.open(it.link, '_blank')}>
-                {it.label}
-              </LinkListItem>
-            ))}
+          <footer className={css.footer}>
+            <LanguageSelect></LanguageSelect>
+            <LinkListItem onClick={() => window.open('https://github.com/rxliuli/ai-assist', '_blank')}>
+              GitHub
+            </LinkListItem>
           </footer>
           <button className={css.close} onClick={props.onCloseShowSidebar}>
             <ReactSVG src={closeSvg}></ReactSVG>

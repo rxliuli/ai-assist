@@ -13,8 +13,9 @@ export interface Prompt {
   id: string
   authorId: string
   fallbackLanguage: string
+  // langs: https://www.techonthenet.com/js/language_tags.php
   locale: Record<
-    string,
+    'en-US' | 'zh-CN' | 'ja-JP' | string,
     {
       title: string
       detail: string
@@ -66,7 +67,6 @@ export const CompleteInput = observer(
           } as LabelValue
         })
         .filter((it) => it.label.includes(store.value.slice(1)))
-      // .slice(0, 10)
       store.acitve = 0
       listRef.current?.scrollToItem(0)
     }, 500)
