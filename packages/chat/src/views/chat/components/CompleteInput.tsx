@@ -2,10 +2,12 @@ import classNames from 'classnames'
 import { throttle, omit } from 'lodash-es'
 import { autorun } from 'mobx'
 import { observer, useLocalStore, useObserver } from 'mobx-react-lite'
-import React, { useRef } from 'react'
+import React, { CSSProperties, useRef } from 'react'
 import { useEffectOnce, useMedia, useMount } from 'react-use'
 import { Assign } from 'utility-types'
 import css from './CompleteInput.module.css'
+import 'react-virtualized/styles.css'
+import { FixedSizeList as List, ListChildComponentProps } from 'react-window'
 
 export interface Prompt {
   id: string
@@ -49,6 +51,8 @@ export const CompleteInput = observer(
       acitve: 0,
       inputFlag: true,
     }))
+    const textareaRef = useRef<HTMLTextAreaElement>(null)
+    const listRef = useRef<List>(null)
 
     const clacPrompt = throttle(() => {
       const language = navigator.language
@@ -62,11 +66,10 @@ export const CompleteInput = observer(
           } as LabelValue
         })
         .filter((it) => it.label.includes(store.value.slice(1)))
-        .slice(0, 10)
+      // .slice(0, 10)
       store.acitve = 0
+      listRef.current?.scrollToItem(0)
     }, 500)
-
-    const textareaRef = useRef<HTMLTextAreaElement>(null)
 
     function setRows() {
       const textarea = textareaRef.current
@@ -112,15 +115,8 @@ export const CompleteInput = observer(
     }
 
     function gotoPrompt(i: number) {
-      if (i < 0) {
-        store.acitve = store.list.length - 1
-        return
-      }
-      if (i >= store.list.length) {
-        store.acitve = 0
-        return
-      }
-      store.acitve = i
+      store.acitve = Math.min(Math.max(0, i), store.list.length - 1)
+      listRef.current?.scrollToItem(store.acitve)
     }
 
     async function selectPrompt(i: number) {
@@ -168,26 +164,36 @@ export const CompleteInput = observer(
     }
     return (
       <div className={props.className}>
-        <ul
+        <div
           className={classNames(css.prompts, {
             [css.hide]: !store.promptMode,
           })}
         >
-          {store.list.map((it, i) => (
-            <li
-              className={classNames(css.prompt, {
-                [css.active]: store.acitve === i,
-              })}
-              key={it.title}
-              onClick={() => {
-                selectPrompt(i)
-                textareaRef.current?.focus()
-              }}
-            >
-              {it.label}
-            </li>
-          ))}
-        </ul>
+          <List
+            ref={listRef}
+            itemData={store.list}
+            itemCount={store.list.length}
+            itemSize={35}
+            height={Math.min(store.list.length, 10) * 35}
+            width={'100%'}
+          >
+            {observer(({ index, style, data }) => (
+              <li
+                style={style}
+                className={classNames(css.prompt, {
+                  [css.active]: store.acitve === index,
+                })}
+                key={data[index].title}
+                onClick={() => {
+                  selectPrompt(index)
+                  textareaRef.current?.focus()
+                }}
+              >
+                {data[index].label}
+              </li>
+            ))}
+          </List>
+        </div>
         <textarea
           className={css.textarea}
           ref={textareaRef}
