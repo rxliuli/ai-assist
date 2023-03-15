@@ -196,10 +196,8 @@
 
 .footer {
   padding: 0.5rem 0 0;
-  display: flex;
-  flex-direction: column;
+  display: grid;
   gap: 8px;
-  overflow-x: hidden;
 }
 
 .operations {
@@ -222,11 +220,11 @@
 
 /* TODO 需要处理奇怪的对不齐的问题 */
 .newMessage {
+  position: relative;
   justify-content: space-between;
   display: flex;
   gap: 8px;
   align-items: end;
-  position: relative;
   padding-bottom: var(--spacing);
 }
 

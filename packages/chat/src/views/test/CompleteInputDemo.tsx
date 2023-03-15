@@ -10,13 +10,15 @@ export const CompleteInputDemo = observer(() => {
   return (
     <div className={css.root}>
       <div></div>
-      <CompleteInput
-        autoFocus={true}
-        value={store.value}
-        onChange={(v) => (store.value = v)}
-        prompts={prompts}
-        onEnter={(value) => console.log('enter', value)}
-      ></CompleteInput>
+      <div className={css.box}>
+        <CompleteInput
+          autoFocus={true}
+          value={store.value}
+          onChange={(v) => (store.value = v)}
+          prompts={prompts}
+          onEnter={(value) => console.log('enter', value)}
+        ></CompleteInput>
+      </div>
     </div>
   )
 })

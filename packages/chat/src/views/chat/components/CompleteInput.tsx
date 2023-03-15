@@ -1,13 +1,12 @@
 import classNames from 'classnames'
 import { throttle, omit } from 'lodash-es'
-import { autorun } from 'mobx'
 import { observer, useLocalStore, useObserver } from 'mobx-react-lite'
-import React, { CSSProperties, useRef } from 'react'
-import { useEffectOnce, useMedia, useMount } from 'react-use'
+import React, { useRef } from 'react'
+import { useMedia, useMount } from 'react-use'
 import { Assign } from 'utility-types'
 import css from './CompleteInput.module.css'
 import 'react-virtualized/styles.css'
-import { FixedSizeList as List, ListChildComponentProps } from 'react-window'
+import { FixedSizeList as List } from 'react-window'
 
 export interface Prompt {
   id: string
@@ -69,7 +68,7 @@ export const CompleteInput = observer(
         })
         .filter((it) => it.label.includes(store.value.slice(1)))
       store.acitve = 0
-      listRef.current?.scrollToItem(0)
+      listRef.current?.scrollToItem(0, 'smart')
     }, 500)
 
     function setRows() {
