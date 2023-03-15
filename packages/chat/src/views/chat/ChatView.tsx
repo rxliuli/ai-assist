@@ -24,7 +24,7 @@ import prompts from '../chat/constants/prompts.json'
 import { LanguageSelect } from './components/LanguageSelect'
 import saveAs from 'file-saver'
 import filenamify from 'filenamify'
-import { ga } from '../../constants/ga'
+import { ga4 } from '../../constants/ga'
 
 function sliceMessages(
   messages: Pick<Message, 'role' | 'content'>[],
@@ -128,7 +128,8 @@ export const ChatMessages = observer(function (props: {
       })
       if (resp.status !== 200) {
         const end = Date.now()
-        ga.track('chat.send', {
+        ga4.track('chat_event', {
+          eventType: 'chat.send',
           sessionId,
           requestMessageCount: list.length,
           requestTokens: sum,
@@ -188,7 +189,8 @@ export const ChatMessages = observer(function (props: {
       const end = Date.now()
 
       const tokenizer = new GPT3Tokenizer({ type: 'gpt3' })
-      ga.track('chat.send', {
+      ga4.track('chat_event', {
+        eventType: 'chat.send',
         sessionId,
         requestMessageCount: list.length,
         requestTokens: sum,
@@ -402,7 +404,7 @@ export const ChatHomeView = observer(() => {
   useMount(async () => {
     Reflect.set(globalThis, 'store', store)
     Reflect.set(globalThis, 'router', router)
-    Reflect.set(globalThis, 'ga', ga)
+    Reflect.set(globalThis, 'ga4', ga4)
     const db = await initDatabase()
     const sessionService = new SessionService(db)
     const messageService = new MessageService(db)
@@ -463,7 +465,7 @@ export const ChatHomeView = observer(() => {
     const r = store.messages.map((it) => it.content).join('\n\n---\n\n')
     await clipboardy.write(r)
     window.alert(t('session.copy.success'))
-    ga.track('chat.copy', { sessionId: store.activeSessionId })
+    ga4.track('chat_event', { eventType: 'chat.copy', sessionId: store.activeSessionId })
   }
 
   function onExport() {
@@ -482,7 +484,7 @@ export const ChatHomeView = observer(() => {
       new Blob([JSON.stringify(r, null, 2)], { type: 'application/json' }),
       filenamify(store.sessionName) + '.json',
     )
-    ga.track('chat.export', { sessionId: store.activeSessionId })
+    ga4.track('chat_event', { eventType: 'chat.export', sessionId: store.activeSessionId })
   }
 
   function onImport() {
@@ -514,7 +516,7 @@ export const ChatHomeView = observer(() => {
       }
     }
     input.click()
-    ga.track('chat.import', { sessionId: store.activeSessionId })
+    ga4.track('chat_event', { eventType: 'chat.import', sessionId: store.activeSessionId })
   }
 
   return (

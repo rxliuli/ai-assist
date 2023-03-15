@@ -7,7 +7,7 @@ import { Assign } from 'utility-types'
 import css from './CompleteInput.module.css'
 import 'react-virtualized/styles.css'
 import { FixedSizeList as List } from 'react-window'
-import { ga } from '../../../constants/ga'
+import { ga4 } from '../../../constants/ga'
 
 export interface Prompt {
   id: string
@@ -134,7 +134,7 @@ export const CompleteInput = observer(
       } else {
         textareaRef.current!.setSelectionRange(detail.length, detail.length)
       }
-      ga.track('chat.selectPrompt', { text: item.title })
+      ga4.track('chat_event', { eventType: 'chat.selectPrompt', text: item.title })
     }
 
     const query = useMedia('(max-width: 768px)', false)
