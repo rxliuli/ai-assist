@@ -163,6 +163,7 @@ export const ChatMessages = observer(function (props: {
         props.onCreateSession(session)
         props.onChangeActiveSessionId(sessionId)
       }
+      props.onNotifiCreateMessage(userMsg)
       props.onNotifiCreateMessage(m)
     } finally {
       store.loading = false
