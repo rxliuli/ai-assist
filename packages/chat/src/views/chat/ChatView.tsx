@@ -3,7 +3,7 @@ import { toJS } from 'mobx'
 import css from './ChatView.module.css'
 import classNames from 'classnames'
 import GPT3Tokenizer from 'gpt3-tokenizer'
-import { pick } from 'lodash-es'
+import { pick, reverse } from 'lodash-es'
 import { ReactElement, useEffect, useRef, useState } from 'react'
 import { useMount } from 'react-use'
 import clipboardy from 'clipboardy'
@@ -19,8 +19,8 @@ import menuSvg from './assets/menu.svg'
 import editSvg from './assets/edit.svg'
 import { MarkdownContent } from './components/MarkdownContent'
 import { langs, t } from '../../constants/i18n'
-import { CompleteInput } from './components/CompleteInput'
-import prompts from '../chat/constants/prompts.json'
+import { CompleteInput, Prompt } from './components/CompleteInput'
+import promptData from '../chat/constants/prompts.json'
 import { LanguageSelect } from './components/LanguageSelect'
 import saveAs from 'file-saver'
 import filenamify from 'filenamify'
@@ -65,10 +65,9 @@ const ChatMessage = observer((props: { message: Message }) => {
 
 export const ChatMessages = observer(function (props: {
   messages: Message[]
-  activeSessionId?: string
-  sessionName: string
-  onChangeActiveSessionId(id: string): void
-  onCreateSession(session: Session): void
+  activeSession?: Session
+  onChangeActiveSessionId(id: string, refresh: boolean): void
+  onCreateSession(session: Session): Promise<void>
   onNotifiCreateMessage(session: Message): void
   onCopy(): void
   onExport(): void
@@ -94,12 +93,13 @@ export const ChatMessages = observer(function (props: {
       if (msg.trim().length === 0) {
         return
       }
-      const sessionId = props.activeSessionId ?? v4()
+      const activeSessionId = props.activeSession?.id
+      const sessionId = activeSessionId ?? v4()
 
       const userMsg: Message = {
         id: v4(),
         sessionId: sessionId,
-        content: msg,
+        content: msg.trim(),
         role: 'user',
         date: new Date().toISOString(),
       }
@@ -110,21 +110,23 @@ export const ChatMessages = observer(function (props: {
         props.messages.map((it) => pick(it, 'role', 'content')),
         3000,
       )
-      console.log('sendMessages ', list)
+      const finalList = [
+        {
+          role: 'system',
+          content:
+            "Please return the message in markdown format, don't use h1,h2 etc headings, please do not wrap pictures and links in code blocks",
+        },
+        ...(props.activeSession?.systemContent ? [{ role: 'system', content: props.activeSession.systemContent }] : []),
+        ...list,
+      ] as Message[]
+      console.log('sendMessages ', finalList)
       const start = Date.now()
       const resp = await fetch('/api/chat-stream', {
         method: 'post',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify([
-          {
-            role: 'system',
-            content:
-              "Please return the message in markdown format, don't use h1,h2 etc headings, please do not wrap pictures and links in code blocks",
-          },
-          ...list,
-        ]),
+        body: JSON.stringify(finalList),
       })
       if (resp.status !== 200) {
         const end = Date.now()
@@ -146,7 +148,7 @@ export const ChatMessages = observer(function (props: {
         return
       }
       let titleRes: Promise<string> = Promise.resolve(t('session.new'))
-      if (!props.activeSessionId) {
+      if (!activeSessionId) {
         titleRes = fetch('/api/chat', {
           method: 'post',
           headers: {
@@ -179,10 +181,10 @@ export const ChatMessages = observer(function (props: {
       new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
         messagesRef.current!.lastElementChild?.scrollIntoView({ behavior: 'auto', block: 'end' })
       })
-      if (!props.activeSessionId) {
+      if (!activeSessionId) {
         const session: Session = { id: sessionId, name: await titleRes, date: new Date().toISOString() }
         props.onCreateSession(session)
-        props.onChangeActiveSessionId(sessionId)
+        props.onChangeActiveSessionId(sessionId, false)
       }
       props.onNotifiCreateMessage(userMsg)
       props.onNotifiCreateMessage(m)
@@ -204,6 +206,17 @@ export const ChatMessages = observer(function (props: {
     }
   }
 
+  async function onPrompt(title: string, systemContent: string) {
+    const session: Session = {
+      id: v4(),
+      name: title,
+      date: new Date().toISOString(),
+      systemContent,
+    }
+    await props.onCreateSession(session)
+    props.onChangeActiveSessionId(session.id, true)
+  }
+
   return (
     <div className={css.chat}>
       <ul className={css.messages} ref={messagesRef}>
@@ -222,7 +235,8 @@ export const ChatMessages = observer(function (props: {
             value={store.value}
             onChange={(value) => (store.value = value)}
             onEnter={onSend}
-            prompts={prompts}
+            onPrompt={onPrompt}
+            prompts={promptData.prompts as unknown as Prompt[]}
             className={css.input}
             autoFocus={true}
             loading={store.loading}
@@ -395,7 +409,10 @@ export const ChatHomeView = observer(() => {
     showSidebar: false,
     get sessionName() {
       const session = this.sessions.find((it) => it.id === this.activeSessionId)
-      return session?.name ?? '新会话'
+      return session?.name ?? t('session.new')
+    },
+    get activeSession() {
+      return this.sessions.find((it) => it.id === this.activeSessionId)
     },
   }))
   const [sessionService, setSessionService] = useState<SessionService>()
@@ -540,11 +557,10 @@ export const ChatHomeView = observer(() => {
         </button>
       </header>
       <ChatMessages
-        activeSessionId={store.activeSessionId}
-        sessionName={store.sessionName}
+        activeSession={store.activeSession}
         messages={store.messages}
         onCreateSession={onCreateSession}
-        onChangeActiveSessionId={(id) => onChangeActiveSessionId(id, false)}
+        onChangeActiveSessionId={onChangeActiveSessionId}
         onNotifiCreateMessage={onNotifiCreateMessage}
         onCopy={onCopy}
         onExport={onExport}

@@ -1,0 +1,156 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "definitions": {
+    "Locale": {
+      "type": "object",
+      "required": ["title", "detail"],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "detail": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": ["prompts"],
+  "properties": {
+    "prompts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "fallback", "authorId", "locale"],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "fallback": {
+            "type": "string",
+            "enum": [
+              "ar-SA",
+              "bn-BD",
+              "bn-IN",
+              "cs-CZ",
+              "da-DK",
+              "de-AT",
+              "de-CH",
+              "de-DE",
+              "el-GR",
+              "en-AU",
+              "en-CA",
+              "en-GB",
+              "en-IE",
+              "en-IN",
+              "en-NZ",
+              "en-US",
+              "en-ZA",
+              "es-AR",
+              "es-CL",
+              "es-CO",
+              "es-ES",
+              "es-MX",
+              "es-US",
+              "fi-FI",
+              "fr-BE",
+              "fr-CA",
+              "fr-CH",
+              "fr-FR",
+              "he-IL",
+              "hi-IN",
+              "hu-HU",
+              "id-ID",
+              "it-CH",
+              "it-IT",
+              "ja-JP",
+              "ko-KR",
+              "nl-BE",
+              "nl-NL",
+              "no-NO",
+              "pl-PL",
+              "pt-BR",
+              "pt-PT",
+              "ro-RO",
+              "ru-RU",
+              "sk-SK",
+              "sv-SE",
+              "ta-IN",
+              "ta-LK",
+              "th-TH",
+              "tr-TR",
+              "zh-CN",
+              "zh-HK",
+              "zh-TW"
+            ]
+          },
+          "authorId": {
+            "type": "string"
+          },
+          "locale": {
+            "type": "object",
+            "description": "https://www.techonthenet.com/js/language_tags.php",
+            "properties": {
+              "ar-SA": { "$ref": "#/definitions/Locale" },
+              "bn-BD": { "$ref": "#/definitions/Locale" },
+              "bn-IN": { "$ref": "#/definitions/Locale" },
+              "cs-CZ": { "$ref": "#/definitions/Locale" },
+              "da-DK": { "$ref": "#/definitions/Locale" },
+              "de-AT": { "$ref": "#/definitions/Locale" },
+              "de-CH": { "$ref": "#/definitions/Locale" },
+              "de-DE": { "$ref": "#/definitions/Locale" },
+              "el-GR": { "$ref": "#/definitions/Locale" },
+              "en-AU": { "$ref": "#/definitions/Locale" },
+              "en-CA": { "$ref": "#/definitions/Locale" },
+              "en-GB": { "$ref": "#/definitions/Locale" },
+              "en-IE": { "$ref": "#/definitions/Locale" },
+              "en-IN": { "$ref": "#/definitions/Locale" },
+              "en-NZ": { "$ref": "#/definitions/Locale" },
+              "en-US": { "$ref": "#/definitions/Locale" },
+              "en-ZA": { "$ref": "#/definitions/Locale" },
+              "es-AR": { "$ref": "#/definitions/Locale" },
+              "es-CL": { "$ref": "#/definitions/Locale" },
+              "es-CO": { "$ref": "#/definitions/Locale" },
+              "es-ES": { "$ref": "#/definitions/Locale" },
+              "es-MX": { "$ref": "#/definitions/Locale" },
+              "es-US": { "$ref": "#/definitions/Locale" },
+              "fi-FI": { "$ref": "#/definitions/Locale" },
+              "fr-BE": { "$ref": "#/definitions/Locale" },
+              "fr-CA": { "$ref": "#/definitions/Locale" },
+              "fr-CH": { "$ref": "#/definitions/Locale" },
+              "fr-FR": { "$ref": "#/definitions/Locale" },
+              "he-IL": { "$ref": "#/definitions/Locale" },
+              "hi-IN": { "$ref": "#/definitions/Locale" },
+              "hu-HU": { "$ref": "#/definitions/Locale" },
+              "id-ID": { "$ref": "#/definitions/Locale" },
+              "it-CH": { "$ref": "#/definitions/Locale" },
+              "it-IT": { "$ref": "#/definitions/Locale" },
+              "ja-JP": { "$ref": "#/definitions/Locale" },
+              "ko-KR": { "$ref": "#/definitions/Locale" },
+              "nl-BE": { "$ref": "#/definitions/Locale" },
+              "nl-NL": { "$ref": "#/definitions/Locale" },
+              "no-NO": { "$ref": "#/definitions/Locale" },
+              "pl-PL": { "$ref": "#/definitions/Locale" },
+              "pt-BR": { "$ref": "#/definitions/Locale" },
+              "pt-PT": { "$ref": "#/definitions/Locale" },
+              "ro-RO": { "$ref": "#/definitions/Locale" },
+              "ru-RU": { "$ref": "#/definitions/Locale" },
+              "sk-SK": { "$ref": "#/definitions/Locale" },
+              "sv-SE": { "$ref": "#/definitions/Locale" },
+              "ta-IN": { "$ref": "#/definitions/Locale" },
+              "ta-LK": { "$ref": "#/definitions/Locale" },
+              "th-TH": { "$ref": "#/definitions/Locale" },
+              "tr-TR": { "$ref": "#/definitions/Locale" },
+              "zh-CN": { "$ref": "#/definitions/Locale" },
+              "zh-HK": { "$ref": "#/definitions/Locale" },
+              "zh-TW": { "$ref": "#/definitions/Locale" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

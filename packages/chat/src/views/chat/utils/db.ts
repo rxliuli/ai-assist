@@ -5,6 +5,7 @@ export interface Session {
   id: string
   name: string
   date: string
+  systemContent?: string
 }
 
 export interface ISessionService {

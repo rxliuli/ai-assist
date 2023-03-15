@@ -18,7 +18,7 @@ it('convert', async () => {
       ({
         id: it.title,
         authorId: 'rockbenben',
-        fallbackLanguage: 'en-US',
+        fallback: 'en-US',
         locale: {
           'en-US': {
             title: format(it.title),
@@ -47,7 +47,7 @@ it('parse', async () => {
       (it) =>
         ({
           id: it.act,
-          fallbackLanguage: 'en-US',
+          fallback: 'en-US',
           authorId: 'awesome-chatgpt-prompts',
           locale: {
             'en-US': {

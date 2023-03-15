@@ -6,16 +6,18 @@ import { useMedia, useMount } from 'react-use'
 import { Assign } from 'utility-types'
 import css from './CompleteInput.module.css'
 import 'react-virtualized/styles.css'
-import { FixedSizeList as List } from 'react-window'
+import { FixedSizeList as List, ListChildComponentProps } from 'react-window'
 import { ga4 } from '../../../constants/ga'
+import { toJS } from 'mobx'
+import { Lang } from '../../../constants/langs'
 
 export interface Prompt {
   id: string
   authorId: string
-  fallbackLanguage: string
+  fallback: Lang
   // langs: https://www.techonthenet.com/js/language_tags.php
   locale: Record<
-    'en-US' | 'zh-CN' | 'ja-JP' | string,
+    Lang,
     {
       title: string
       detail: string
@@ -27,12 +29,13 @@ interface CompleteInputProps {
   value: string
   onChange: (value: string) => void
   onEnter: (value: string) => void
+  onPrompt: (title: string, systemContent: string) => void
   prompts: Prompt[]
   loading?: boolean
 }
 
 interface LabelValue {
-  label: string
+  id: string
   title: string
   detail: string
 }
@@ -57,17 +60,22 @@ export const CompleteInput = observer(
     const listRef = useRef<List>(null)
 
     const clacPrompt = throttle(() => {
-      const language = navigator.language
+      const language = navigator.language as Lang
+      const t = store.value.slice(1).toLowerCase()
       store.list = props.prompts
+        .filter(
+          (it) =>
+            it.locale[language]?.title.toLowerCase().includes(t) ||
+            it.locale[it.fallback].title.toLowerCase().includes(t),
+        )
         .map((it) => {
-          const locale = it.locale[language] ?? it.locale[it.fallbackLanguage]
+          const locale = it.locale[language] ?? it.locale[it.fallback]
           return {
-            title: it.id,
-            label: locale.title,
-            detail: locale.detail,
+            id: it.id,
+            ...locale,
           } as LabelValue
         })
-        .filter((it) => it.label.includes(store.value.slice(1)))
+      console.log('list', toJS(store.list))
       store.acitve = 0
       listRef.current?.scrollToItem(0, 'smart')
     }, 500)
@@ -122,19 +130,10 @@ export const CompleteInput = observer(
 
     async function selectPrompt(i: number) {
       const item = store.list[i]
-      const detail = item.detail
-      store.value = detail
-      props.onChange(detail)
-      await new Promise((resolve) => setTimeout(resolve, 0))
-      const match = detail.match(/\[[^\]]+\]/)
-      if (match) {
-        const start = detail.indexOf(match[0])
-        const end = start + match[0].length
-        textareaRef.current!.setSelectionRange(start, end)
-      } else {
-        textareaRef.current!.setSelectionRange(detail.length, detail.length)
-      }
-      ga4.track('chat_event', { eventType: 'chat.selectPrompt', text: item.title })
+      props.onPrompt(item.title, item.detail)
+      store.value = ''
+      props.onChange('')
+      ga4.track('chat_event', { eventType: 'chat.selectPrompt', text: item.id })
     }
 
     const query = useMedia('(max-width: 768px)', false)
@@ -182,19 +181,19 @@ export const CompleteInput = observer(
             height={Math.min(store.list.length, 10) * 35}
             width={'100%'}
           >
-            {observer(({ index, style, data }) => (
+            {observer(({ index, style, data }: ListChildComponentProps<LabelValue[]>) => (
               <li
                 style={style}
                 className={classNames(css.prompt, {
                   [css.active]: store.acitve === index,
                 })}
-                key={data[index].title}
+                key={data[index].id}
                 onClick={() => {
                   selectPrompt(index)
                   textareaRef.current?.focus()
                 }}
               >
-                {data[index].label}
+                {data[index].title}
               </li>
             ))}
           </List>
@@ -202,7 +201,7 @@ export const CompleteInput = observer(
         <textarea
           className={css.textarea}
           ref={textareaRef}
-          {...omit(props, 'value', 'onChange', 'prompts', 'onEnter', 'onInput', 'className', 'loading')}
+          {...omit(props, 'value', 'onChange', 'prompts', 'onEnter', 'onInput', 'className', 'loading', 'onPrompt')}
           value={store.value}
           onInput={onInput}
           onKeyDown={onKeyDown}
