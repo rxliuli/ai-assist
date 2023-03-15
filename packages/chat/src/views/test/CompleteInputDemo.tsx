@@ -1,6 +1,6 @@
 import { observer, useLocalStore } from 'mobx-react-lite'
 import { CompleteInput, Prompt } from '../chat/components/CompleteInput'
-import prompts from '../chat/constants/prompts.json'
+import promptData from '../chat/constants/prompts.json'
 import css from './CompleteInputDemo.module.css'
 
 export const CompleteInputDemo = observer(() => {
@@ -15,7 +15,8 @@ export const CompleteInputDemo = observer(() => {
           autoFocus={true}
           value={store.value}
           onChange={(v) => (store.value = v)}
-          prompts={prompts}
+          onPrompt={(title, content) => console.log('prmopt', title, content)}
+          prompts={promptData.prompts as any}
           onEnter={(value) => console.log('enter', value)}
         ></CompleteInput>
       </div>

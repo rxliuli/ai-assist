@@ -1,5 +1,6 @@
 import { createHashHistory, RouteConfig } from '@liuli-util/react-router'
 import { ChatHomeView } from '../views/chat/ChatView'
+import { SettingView } from '../views/setting/SettingView'
 import { SpeakView } from '../views/speak/SpeakView'
 import { AzureSpeechToText } from '../views/test/AzureSpeechToText'
 import { AzureTextToSpeech } from '../views/test/AzureTextToSpeech'
@@ -7,6 +8,7 @@ import { CompleteInputDemo } from '../views/test/CompleteInputDemo'
 
 export const routes: RouteConfig[] = [
   { path: '/speak', component: SpeakView },
+  { path: '/settings', component: SettingView },
   { path: '/:sessionId', component: ChatHomeView },
   { path: '/', component: ChatHomeView },
 ]
