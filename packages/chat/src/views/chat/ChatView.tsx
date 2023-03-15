@@ -24,8 +24,12 @@ import prompts from '../chat/constants/prompts.json'
 import { LanguageSelect } from './components/LanguageSelect'
 import saveAs from 'file-saver'
 import filenamify from 'filenamify'
+import { ga } from '../../constants/ga'
 
-function sliceMessages(messages: Pick<Message, 'role' | 'content'>[], max: number) {
+function sliceMessages(
+  messages: Pick<Message, 'role' | 'content'>[],
+  max: number,
+): [Pick<Message, 'role' | 'content'>[], number] {
   const tokenizer = new GPT3Tokenizer({ type: 'gpt3' })
   let sum = 0
   const r: Pick<Message, 'role' | 'content'>[] = []
@@ -33,12 +37,12 @@ function sliceMessages(messages: Pick<Message, 'role' | 'content'>[], max: numbe
     const it = messages[i]
     const count = tokenizer.encode(it.content).text.length
     if (sum + count > max) {
-      return r
+      return [r, sum]
     }
     sum += count
     r.unshift(it)
   }
-  return r
+  return [r, sum]
 }
 
 const ChatMessage = observer((props: { message: Message }) => {
@@ -66,6 +70,7 @@ export const ChatMessages = observer(function (props: {
   onChangeActiveSessionId(id: string): void
   onCreateSession(session: Session): void
   onNotifiCreateMessage(session: Message): void
+  onCopy(): void
   onExport(): void
   onImport(): void
 }) {
@@ -101,11 +106,12 @@ export const ChatMessages = observer(function (props: {
       props.messages.push(userMsg)
       await new Promise((resolve) => setTimeout(resolve, 0))
       messagesRef.current!.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'end' })
-      const list = sliceMessages(
+      const [list, sum] = sliceMessages(
         props.messages.map((it) => pick(it, 'role', 'content')),
         3000,
       )
       console.log('sendMessages ', list)
+      const start = Date.now()
       const resp = await fetch('/api/chat-stream', {
         method: 'post',
         headers: {
@@ -121,6 +127,20 @@ export const ChatMessages = observer(function (props: {
         ]),
       })
       if (resp.status !== 200) {
+        const end = Date.now()
+        ga.track('chat.send', {
+          sessionId,
+          requestMessageCount: list.length,
+          requestTokens: sum,
+          responseTokens: null,
+          begin: start,
+          end: end,
+          time: end - start,
+          error: {
+            code: resp.status,
+            msg: resp.statusText,
+          },
+        })
         alert(t('message.error.network'))
         return
       }
@@ -165,19 +185,21 @@ export const ChatMessages = observer(function (props: {
       }
       props.onNotifiCreateMessage(userMsg)
       props.onNotifiCreateMessage(m)
+      const end = Date.now()
+
+      const tokenizer = new GPT3Tokenizer({ type: 'gpt3' })
+      ga.track('chat.send', {
+        sessionId,
+        requestMessageCount: list.length,
+        requestTokens: sum,
+        responseTokens: tokenizer.encode(m.content).text.length,
+        begin: start,
+        end: end,
+        time: end - start,
+      })
     } finally {
       store.loading = false
     }
-  }
-
-  async function onCopy() {
-    if (props.messages.length === 0) {
-      window.alert(t('session.copy.empty'))
-      return
-    }
-    const r = props.messages.map((it) => it.content).join('\n\n---\n\n')
-    await clipboardy.write(r)
-    window.alert(t('session.copy.success'))
   }
 
   return (
@@ -189,7 +211,7 @@ export const ChatMessages = observer(function (props: {
       </ul>
       <footer className={classNames('container', css.footer)}>
         <div className={css.operations}>
-          <button onClick={onCopy}>{t('session.copy')}</button>
+          <button onClick={props.onCopy}>{t('session.copy')}</button>
           <button onClick={props.onExport}>{t('session.export')}</button>
           <button onClick={props.onImport}>{t('session.import')}</button>
         </div>
@@ -380,6 +402,7 @@ export const ChatHomeView = observer(() => {
   useMount(async () => {
     Reflect.set(globalThis, 'store', store)
     Reflect.set(globalThis, 'router', router)
+    Reflect.set(globalThis, 'ga', ga)
     const db = await initDatabase()
     const sessionService = new SessionService(db)
     const messageService = new MessageService(db)
@@ -432,6 +455,17 @@ export const ChatHomeView = observer(() => {
     await sessionService!.put(toJS(session))
   }
 
+  async function onCopy() {
+    if (store.messages.length === 0) {
+      window.alert(t('session.copy.empty'))
+      return
+    }
+    const r = store.messages.map((it) => it.content).join('\n\n---\n\n')
+    await clipboardy.write(r)
+    window.alert(t('session.copy.success'))
+    ga.track('chat.copy', { sessionId: store.activeSessionId })
+  }
+
   function onExport() {
     if (store.messages.length === 0) {
       window.alert(t('session.export.empty'))
@@ -448,6 +482,7 @@ export const ChatHomeView = observer(() => {
       new Blob([JSON.stringify(r, null, 2)], { type: 'application/json' }),
       filenamify(store.sessionName) + '.json',
     )
+    ga.track('chat.export', { sessionId: store.activeSessionId })
   }
 
   function onImport() {
@@ -479,6 +514,7 @@ export const ChatHomeView = observer(() => {
       }
     }
     input.click()
+    ga.track('chat.import', { sessionId: store.activeSessionId })
   }
 
   return (
@@ -508,6 +544,7 @@ export const ChatHomeView = observer(() => {
         onCreateSession={onCreateSession}
         onChangeActiveSessionId={(id) => onChangeActiveSessionId(id, false)}
         onNotifiCreateMessage={onNotifiCreateMessage}
+        onCopy={onCopy}
         onExport={onExport}
         onImport={onImport}
       ></ChatMessages>

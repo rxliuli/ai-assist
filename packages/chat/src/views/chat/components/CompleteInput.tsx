@@ -7,6 +7,7 @@ import { Assign } from 'utility-types'
 import css from './CompleteInput.module.css'
 import 'react-virtualized/styles.css'
 import { FixedSizeList as List } from 'react-window'
+import { ga } from '../../../constants/ga'
 
 export interface Prompt {
   id: string
@@ -120,7 +121,8 @@ export const CompleteInput = observer(
     }
 
     async function selectPrompt(i: number) {
-      const detail = store.list[i].detail
+      const item = store.list[i]
+      const detail = item.detail
       store.value = detail
       props.onChange(detail)
       await new Promise((resolve) => setTimeout(resolve, 0))
@@ -132,6 +134,7 @@ export const CompleteInput = observer(
       } else {
         textareaRef.current!.setSelectionRange(detail.length, detail.length)
       }
+      ga.track('chat.selectPrompt', { text: item.title })
     }
 
     const query = useMedia('(max-width: 768px)', false)
