@@ -307,7 +307,7 @@ const SessionItem = observer(
             value={store.value}
             onInput={(ev) => (store.value = ev.currentTarget.value)}
             className={css.input}
-            // onBlur={onCancel}
+            onBlur={onCancel}
             onKeyDown={onKeyDown}
             onCompositionStart={() => (store.inputFlag = false)}
             onCompositionEnd={() => (store.inputFlag = true)}
