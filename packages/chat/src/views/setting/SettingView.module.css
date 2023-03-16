@@ -1,0 +1,14 @@
+.settings {
+}
+
+.header {
+  display: flex;
+}
+.header h2 {
+  margin-bottom: 0;
+}
+.header button {
+  width: fit-content;
+  padding: 0 16px;
+  margin: 0;
+}
