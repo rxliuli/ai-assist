@@ -10,6 +10,7 @@ import { FixedSizeList as List, ListChildComponentProps } from 'react-window'
 import { ga4 } from '../../../constants/ga'
 import { toJS } from 'mobx'
 import { Lang } from '../../../constants/langs'
+import { t } from '../../../constants/i18n'
 
 export interface Prompt {
   id: string
@@ -136,6 +137,12 @@ export const CompleteInput = observer(
       ga4.track('chat_event', { eventType: 'chat.selectPrompt', text: item.id })
     }
 
+    function onEnter() {
+      props.onEnter(store.value)
+      store.value = ''
+      props.onChange(store.value)
+    }
+
     const query = useMedia('(max-width: 768px)', false)
     function onKeyDown(ev: React.KeyboardEvent<HTMLTextAreaElement>) {
       if (store.promptMode) {
@@ -157,9 +164,7 @@ export const CompleteInput = observer(
       }
       if (ev.key === 'Enter' && !ev.shiftKey && store.inputFlag && !query) {
         if (!props.loading) {
-          props.onEnter(store.value)
-          store.value = ''
-          props.onChange(store.value)
+          onEnter()
         }
         ev.preventDefault()
         return
@@ -167,7 +172,7 @@ export const CompleteInput = observer(
       props.onKeyDown?.(ev)
     }
     return (
-      <div className={props.className}>
+      <div className={classNames(css.newMessage, props.className)}>
         <div
           className={classNames(css.prompts, {
             [css.hide]: !store.promptMode,
@@ -208,6 +213,9 @@ export const CompleteInput = observer(
           onCompositionStart={() => (store.inputFlag = false)}
           onCompositionEnd={() => (store.inputFlag = true)}
         ></textarea>
+        <button onClick={onEnter} aria-busy={props.loading}>
+          {t('message.send')}
+        </button>
       </div>
     )
   },

@@ -219,29 +219,6 @@
 }
 
 /* TODO 需要处理奇怪的对不齐的问题 */
-.newMessage {
-  position: relative;
-  justify-content: space-between;
-  display: flex;
-  gap: 8px;
-  align-items: end;
-  padding-bottom: var(--spacing);
-}
-
-.newMessage .input {
-  width: 100%;
-  flex-grow: 1;
-  display: flex;
-}
-.newMessage button {
-  margin-bottom: 0;
-  width: fit-content;
-  white-space: nowrap;
-  height: 2.9em;
-  line-height: 2.9em;
-  padding-top: 0;
-  padding-bottom: 0;
-}
 
 /* #endregion */
 

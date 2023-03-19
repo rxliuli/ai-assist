@@ -116,7 +116,9 @@ export const ChatMessages = observer(function (props: {
           content:
             "Please return the message in markdown format, don't use h1,h2 etc headings, please do not wrap pictures and links in code blocks",
         },
-        ...(props.activeSession?.systemContent ? [{ role: 'system', content: props.activeSession.systemContent }] : []),
+        ...(props.activeSession?.systemContent
+          ? [{ role: 'system', content: props.activeSession!.systemContent }]
+          : []),
         ...list,
       ] as Message[]
       console.log('sendMessages ', finalList)
@@ -230,21 +232,16 @@ export const ChatMessages = observer(function (props: {
           <button onClick={props.onExport}>{t('session.export')}</button>
           <button onClick={props.onImport}>{t('session.import')}</button>
         </div>
-        <div className={css.newMessage}>
-          <CompleteInput
-            value={store.value}
-            onChange={(value) => (store.value = value)}
-            onEnter={onSend}
-            onPrompt={onPrompt}
-            prompts={promptData.prompts as unknown as Prompt[]}
-            className={css.input}
-            autoFocus={true}
-            loading={store.loading}
-          ></CompleteInput>
-          <button onClick={() => onSend(store.value)} aria-busy={store.loading}>
-            {t('message.send')}
-          </button>
-        </div>
+        <CompleteInput
+          value={store.value}
+          onChange={(value) => (store.value = value)}
+          onEnter={onSend}
+          onPrompt={onPrompt}
+          prompts={promptData.prompts as unknown as Prompt[]}
+          className={css.input}
+          autoFocus={true}
+          loading={store.loading}
+        ></CompleteInput>
       </footer>
     </div>
   )
