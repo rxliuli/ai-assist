@@ -148,6 +148,7 @@ importers:
       chatgpt: ^5.0.6
       dotenv: ^16.0.3
       dotenv-cli: ^7.0.0
+      eventemitter3: ^5.0.0
       koa: ^2.14.1
       koa-bodyparser: ^4.3.0
       koa-mount: ^4.0.0
@@ -176,6 +177,7 @@ importers:
       chatgpt: 5.0.6
       dotenv: 16.0.3
       dotenv-cli: 7.0.0
+      eventemitter3: 5.0.0
       koa: 2.14.1
       koa-bodyparser: 4.3.0
       koa-mount: 4.0.0
@@ -4419,6 +4421,10 @@ packages:
       split: 0.3.3
       stream-combiner: 0.0.4
       through: 2.3.8
+    dev: true
+
+  /eventemitter3/5.0.0:
+    resolution: {integrity: sha512-riuVbElZZNXLeLEoprfNYoDSwTBRR44X3mnhdI1YcnENpWTCsTTVZ2zFuqQcpoyqPQIUXdiPEU0ECAq0KQRaHg==}
     dev: true
 
   /eventsource-parser/0.0.5:

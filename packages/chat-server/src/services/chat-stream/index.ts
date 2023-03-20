@@ -1,7 +1,7 @@
 import { ChatCompletionRequestMessage } from 'openai'
 import { openai } from '../../constants/chatgpt'
 import { streamCompletion } from '@fortaine/openai/stream'
-import { Stream } from 'stream'
+import { PassThrough, Stream } from 'stream'
 
 interface ChatCompletion {
   id: string

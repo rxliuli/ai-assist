@@ -12,6 +12,7 @@ import serve from 'koa-static'
 import path from 'path'
 import mount from 'koa-mount'
 import { fileURLToPath } from 'url'
+import { streamResp } from './services/test/streamResp'
 
 const app = new Application()
 const router = new Router()
@@ -49,6 +50,15 @@ router.get('/api/get-region-and-token', async (ctx) => {
   logger.info('getRegionAndToken result', JSON.stringify(r))
   ctx.body = r
 })
+
+if (process.env.NODE_ENV === 'development') {
+  router.post('/api/test/stream', async (ctx) => {
+    const stream = streamResp()
+    ctx.set('Content-Type', 'application/octet-stream')
+    ctx.set('Content-Disposition', 'attachment; filename="file.txt"')
+    ctx.body = stream
+  })
+}
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 

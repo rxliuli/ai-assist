@@ -25,6 +25,7 @@
     "chatgpt": "^5.0.6",
     "dotenv": "^16.0.3",
     "dotenv-cli": "^7.0.0",
+    "eventemitter3": "^5.0.0",
     "koa": "^2.14.1",
     "koa-bodyparser": "^4.3.0",
     "koa-mount": "^4.0.0",
