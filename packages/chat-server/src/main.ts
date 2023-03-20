@@ -5,7 +5,7 @@ import bodyParser from 'koa-bodyparser'
 import { translate, TranslateParams } from './services/translate'
 import { ChatCompletionRequestMessage } from 'openai'
 import { chat } from './services/chat'
-import { logger } from './constants/logger'
+import { httpLogger, logger } from './constants/logger'
 import { chatStream } from './services/chat-stream'
 import { getRegionAndToken } from './services/speak'
 import serve from 'koa-static'
@@ -22,22 +22,17 @@ router.get('/api/ping', (ctx) => {
 
 router.post('/api/translate', async (ctx) => {
   const params = ctx.request.body as TranslateParams
-  logger.info('translate params', JSON.stringify(params))
   const r = await translate(params)
-  logger.info('translate result', r)
   ctx.body = r
 })
 
 router.post('/api/chat', async (ctx) => {
   const params = ctx.request.body as Array<ChatCompletionRequestMessage>
-  logger.info('chat params', JSON.stringify(params))
   const r = await chat(params)
-  logger.info('chat result', r)
   ctx.body = r
 })
 router.post('/api/chat-stream', async (ctx) => {
   const params = ctx.request.body as Array<ChatCompletionRequestMessage>
-  logger.info('chat params', JSON.stringify(params))
   const stream = chatStream(params)
   // 设置响应头
   ctx.set('Content-Type', 'application/octet-stream')
@@ -63,6 +58,7 @@ if (process.env.NODE_ENV === 'development') {
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 app
+  .use(httpLogger())
   .use(cors())
   .use(bodyParser())
   .use(router.routes())
