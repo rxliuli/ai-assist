@@ -16,6 +16,7 @@ export const settingRoutes: (RouteConfig & { title: string })[] = [
   { path: '/setting', component: SettingHomeView, title: 'Setting' },
   { path: '/setting/open-api-key', component: SettingOpenAPIKeyView, title: 'Open API Key' },
   { path: '/setting/prompt', component: SettingPromptView, title: 'Prompt' },
+  { path: '/setting/prompt/new', component: SettingPromptEditView, title: 'Prompt' },
   { path: '/setting/prompt/:promptId', component: SettingPromptEditView, title: 'Prompt Edit' },
 ]
 

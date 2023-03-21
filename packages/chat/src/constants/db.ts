@@ -1,5 +1,7 @@
 import { DBSchema, IDBPDatabase, openDB } from 'idb'
 import { sortBy } from 'lodash-es'
+import { once } from '@liuli-util/async'
+import { Lang } from './langs'
 
 export interface Session {
   id: string
@@ -8,26 +10,12 @@ export interface Session {
   systemContent?: string
 }
 
-export interface ISessionService {
-  list(): Promise<Session[]>
-  remove(id: string): Promise<void>
-  add(session: Session): Promise<void>
-  put(session: Session): Promise<void>
-}
-
 export interface Message {
   id: string
   sessionId: string
   role: 'user' | 'assistant'
   content: string
   date: string
-}
-
-export interface IMessageService {
-  list(sessionId: string): Promise<Message[]>
-  remove(id: string): Promise<void>
-  add(msg: Message): Promise<void>
-  put(msg: Message): Promise<void>
 }
 
 export interface AllDBSchema extends DBSchema {
@@ -42,18 +30,29 @@ export interface AllDBSchema extends DBSchema {
       sessionId: string
     }
   }
+  prompt: {
+    key: string
+    value: Prompt
+  }
 }
 
-export async function initDatabase(): Promise<IDBPDatabase<AllDBSchema>> {
-  return await openDB<AllDBSchema>('chat', 1, {
+export const initDatabase = once(async () => {
+  return await openDB<AllDBSchema>('chat', 2, {
     upgrade(db) {
-      db.createObjectStore('session', { keyPath: 'id' })
-      db.createObjectStore('message', { keyPath: 'id' }).createIndex('sessionId', 'sessionId')
+      if (!db.objectStoreNames.contains('session')) {
+        db.createObjectStore('session', { keyPath: 'id' })
+      }
+      if (!db.objectStoreNames.contains('message')) {
+        db.createObjectStore('message', { keyPath: 'id' }).createIndex('sessionId', 'sessionId')
+      }
+      if (!db.objectStoreNames.contains('prompt')) {
+        db.createObjectStore('prompt', { keyPath: 'id' })
+      }
     },
   })
-}
+})
 
-export class SessionService implements ISessionService {
+export class SessionService {
   constructor(private readonly db: IDBPDatabase<AllDBSchema>) {}
   async put(session: Session): Promise<void> {
     await this.db.put('session', session)
@@ -72,7 +71,7 @@ export class SessionService implements ISessionService {
   }
 }
 
-export class MessageService implements IMessageService {
+export class MessageService {
   constructor(private readonly db: IDBPDatabase<AllDBSchema>) {}
   async list(sessionId: string): Promise<Message[]> {
     return sortBy(await this.db.getAllFromIndex('message', 'sessionId', sessionId), (it) => new Date(it.date).valueOf())
@@ -92,5 +91,40 @@ export class MessageService implements IMessageService {
   }
   async put(msg: Message): Promise<void> {
     await this.db.put('message', msg)
+  }
+}
+
+export interface Prompt {
+  id: string
+  authorId: string
+  fallback: Lang
+  // langs: https://www.techonthenet.com/js/language_tags.php
+  locale: Partial<
+    Record<
+      Lang,
+      {
+        title: string
+        detail: string
+      }
+    >
+  >
+}
+
+export class PromptService {
+  constructor(private readonly db: IDBPDatabase<AllDBSchema>) {}
+  async list() {
+    return await this.db.getAll('prompt')
+  }
+  async add(prompt: Prompt) {
+    await this.db.add('prompt', prompt)
+  }
+  async get(id: string) {
+    return await this.db.get('prompt', id)
+  }
+  async update(prompt: Prompt) {
+    await this.db.put('prompt', prompt)
+  }
+  async delete(id: string) {
+    await this.db.delete('prompt', id)
   }
 }

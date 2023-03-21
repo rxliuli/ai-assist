@@ -24,6 +24,7 @@ importers:
     specifiers:
       '@analytics/google-analytics': ^1.0.5
       '@dqbd/tiktoken': ^0.4.0
+      '@liuli-util/async': ^3.6.0
       '@liuli-util/react-router': ^0.8.0
       '@liuli-util/rollup-plugin-i18next-dts-gen': ^0.4.3
       '@liuli-util/vite-plugin-css-dts': ^0.2.0
@@ -77,6 +78,7 @@ importers:
       vitest: ^0.29.2
     dependencies:
       '@analytics/google-analytics': 1.0.5
+      '@liuli-util/async': 3.6.0
       '@liuli-util/react-router': 0.8.0_biqbaboplfbrettd7655fr4n2y
       '@picocss/pico': 1.5.7
       analytics: 0.8.1
@@ -2316,7 +2318,6 @@ packages:
 
   /@liuli-util/async/3.6.0:
     resolution: {integrity: sha512-cUPE7D7uRToGZEakaC2KzT7S9yQsnk1XYtxTWCTh2sJZkL+PKvJNaoBkgX62gdmYDQ6tfxLZbSPnL09/ZG/LuA==}
-    dev: true
 
   /@liuli-util/fs-extra/0.1.0:
     resolution: {integrity: sha512-eaAyDyMGT23QuRGbITVY3SOJff3G9ekAAyGqB9joAnTBmqvFN+9a1FazOdO70G6IUqgpKV451eBHYSRcOJ/FNQ==}

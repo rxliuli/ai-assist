@@ -5,8 +5,8 @@ import zhCN from '../i18n/zh-CN.json'
 import jaJP from '../i18n/ja-JP.json'
 import { Lang } from './langs'
 
-export function getLanguage() {
-  return localStorage.getItem('chatLanguage') ?? navigator.language
+export function getLanguage(): Lang {
+  return (localStorage.getItem('chatLanguage') ?? navigator.language) as Lang
 }
 
 export function setLanguage(lang: Lang) {

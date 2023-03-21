@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@analytics/google-analytics": "^1.0.5",
+    "@liuli-util/async": "^3.6.0",
     "@liuli-util/react-router": "^0.8.0",
     "@picocss/pico": "^1.5.7",
     "analytics": "^0.8.1",
