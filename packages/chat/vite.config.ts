@@ -7,7 +7,9 @@ import { i18nextDtsGen } from '@liuli-util/rollup-plugin-i18next-dts-gen'
 export default defineConfig({
   base: './',
   plugins: [
-    react({ fastRefresh: false }),
+    react({
+      fastRefresh: false,
+    }),
     cssdts(),
     i18nextDtsGen({
       dirs: ['src/i18n'],

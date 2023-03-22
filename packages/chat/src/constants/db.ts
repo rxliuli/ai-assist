@@ -96,18 +96,8 @@ export class MessageService {
 
 export interface Prompt {
   id: string
-  authorId: string
-  fallback: Lang
-  // langs: https://www.techonthenet.com/js/language_tags.php
-  locale: Partial<
-    Record<
-      Lang,
-      {
-        title: string
-        detail: string
-      }
-    >
-  >
+  title: string
+  detail: string
 }
 
 export class PromptService {

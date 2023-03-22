@@ -1,14 +1,19 @@
-.settings {
+.icon {
+  color: rgb(207, 204, 200);
+  width: 1.5em;
+  height: 1.5em;
+  cursor: pointer;
 }
 
-.header {
+.newPrompt {
+  width: 100%;
+}
+
+.prompt {
   display: flex;
+  gap: 8px;
 }
-.header h2 {
-  margin-bottom: 0;
-}
-.header button {
-  width: fit-content;
-  padding: 0 16px;
-  margin: 0;
+
+.prompt > a {
+  flex-grow: 1;
 }

@@ -385,6 +385,7 @@ const ChatSidebar = observer(
           </ul>
           <footer className={css.footer}>
             <LanguageSelect></LanguageSelect>
+            <LinkListItem onClick={() => router.push('/setting')}>Setting</LinkListItem>
             <LinkListItem onClick={() => window.open('https://github.com/rxliuli/ai-assist', '_blank')}>
               GitHub
             </LinkListItem>

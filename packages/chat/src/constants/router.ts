@@ -12,20 +12,18 @@ import { AzureSpeechToText } from '../views/test/AzureSpeechToText'
 import { AzureTextToSpeech } from '../views/test/AzureTextToSpeech'
 import { CompleteInputDemo } from '../views/test/CompleteInputDemo'
 
-export const settingRoutes: (RouteConfig & { title: string })[] = [
-  { path: '/setting', component: SettingHomeView, title: 'Setting' },
-  { path: '/setting/open-api-key', component: SettingOpenAPIKeyView, title: 'Open API Key' },
-  { path: '/setting/prompt', component: SettingPromptView, title: 'Prompt' },
-  { path: '/setting/prompt/new', component: SettingPromptEditView, title: 'Prompt' },
-  { path: '/setting/prompt/:promptId', component: SettingPromptEditView, title: 'Prompt Edit' },
-]
-
 export const routes: RouteConfig[] = [
   { path: '/speak', component: SpeakView },
   {
     path: '/setting',
     component: SettingLayoutView,
-    children: settingRoutes,
+    children: [
+      { path: '/setting', component: SettingHomeView },
+      { path: '/setting/open-api-key', component: SettingOpenAPIKeyView },
+      { path: '/setting/prompt', component: SettingPromptView },
+      { path: '/setting/prompt/new', component: SettingPromptEditView },
+      { path: '/setting/prompt/:promptId', component: SettingPromptEditView },
+    ],
   },
   { path: '/:sessionId', component: ChatHomeView },
   { path: '/', component: ChatHomeView },

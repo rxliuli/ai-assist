@@ -11,7 +11,5 @@ configure({
 })
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
-    <ReactRouter history={router} routes={routes} />
-  </React.StrictMode>,
+  <ReactRouter history={router} routes={routes} />,
 )

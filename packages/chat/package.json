@@ -10,6 +10,9 @@
   },
   "dependencies": {
     "@analytics/google-analytics": "^1.0.5",
+    "@fortawesome/fontawesome-svg-core": "^6.3.0",
+    "@fortawesome/free-solid-svg-icons": "^6.3.0",
+    "@fortawesome/react-fontawesome": "^0.2.0",
     "@liuli-util/async": "^3.6.0",
     "@liuli-util/react-router": "^0.8.0",
     "@picocss/pico": "^1.5.7",
@@ -33,6 +36,7 @@
     "react-dom": "^18.2.0",
     "react-list": "^0.8.17",
     "react-markdown": "^8.0.5",
+    "react-router-dom": "^6.9.0",
     "react-svg": "^16.1.5",
     "react-syntax-highlighter": "^15.5.0",
     "react-use": "^17.4.0",
