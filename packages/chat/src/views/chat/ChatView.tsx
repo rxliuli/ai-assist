@@ -7,7 +7,7 @@ import { pick, reverse } from 'lodash-es'
 import { ReactElement, useEffect, useRef, useState } from 'react'
 import { useMount } from 'react-use'
 import clipboardy from 'clipboardy'
-import { initDatabase, Message, MessageService, Session, SessionService } from '../../constants/db'
+import { initDatabase, Message, MessageService, PromptService, Session, SessionService } from '../../constants/db'
 import { v4 } from 'uuid'
 import { router } from '../../constants/router'
 import { useParams } from '@liuli-util/react-router'
@@ -18,8 +18,8 @@ import closeSvg from './assets/close.svg'
 import menuSvg from './assets/menu.svg'
 import editSvg from './assets/edit.svg'
 import { MarkdownContent } from './components/MarkdownContent'
-import { t } from '../../constants/i18n'
-import { CompleteInput, Prompt } from './components/CompleteInput'
+import { getLanguage, t } from '../../constants/i18n'
+import { CompleteInput, Prompt, SystemPrompt } from './components/CompleteInput'
 import promptData from '../chat/constants/prompts.json'
 import { LanguageSelect } from './components/LanguageSelect'
 import saveAs from 'file-saver'
@@ -219,6 +219,25 @@ export const ChatMessages = observer(function (props: {
     props.onChangeActiveSessionId(session.id, true)
   }
 
+  const promptStore = useLocalStore(() => ({
+    prompts: [] as Prompt[],
+  }))
+  useMount(async () => {
+    const db = await initDatabase()
+    const service = new PromptService(db)
+    const language = getLanguage()
+    promptStore.prompts = [
+      ...(promptData.prompts as unknown as SystemPrompt[]).map((it) => {
+        const locale = it.locale[language] ?? it.locale[it.fallback]
+        return {
+          id: it.id,
+          title: locale.title,
+          detail: locale.detail,
+        } as Prompt
+      }),
+      ...(await service.list()),
+    ]
+  })
   return (
     <div className={css.chat}>
       <ul className={css.messages} ref={messagesRef}>
@@ -237,7 +256,7 @@ export const ChatMessages = observer(function (props: {
           onChange={(value) => (store.value = value)}
           onEnter={onSend}
           onPrompt={onPrompt}
-          prompts={promptData.prompts as unknown as Prompt[]}
+          prompts={promptStore.prompts}
           className={css.input}
           autoFocus={true}
           loading={store.loading}
@@ -385,7 +404,7 @@ const ChatSidebar = observer(
           </ul>
           <footer className={css.footer}>
             <LanguageSelect></LanguageSelect>
-            <LinkListItem onClick={() => router.push('/setting')}>Setting</LinkListItem>
+            <LinkListItem onClick={() => router.push('/setting')}>{t('setting.title')}</LinkListItem>
             <LinkListItem onClick={() => window.open('https://github.com/rxliuli/ai-assist', '_blank')}>
               GitHub
             </LinkListItem>
@@ -412,9 +431,9 @@ export const ChatHomeView = observer(() => {
     get activeSession() {
       return this.sessions.find((it) => it.id === this.activeSessionId)
     },
+    sessionService: null as SessionService | null,
+    messageService: null as MessageService | null,
   }))
-  const [sessionService, setSessionService] = useState<SessionService>()
-  const [messageService, setMessageService] = useState<MessageService>()
   const params = useParams<{ sessionId: string }>()
   useMount(async () => {
     Reflect.set(globalThis, 'store', store)
@@ -423,12 +442,26 @@ export const ChatHomeView = observer(() => {
     const db = await initDatabase()
     const sessionService = new SessionService(db)
     const messageService = new MessageService(db)
-    setSessionService(sessionService)
-    setMessageService(messageService)
+    store.sessionService = sessionService
+    store.messageService = messageService
     store.sessions = await sessionService.list()
     if (params.sessionId && store.sessions.some((it) => it.id === params.sessionId)) {
       store.messages = await messageService.list(params.sessionId)
       store.activeSessionId = params.sessionId
+    }
+    const s = new URLSearchParams(router.location.search)
+    if (s.get('action') === 'newPrompt' && s.has('prompt')) {
+      const prompt = { ...JSON.parse(s.get('prompt')!), id: v4() } as Prompt
+      const service = new PromptService(db)
+      await service.add(prompt)
+      const session: Session = {
+        id: v4(),
+        name: prompt.title,
+        date: new Date().toISOString(),
+        systemContent: prompt.detail,
+      }
+      await onCreateSession(session)
+      await onChangeActiveSessionId(session.id, true)
     }
   })
   async function onChangeActiveSessionId(id?: string, refresh?: boolean) {
@@ -441,15 +474,15 @@ export const ChatHomeView = observer(() => {
       store.messages = []
       return
     }
-    store.messages = await messageService!.list(id)
+    store.messages = await store.messageService!.list(id)
   }
   async function onCreateSession(session: Session) {
     store.sessions.unshift(session)
-    await sessionService!.add(toJS(session))
+    await store.sessionService!.add(toJS(session))
     router.push(`/${session.id}`)
   }
   async function onNotifiCreateMessage(message: Message) {
-    await messageService!.add(toJS(message))
+    await store.messageService!.add(toJS(message))
   }
   async function onDeleteSession(sessionId: string) {
     if (!store.sessions.some((it) => it.id === sessionId)) {
@@ -457,7 +490,7 @@ export const ChatHomeView = observer(() => {
       return
     }
     store.sessions = store.sessions.filter((it) => it.id !== sessionId)
-    await sessionService!.remove(sessionId)
+    await store.sessionService!.remove(sessionId)
     if (sessionId === store.activeSessionId) {
       store.activeSessionId = undefined
       store.messages = []
@@ -469,7 +502,7 @@ export const ChatHomeView = observer(() => {
       throw new Error('找不到 session ' + id)
     }
     session.name = name
-    await sessionService!.put(toJS(session))
+    await store.sessionService!.put(toJS(session))
   }
 
   async function onCopy() {
@@ -520,10 +553,10 @@ export const ChatHomeView = observer(() => {
         }
         const sessionId = v4()
         const session: Session = { id: sessionId, name: data.session.name, date: new Date().toISOString() }
-        await sessionService!.add(session)
+        await store.sessionService!.add(session)
         store.sessions.unshift(session)
         const messages = data.messages.map((it) => ({ ...it, id: v4(), sessionId } as Message))
-        await messageService!.batchAdd(messages)
+        await store.messageService!.batchAdd(messages)
         await onChangeActiveSessionId(sessionId, true)
       } catch (e) {
         alert(t('session.import.error'))

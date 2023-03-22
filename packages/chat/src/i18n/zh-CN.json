@@ -9,5 +9,20 @@
   "session.import.error": "导入失败",
   "message.send": "发送",
   "message.error.network": "网络错误",
-  "message.you": "你"
+  "message.you": "你",
+  "setting.title": "设置",
+  "setting.back": "返回",
+  "setting.home": "首页",
+  "setting.save": "保存",
+  "setting.save.success": "保存成功",
+  "setting.openApiKey.title": "OPEN API Key",
+  "setting.openApiKey.form.key": "OPEN API Key",
+  "setting.prompt.title": "提示",
+  "setting.prompt.new.title": "新建提示",
+  "setting.prompt.new.form.title": "标题",
+  "setting.prompt.new.form.detail": "提示内容",
+  "setting.prompt.edit.title": "编辑提示",
+  "setting.prompt.share": "分享",
+  "setting.prompt.share.success": "共享链接已复制到剪贴板",
+  "setting.prompt.delete": "删除"
 }

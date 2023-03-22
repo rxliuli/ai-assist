@@ -11,29 +11,30 @@ import { observable, toJS } from 'mobx'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleLeft, faHouse, faShare, faTrash } from '@fortawesome/free-solid-svg-icons'
 import clipboardy from 'clipboardy'
+import { t } from '../../constants/i18n'
 
 const settingStore = observable({
-  title: 'Setting',
+  title: t('setting.title'),
 })
 
 export const SettingOpenAPIKeyView = observer(() => {
   const apiKey = useLocalStore(() => ({ value: localStorage.getItem('OpenAPIKey') ?? '' }))
 
   useMount(() => {
-    settingStore.title = 'OpenAPIKey'
+    settingStore.title = t('setting.openApiKey.title')
   })
 
   function onSave(ev: FormEvent) {
     ev.preventDefault()
     localStorage.setItem('OpenAPIKey', apiKey.value)
     apiKey.value = ''
-    alert('Save success')
+    alert(t('setting.save.success'))
     router.back()
   }
   return (
     <form onSubmit={onSave}>
       <div>
-        <label htmlFor={'OpenAPIKey'}>OpenAPIKey:</label>
+        <label htmlFor={'OpenAPIKey'}>{t('setting.openApiKey.form.key')}:</label>
         <input
           type={'password'}
           id={'OpenAPIKey'}
@@ -43,7 +44,7 @@ export const SettingOpenAPIKeyView = observer(() => {
         ></input>
       </div>
       <div>
-        <button type={'submit'}>Save</button>
+        <button type={'submit'}>{t('setting.save')}</button>
       </div>
     </form>
   )
@@ -59,14 +60,7 @@ export const SettingPromptView = observer(() => {
     const service = new PromptService(db)
     store.list = await service.list()
     setPromptService(service)
-    settingStore.title = 'Prompt'
-    const s = new URLSearchParams(router.location.search)
-    if (s.get('action') === 'new' && s.has('prompt')) {
-      const prompt = { ...JSON.parse(s.get('prompt')!), id: v4() }
-      await service.add(prompt)
-      store.list.push(prompt)
-      router.replace('/setting/prompt')
-    }
+    settingStore.title = t('setting.prompt.title')
   })
   async function onDelete(it: Prompt) {
     await promptService!.delete(it.id)
@@ -75,17 +69,17 @@ export const SettingPromptView = observer(() => {
   async function onShare(it: Prompt) {
     const s = new URLSearchParams(router.location.search)
     s.forEach((it) => s.delete(it))
-    s.append('action', 'new')
+    s.append('action', 'newPrompt')
     s.append('prompt', JSON.stringify(it))
     const href =
       location.origin +
       router.createHref({
-        pathname: '/setting/prompt',
+        pathname: '/',
         search: s.toString(),
       })
-    console.log(href)
+    console.log('href', href)
     await clipboardy.write(href)
-    alert('Share url copy to clipboard')
+    alert(t('setting.prompt.share.success'))
   }
 
   return (
@@ -94,7 +88,7 @@ export const SettingPromptView = observer(() => {
         <ul>
           <li>
             <Link role="button" to={'/setting/prompt/new'} className={css.newPrompt}>
-              New Prompt
+              {t('setting.prompt.new.title')}
             </Link>
           </li>
           {store.list.map((it) => (
@@ -102,8 +96,18 @@ export const SettingPromptView = observer(() => {
               <Link to={`/setting/prompt/${it.id}`}>
                 <span>{it.title}</span>
               </Link>
-              <FontAwesomeIcon icon={faTrash} className={css.icon} onClick={() => onDelete(it)} />
-              <FontAwesomeIcon icon={faShare} className={css.icon} onClick={() => onShare(it)} />
+              <FontAwesomeIcon
+                icon={faTrash}
+                className={css.icon}
+                onClick={() => onDelete(it)}
+                title={t('setting.prompt.share')}
+              />
+              <FontAwesomeIcon
+                icon={faShare}
+                className={css.icon}
+                onClick={() => onShare(it)}
+                title={t('setting.prompt.delete')}
+              />
             </li>
           ))}
         </ul>
@@ -131,9 +135,9 @@ export const SettingPromptEditView = observer(() => {
     setPromptService(service)
     if (store.edit) {
       store.prompt = (await service.get(params.promptId!))!
-      settingStore.title = 'Edit Prompt'
+      settingStore.title = t('setting.prompt.edit.title')
     } else {
-      settingStore.title = 'New Prompt'
+      settingStore.title = t('setting.prompt.new.title')
     }
     console.log(params.promptId, toJS(store.prompt))
   })
@@ -151,11 +155,11 @@ export const SettingPromptEditView = observer(() => {
   return (
     <form onSubmit={onSave}>
       <div>
-        <label htmlFor={'title'}>Title:</label>
+        <label htmlFor={'title'}>{t('setting.prompt.new.form.title')}:</label>
         <input value={store.prompt.title} onChange={(ev) => (store.prompt.title = ev.target.value)} required></input>
       </div>
       <div>
-        <label htmlFor={'detail'}>System Message:</label>
+        <label htmlFor={'detail'}>{t('setting.prompt.new.form.detail')}:</label>
         <textarea
           value={store.prompt.detail}
           onChange={(ev) => (store.prompt.detail = ev.target.value)}
@@ -163,7 +167,7 @@ export const SettingPromptEditView = observer(() => {
         ></textarea>
       </div>
       <div>
-        <button type={'submit'}>Save</button>
+        <button type={'submit'}>{t('setting.save')}</button>
       </div>
     </form>
   )
@@ -187,17 +191,17 @@ function Select<T extends string>(props: {
 
 export const SettingHomeView = observer(() => {
   useMount(() => {
-    settingStore.title = 'Setting'
+    settingStore.title = t('setting.title')
   })
   return (
     <aside>
       <nav>
         <ul>
+          {/* <li>
+            <Link to={'/setting/open-api-key'}>{t('setting.openApiKey.title')}</Link>
+          </li> */}
           <li>
-            <Link to={'/setting/open-api-key'}>OpenAPIKey</Link>
-          </li>
-          <li>
-            <Link to={'/setting/prompt'}>Prompt</Link>
+            <Link to={'/setting/prompt'}>{t('setting.prompt.title')}</Link>
           </li>
         </ul>
       </nav>
@@ -211,7 +215,12 @@ export const SettingLayoutView = observer(() => {
       <nav>
         <ul>
           <li>
-            <FontAwesomeIcon onClick={() => router.back()} icon={faAngleLeft} className={css.icon} />
+            <FontAwesomeIcon
+              onClick={() => router.back()}
+              icon={faAngleLeft}
+              className={css.icon}
+              title={t('setting.back')}
+            />
           </li>
         </ul>
         <ul>
@@ -221,7 +230,12 @@ export const SettingLayoutView = observer(() => {
         </ul>
         <ul>
           <li>
-            <FontAwesomeIcon onClick={() => router.push('/')} icon={faHouse} />
+            <FontAwesomeIcon
+              onClick={() => router.push('/')}
+              icon={faHouse}
+              className={css.icon}
+              title={t('setting.home')}
+            />
           </li>
         </ul>
       </nav>

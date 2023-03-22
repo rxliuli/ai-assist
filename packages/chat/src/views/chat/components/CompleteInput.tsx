@@ -12,7 +12,7 @@ import { toJS } from 'mobx'
 import { Lang } from '../../../constants/langs'
 import { t } from '../../../constants/i18n'
 
-export interface Prompt {
+export interface SystemPrompt {
   id: string
   authorId: string
   fallback: Lang
@@ -26,6 +26,12 @@ export interface Prompt {
   >
 }
 
+export interface Prompt {
+  id: string
+  title: string
+  detail: string
+}
+
 interface CompleteInputProps {
   value: string
   onChange: (value: string) => void
@@ -33,12 +39,6 @@ interface CompleteInputProps {
   onPrompt: (title: string, systemContent: string) => void
   prompts: Prompt[]
   loading?: boolean
-}
-
-interface LabelValue {
-  id: string
-  title: string
-  detail: string
 }
 
 /**
@@ -53,7 +53,7 @@ export const CompleteInput = observer(
       get promptMode() {
         return store.value.startsWith('/') && !store.value.includes(' ')
       },
-      list: [] as LabelValue[],
+      list: [] as Prompt[],
       acitve: 0,
       inputFlag: true,
     }))
@@ -61,21 +61,8 @@ export const CompleteInput = observer(
     const listRef = useRef<List>(null)
 
     const clacPrompt = throttle(() => {
-      const language = navigator.language as Lang
       const t = store.value.slice(1).toLowerCase()
-      store.list = props.prompts
-        .filter(
-          (it) =>
-            it.locale[language]?.title.toLowerCase().includes(t) ||
-            it.locale[it.fallback].title.toLowerCase().includes(t),
-        )
-        .map((it) => {
-          const locale = it.locale[language] ?? it.locale[it.fallback]
-          return {
-            id: it.id,
-            ...locale,
-          } as LabelValue
-        })
+      store.list = props.prompts.filter((it) => it.title.toLowerCase().includes(t))
       console.log('list', toJS(store.list))
       store.acitve = 0
       listRef.current?.scrollToItem(0, 'smart')
@@ -186,7 +173,7 @@ export const CompleteInput = observer(
             height={Math.min(store.list.length, 10) * 35}
             width={'100%'}
           >
-            {observer(({ index, style, data }: ListChildComponentProps<LabelValue[]>) => (
+            {observer(({ index, style, data }: ListChildComponentProps<Prompt[]>) => (
               <li
                 style={style}
                 className={classNames(css.prompt, {

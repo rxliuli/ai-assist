@@ -9,5 +9,20 @@
   "session.import.error": "インポートに失敗しました",
   "message.send": "送信",
   "message.error.network": "ネットワークエラー",
-  "message.you": "あなた"
+  "message.you": "あなた",
+  "setting.title": "設定",
+  "setting.back": "戻る",
+  "setting.home": "ホーム",
+  "setting.save": "保存",
+  "setting.save.success": "保存に成功しました",
+  "setting.openApiKey.title": "OPEN API Key",
+  "setting.openApiKey.form.key": "OPEN API Key",
+  "setting.prompt.title": "プロンプト",
+  "setting.prompt.new.title": "新しいプロンプト",
+  "setting.prompt.new.form.title": "タイトル",
+  "setting.prompt.new.form.detail": "プロンプトの内容",
+  "setting.prompt.edit.title": "プロンプトの編集",
+  "setting.prompt.share": "共有",
+  "setting.prompt.share.success": "共有リンクがクリップボードにコピーされました",
+  "setting.prompt.delete": "削除"
 }
