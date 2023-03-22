@@ -17,18 +17,8 @@ it('convert', async () => {
     (it) =>
       ({
         id: it.title,
-        authorId: 'rockbenben',
-        fallback: 'en-US',
-        locale: {
-          'en-US': {
-            title: format(it.title),
-            detail: format(it.description),
-          },
-          'zh-CN': {
-            title: format(it.title),
-            detail: format(it.descn),
-          },
-        },
+        title: format(it.title),
+        detail: format(it.descn),
       } as Prompt),
   )
   await writeFile(path.resolve(tempPath, 'prompts.json'), JSON.stringify(r, null, 2))
@@ -47,14 +37,8 @@ it('parse', async () => {
       (it) =>
         ({
           id: it.act,
-          fallback: 'en-US',
-          authorId: 'awesome-chatgpt-prompts',
-          locale: {
-            'en-US': {
-              title: it.act,
-              detail: it.prompt,
-            },
-          },
+          title: it.act,
+          detail: it.prompt,
         } as Prompt),
     )
   await writeFile(path.resolve(tempPath, 'prompts.json'), JSON.stringify(r, null, 2))
