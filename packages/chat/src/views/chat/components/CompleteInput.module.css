@@ -1,6 +1,14 @@
 .hide {
   display: none;
 }
+.icon {
+  color: rgb(207, 204, 200);
+  width: 1.5em;
+  height: 1.5em;
+  cursor: pointer;
+
+  margin-bottom: 12px;
+}
 
 .newMessage {
   position: relative;

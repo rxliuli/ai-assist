@@ -173,6 +173,10 @@
   gap: 8px;
   padding: 1rem 1rem;
 }
+.messageButtom {
+  display: block;
+  height: 1px;
+}
 .message div.user {
   white-space: pre-wrap;
 }

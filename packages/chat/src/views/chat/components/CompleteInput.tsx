@@ -11,6 +11,8 @@ import { ga4 } from '../../../constants/ga'
 import { toJS } from 'mobx'
 import { Lang } from '../../../constants/langs'
 import { t } from '../../../constants/i18n'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPaperPlane, faStop } from '@fortawesome/free-solid-svg-icons'
 
 export interface SystemPrompt {
   id: string
@@ -37,6 +39,7 @@ interface CompleteInputProps {
   onChange: (value: string) => void
   onEnter: (value: string) => void
   onPrompt: (title: string, systemContent: string) => void
+  onStop: () => void
   prompts: Prompt[]
   loading?: boolean
 }
@@ -193,16 +196,29 @@ export const CompleteInput = observer(
         <textarea
           className={css.textarea}
           ref={textareaRef}
-          {...omit(props, 'value', 'onChange', 'prompts', 'onEnter', 'onInput', 'className', 'loading', 'onPrompt')}
+          {...omit(
+            props,
+            'value',
+            'onChange',
+            'prompts',
+            'onEnter',
+            'onInput',
+            'className',
+            'loading',
+            'onPrompt',
+            'onStop',
+          )}
           value={store.value}
           onInput={onInput}
           onKeyDown={onKeyDown}
           onCompositionStart={() => (store.inputFlag = false)}
           onCompositionEnd={() => (store.inputFlag = true)}
         ></textarea>
-        <button onClick={onEnter} aria-busy={props.loading}>
-          {t('message.send')}
-        </button>
+        {props.loading ? (
+          <FontAwesomeIcon onClick={props.onStop} icon={faStop} className={css.icon} title={t('setting.back')} />
+        ) : (
+          <FontAwesomeIcon onClick={onEnter} icon={faPaperPlane} className={css.icon} title={t('setting.back')} />
+        )}
       </div>
     )
   },

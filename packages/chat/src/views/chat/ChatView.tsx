@@ -3,7 +3,7 @@ import { toJS } from 'mobx'
 import css from './ChatView.module.css'
 import classNames from 'classnames'
 import GPT3Tokenizer from 'gpt3-tokenizer'
-import { pick, reverse } from 'lodash-es'
+import { findLast, last, pick, reverse } from 'lodash-es'
 import { ReactElement, useEffect, useRef, useState } from 'react'
 import { useMount } from 'react-use'
 import clipboardy from 'clipboardy'
@@ -68,7 +68,8 @@ export const ChatMessages = observer(function (props: {
   activeSession?: Session
   onChangeActiveSessionId(id: string, refresh: boolean): void
   onCreateSession(session: Session): Promise<void>
-  onNotifiCreateMessage(session: Message): void
+  onNotifiCreateMessage(message: Message): void
+  onNotifiDeleteMessage(id: string): void
   onCopy(): void
   onExport(): void
   onImport(): void
@@ -76,6 +77,7 @@ export const ChatMessages = observer(function (props: {
   const store = useLocalObservable(() => ({
     value: '',
     loading: false,
+    abort: null as AbortController | null,
   }))
 
   const messagesRef = useRef<HTMLUListElement>(null)
@@ -83,29 +85,28 @@ export const ChatMessages = observer(function (props: {
     messagesRef.current?.lastElementChild?.scrollIntoView({ behavior: 'auto', block: 'end' })
   }, [props.messages])
 
-  async function onSend(msg: string) {
-    if (store.loading) {
-      return
+  // 保存消息与生成会话
+  function onSave(msg: string) {
+    const activeSessionId = props.activeSession?.id
+    const sessionId = activeSessionId ?? v4()
+
+    const userMsg: Message = {
+      id: v4(),
+      sessionId: sessionId,
+      content: msg.trim(),
+      role: 'user',
+      date: new Date().toISOString(),
     }
-    store.loading = true
+    props.messages.push(userMsg)
+    props.onNotifiCreateMessage(userMsg)
 
+    return sessionId
+  }
+  // 根据前文生成答案，不负责保存用户输入的消息
+  async function onGenerate(sessionId: string) {
     try {
-      if (msg.trim().length === 0) {
-        return
-      }
-      const activeSessionId = props.activeSession?.id
-      const sessionId = activeSessionId ?? v4()
-
-      const userMsg: Message = {
-        id: v4(),
-        sessionId: sessionId,
-        content: msg.trim(),
-        role: 'user',
-        date: new Date().toISOString(),
-      }
-      props.messages.push(userMsg)
-      await new Promise((resolve) => setTimeout(resolve, 0))
-      messagesRef.current!.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+      store.loading = true
+      store.abort = new AbortController()
       const [list, sum] = sliceMessages(
         props.messages.map((it) => pick(it, 'role', 'content')),
         3000,
@@ -129,6 +130,7 @@ export const ChatMessages = observer(function (props: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(finalList),
+        signal: store.abort?.signal,
       })
       if (resp.status !== 200) {
         const end = Date.now()
@@ -149,31 +151,55 @@ export const ChatMessages = observer(function (props: {
         alert(t('message.error.network'))
         return
       }
-      let titleRes: Promise<string> = Promise.resolve(t('session.new'))
-      if (!activeSessionId) {
-        titleRes = fetch('/api/chat', {
-          method: 'post',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify([
-            {
-              role: 'system',
-              content:
-                'Please summarize the following content into a topic, no more than 10 words, do not add punctuation at the end, please use the original language of the following content',
-            },
-            {
-              role: 'user',
-              content: userMsg.content,
-            },
-          ] as Message[]),
-        }).then((res) => res.text())
-      }
       props.messages.push({ id: v4(), sessionId, content: '', role: 'assistant', date: new Date().toISOString() })
       const m = props.messages[props.messages.length - 1]
       const reader = resp.body!.getReader()
       let chunk = await reader.read()
       const textDecoder = new TextDecoder()
+
+      async function onGenerated() {
+        const activeSessionId = props.activeSession?.id
+        const userMsg = findLast(props.messages, (it) => it.role === 'user')!
+        if (!activeSessionId) {
+          const generateTitle = await fetch('/api/chat', {
+            method: 'post',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify([
+              {
+                role: 'system',
+                content:
+                  'Please summarize the following content into a topic, no more than 10 words, do not add punctuation at the end, please use the original language of the following content',
+              },
+              {
+                role: 'user',
+                content: userMsg.content,
+              },
+            ] as Message[]),
+          }).then((res) => res.text())
+          const session: Session = { id: sessionId, name: generateTitle, date: new Date().toISOString() }
+          props.onCreateSession(session)
+          props.onChangeActiveSessionId(sessionId, false)
+        }
+        props.onNotifiCreateMessage(m)
+        const end = Date.now()
+
+        const tokenizer = new GPT3Tokenizer({ type: 'gpt3' })
+        ga4.track('chat_event', {
+          eventType: 'chat.send',
+          sessionId,
+          requestMessageCount: list.length,
+          requestTokens: sum,
+          responseTokens: tokenizer.encode(m.content).text.length,
+          begin: start,
+          end: end,
+          time: end - start,
+        })
+      }
+
+      store.abort?.signal.addEventListener('abort', onGenerated)
+
       while (!chunk.done) {
         const s = textDecoder.decode(chunk.value)
         m.content += s
@@ -183,29 +209,29 @@ export const ChatMessages = observer(function (props: {
       new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
         messagesRef.current!.lastElementChild?.scrollIntoView({ behavior: 'auto', block: 'end' })
       })
-      if (!activeSessionId) {
-        const session: Session = { id: sessionId, name: await titleRes, date: new Date().toISOString() }
-        props.onCreateSession(session)
-        props.onChangeActiveSessionId(sessionId, false)
+      await onGenerated()
+    } catch (err) {
+      if (err instanceof Error && err.name !== 'AbortError') {
+        console.log('abort')
+        return
       }
-      props.onNotifiCreateMessage(userMsg)
-      props.onNotifiCreateMessage(m)
-      const end = Date.now()
-
-      const tokenizer = new GPT3Tokenizer({ type: 'gpt3' })
-      ga4.track('chat_event', {
-        eventType: 'chat.send',
-        sessionId,
-        requestMessageCount: list.length,
-        requestTokens: sum,
-        responseTokens: tokenizer.encode(m.content).text.length,
-        begin: start,
-        end: end,
-        time: end - start,
-      })
+      throw err
     } finally {
       store.loading = false
+      store.abort = null
     }
+  }
+
+  async function onSend(msg: string) {
+    if (store.loading) {
+      return
+    }
+    if (msg.trim().length === 0) {
+      return
+    }
+    const sessionId = onSave(msg)
+    messagesRef.current!.lastElementChild!.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    await onGenerate(sessionId)
   }
 
   async function onPrompt(title: string, systemContent: string) {
@@ -238,15 +264,46 @@ export const ChatMessages = observer(function (props: {
       ...(await service.list()),
     ]
   })
+
+  function onStop() {
+    store.abort?.abort()
+    ga4.track('chat_event', {
+      eventType: 'chat.stop',
+      sessionId: props.activeSession!.id,
+    })
+  }
+  async function onRegenerate() {
+    if (store.loading) {
+      return
+    }
+    const lastMsg = last(props.messages)
+    if (!lastMsg || lastMsg.role !== 'assistant') {
+      return
+    }
+    const sessionId = props.activeSession?.id
+    if (!sessionId) {
+      return
+    }
+    props.messages.splice(props.messages.length - 1, 1)
+    props.onNotifiDeleteMessage(lastMsg.id)
+    await onGenerate(sessionId)
+    ga4.track('chat_event', {
+      eventType: 'chat.regenerate',
+      sessionId: props.activeSession!.id,
+    })
+  }
+
   return (
     <div className={css.chat}>
       <ul className={css.messages} ref={messagesRef}>
         {props.messages.map((it) => (
           <ChatMessage key={it.id} message={it}></ChatMessage>
         ))}
+        <li className={css.messageButtom}></li>
       </ul>
       <footer className={classNames('container', css.footer)}>
         <div className={css.operations}>
+          <button onClick={onRegenerate}>Regenerate response</button>
           <button onClick={props.onCopy}>{t('session.copy')}</button>
           <button onClick={props.onExport}>{t('session.export')}</button>
           <button onClick={props.onImport}>{t('session.import')}</button>
@@ -256,6 +313,7 @@ export const ChatMessages = observer(function (props: {
           onChange={(value) => (store.value = value)}
           onEnter={onSend}
           onPrompt={onPrompt}
+          onStop={onStop}
           prompts={promptStore.prompts}
           className={css.input}
           autoFocus={true}
@@ -484,6 +542,9 @@ export const ChatHomeView = observer(() => {
   async function onNotifiCreateMessage(message: Message) {
     await store.messageService!.add(toJS(message))
   }
+  async function onNotifiDeleteMessage(id: string) {
+    await store.messageService!.remove(id)
+  }
   async function onDeleteSession(sessionId: string) {
     if (!store.sessions.some((it) => it.id === sessionId)) {
       console.log('session not found')
@@ -593,6 +654,7 @@ export const ChatHomeView = observer(() => {
         onCreateSession={onCreateSession}
         onChangeActiveSessionId={onChangeActiveSessionId}
         onNotifiCreateMessage={onNotifiCreateMessage}
+        onNotifiDeleteMessage={onNotifiDeleteMessage}
         onCopy={onCopy}
         onExport={onExport}
         onImport={onImport}
