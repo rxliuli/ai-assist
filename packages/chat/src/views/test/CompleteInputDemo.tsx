@@ -18,6 +18,7 @@ export const CompleteInputDemo = observer(() => {
           onPrompt={(title, content) => console.log('prmopt', title, content)}
           prompts={promptData.prompts as any}
           onEnter={(value) => console.log('enter', value)}
+          onStop={() => console.log('stop')}
         ></CompleteInput>
       </div>
     </div>
