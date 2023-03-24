@@ -12,6 +12,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleLeft, faHouse, faShare, faTrash } from '@fortawesome/free-solid-svg-icons'
 import clipboardy from 'clipboardy'
 import { t } from '../../constants/i18n'
+import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 
 const settingStore = observable({
   title: t('setting.title'),
@@ -46,6 +47,9 @@ export const SettingOpenAPIKeyView = observer(() => {
       <div>
         <button type={'submit'}>{t('setting.save')}</button>
       </div>
+      <article>
+        <ReactMarkdown children={t('setting.openApiKey.desc').trim()}></ReactMarkdown>
+      </article>
     </form>
   )
 })
