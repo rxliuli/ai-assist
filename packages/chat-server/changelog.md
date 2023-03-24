@@ -1,5 +1,14 @@
 # changelog
 
+## 0.4.6
+
+- fix: 网络失败后允许重新生成
+- feat: 支持自定义 openai key
+- feat: 支持中断输出，支持重新开始输出
+- chore: remove service worker
+- fix: 修复一些细节性的 ui 错误
+- chore: 调整发布脚本
+
 ## 0.4.0
 
 - feat: 支持自定义提示语
