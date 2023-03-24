@@ -18,7 +18,7 @@ const settingStore = observable({
 })
 
 export const SettingOpenAPIKeyView = observer(() => {
-  const apiKey = useLocalStore(() => ({ value: localStorage.getItem('OpenAPIKey') ?? '' }))
+  const apiKey = useLocalStore(() => ({ value: localStorage.getItem('OPENAI_API_KEY') ?? '' }))
 
   useMount(() => {
     settingStore.title = t('setting.openApiKey.title')
@@ -26,7 +26,7 @@ export const SettingOpenAPIKeyView = observer(() => {
 
   function onSave(ev: FormEvent) {
     ev.preventDefault()
-    localStorage.setItem('OpenAPIKey', apiKey.value)
+    localStorage.setItem('OPENAI_API_KEY', apiKey.value)
     apiKey.value = ''
     alert(t('setting.save.success'))
     router.back()
@@ -197,9 +197,9 @@ export const SettingHomeView = observer(() => {
     <aside>
       <nav>
         <ul>
-          {/* <li>
+          <li>
             <Link to={'/setting/open-api-key'}>{t('setting.openApiKey.title')}</Link>
-          </li> */}
+          </li>
           <li>
             <Link to={'/setting/prompt'}>{t('setting.prompt.title')}</Link>
           </li>

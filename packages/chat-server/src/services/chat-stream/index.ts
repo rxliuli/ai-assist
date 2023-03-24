@@ -1,5 +1,5 @@
 import { ChatCompletionRequestMessage } from 'openai'
-import { openai } from '../../constants/chatgpt'
+import { getOpenAIApi } from '../../constants/chatgpt'
 import { streamCompletion } from '@fortaine/openai/stream'
 import { PassThrough, Stream } from 'stream'
 import { logger } from '../../constants/logger'
@@ -23,7 +23,7 @@ interface ChatCompletion {
  * @param messages
  * @returns
  */
-export function chatStream(messages: Array<ChatCompletionRequestMessage>) {
+export function chatStream(messages: Array<ChatCompletionRequestMessage>, apiKey: string) {
   const stream = new Stream.Readable({
     read(size) {
       // do nothing
@@ -35,7 +35,7 @@ export function chatStream(messages: Array<ChatCompletionRequestMessage>) {
     chatStreamLogger.startTime = new Date()
     chatStreamLogger.messages = messages
     try {
-      const completion = await openai.createChatCompletion(
+      const completion = await getOpenAIApi(apiKey).createChatCompletion(
         {
           model: 'gpt-3.5-turbo',
           messages,

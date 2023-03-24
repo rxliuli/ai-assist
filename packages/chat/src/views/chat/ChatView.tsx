@@ -124,6 +124,7 @@ export const ChatMessages = observer(function (props: {
         method: 'post',
         headers: {
           'Content-Type': 'application/json',
+          OPENAI_API_KEY: localStorage.getItem('OPENAI_API_KEY')!,
         },
         body: JSON.stringify(finalList),
         signal: store.abort?.signal,
@@ -161,6 +162,7 @@ export const ChatMessages = observer(function (props: {
             method: 'post',
             headers: {
               'Content-Type': 'application/json',
+              OPENAI_API_KEY: localStorage.getItem('OPENAI_API_KEY')!,
             },
             body: JSON.stringify([
               {

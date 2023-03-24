@@ -12,6 +12,7 @@ import classNames from 'classnames'
 import { useUnmount } from 'react-use'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCopy } from '@fortawesome/free-solid-svg-icons'
+import { t } from '../../../constants/i18n'
 
 function attrs(o: Record<string, [pre: boolean, val: string]>) {
   return Object.entries(o).reduce((r, [k, v]) => {
@@ -23,14 +24,14 @@ function attrs(o: Record<string, [pre: boolean, val: string]>) {
 }
 
 const ClickTooltip = (props: { className?: string; children: ReactNode }) => {
-  const [tip, setTip] = useState('Copy code')
+  const [tip, setTip] = useState(t('message.code.copy'))
   return (
     <span
-      onClick={() => setTip('Copied')}
+      onClick={() => setTip(t('message.code.copied'))}
       className={props.className}
       data-placement={'left'}
       data-tooltip={tip}
-      onMouseLeave={() => setTip('Copy code')}
+      onMouseLeave={() => setTip(t('message.code.copy'))}
     >
       {props.children}
     </span>
@@ -40,12 +41,7 @@ const ClickTooltip = (props: { className?: string; children: ReactNode }) => {
 const CopyButton = (props: { children: ReactNode }) => {
   return (
     <ClickTooltip className={css.copy}>
-      <FontAwesomeIcon
-        icon={faCopy}
-        width={'1em'}
-        height={'1em'}
-        onClick={() => clipboardy.write(String(props.children))}
-      />
+      <FontAwesomeIcon icon={faCopy} onClick={() => clipboardy.write(String(props.children))} />
     </ClickTooltip>
   )
 }

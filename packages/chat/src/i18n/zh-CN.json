@@ -12,6 +12,8 @@
   "message.you": "你",
   "message.regenerate": "重新生成",
   "message.stopGenerate": "停止生成",
+  "message.code.copy": "复制代码",
+  "message.code.copied": "已复制",
   "setting.title": "设置",
   "setting.back": "返回",
   "setting.home": "首页",

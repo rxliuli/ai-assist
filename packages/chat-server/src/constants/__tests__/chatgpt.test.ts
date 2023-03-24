@@ -1,9 +1,9 @@
 import { expect, it } from 'vitest'
-import { openai } from '../chatgpt'
+import { getOpenAIApi } from '../chatgpt'
 import { streamCompletion } from '@fortaine/openai/stream'
 
 it('should work', async () => {
-  const r = await openai.createChatCompletion({
+  const r = await getOpenAIApi().createChatCompletion({
     model: 'gpt-3.5-turbo',
     messages: [
       {
@@ -30,7 +30,7 @@ type ChatCompletion = {
 }
 
 it('stream', async () => {
-  const completion = await openai.createChatCompletion(
+  const completion = await getOpenAIApi().createChatCompletion(
     {
       model: 'gpt-3.5-turbo',
       messages: [

@@ -12,6 +12,8 @@
   "message.you": "あなた",
   "message.regenerate": "再生成",
   "message.stopGenerate": "生成を中止",
+  "message.code.copy": "コードをコピー",
+  "message.code.copied": "コピーしました",
   "setting.title": "設定",
   "setting.back": "戻る",
   "setting.home": "ホーム",

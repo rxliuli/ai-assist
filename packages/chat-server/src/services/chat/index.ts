@@ -1,8 +1,8 @@
 import { ChatCompletionRequestMessage } from 'openai'
-import { openai } from '../../constants/chatgpt'
+import { getOpenAIApi, openai } from '../../constants/chatgpt'
 
-export async function chat(messages: Array<ChatCompletionRequestMessage>) {
-  const r = await openai.createChatCompletion({
+export async function chat(messages: Array<ChatCompletionRequestMessage>, apiKey: string) {
+  const r = await getOpenAIApi(apiKey).createChatCompletion({
     model: 'gpt-3.5-turbo',
     messages: messages,
   })

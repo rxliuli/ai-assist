@@ -12,6 +12,8 @@
   "message.you": "You",
   "message.regenerate": "Regenerate response",
   "message.stopGenerate": "Stop generate",
+  "message.code.copy": "Copy code",
+  "message.code.copied": "Copied",
   "setting.title": "Settings",
   "setting.back": "Back",
   "setting.home": "Home",

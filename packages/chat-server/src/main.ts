@@ -28,12 +28,12 @@ router.post('/api/translate', async (ctx) => {
 
 router.post('/api/chat', async (ctx) => {
   const params = ctx.request.body as Array<ChatCompletionRequestMessage>
-  const r = await chat(params)
+  const r = await chat(params, ctx.get('OPENAI_API_KEY'))
   ctx.body = r
 })
 router.post('/api/chat-stream', async (ctx) => {
   const params = ctx.request.body as Array<ChatCompletionRequestMessage>
-  const stream = chatStream(params)
+  const stream = chatStream(params, ctx.get('OPENAI_API_KEY'))
   // 设置响应头
   ctx.set('Content-Type', 'application/octet-stream')
   ctx.set('Content-Disposition', 'attachment; filename="file.txt"')
