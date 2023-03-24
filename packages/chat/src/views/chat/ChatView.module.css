@@ -23,7 +23,7 @@
     height: 42px;
     padding: 0 var(--spacing);
     background-color: #2e3234;
-    box-shadow: 0 0 4px red;
+    border-bottom: solid 1px var(--muted-color);
     display: grid;
     grid-template-columns: auto 1fr auto;
     align-items: center;
