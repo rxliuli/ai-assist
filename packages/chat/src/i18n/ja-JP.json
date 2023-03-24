@@ -10,6 +10,8 @@
   "message.send": "送信",
   "message.error.network": "ネットワークエラー",
   "message.you": "あなた",
+  "message.regenerate": "再生成",
+  "message.stopGenerate": "生成を中止",
   "setting.title": "設定",
   "setting.back": "戻る",
   "setting.home": "ホーム",

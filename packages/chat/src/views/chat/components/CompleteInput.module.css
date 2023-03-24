@@ -16,7 +16,6 @@
   display: flex;
   gap: 8px;
   align-items: end;
-  padding-bottom: var(--spacing);
 }
 
 .newMessage .input {

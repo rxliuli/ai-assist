@@ -10,6 +10,8 @@
   "message.send": "Send",
   "message.error.network": "Network error",
   "message.you": "You",
+  "message.regenerate": "Regenerate response",
+  "message.stopGenerate": "Stop generate",
   "setting.title": "Settings",
   "setting.back": "Back",
   "setting.home": "Home",

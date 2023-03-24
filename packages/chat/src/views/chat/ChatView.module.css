@@ -21,25 +21,13 @@
   }
   .header {
     height: 42px;
+    padding: 0 var(--spacing);
     background-color: #2e3234;
+    box-shadow: 0 0 4px red;
     display: grid;
     grid-template-columns: auto 1fr auto;
     align-items: center;
     gap: 16px;
-  }
-  .header > button {
-    width: 40px;
-    height: 40px;
-    background-color: transparent;
-    border: none;
-    padding: 0;
-    margin-bottom: 0;
-    box-shadow: none;
-    outline: none;
-  }
-  .header > button svg {
-    width: 24px;
-    height: 24px;
   }
 }
 /* 侧边栏 */
@@ -121,8 +109,10 @@
   text-decoration: none;
   display: flex;
   align-items: center;
-  gap: 6px;
   height: 36px;
+}
+.sessionOperator {
+  padding: 4px;
 }
 .session .name {
   flex-grow: 1;
@@ -200,6 +190,12 @@
 
 .footer {
   padding: 0.5rem 0 0;
+  display: grid;
+  gap: 8px;
+}
+
+.messageEditor {
+  padding: 0.5rem 1rem 0;
   display: grid;
   gap: 8px;
 }

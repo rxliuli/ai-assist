@@ -3,20 +3,14 @@ import { toJS } from 'mobx'
 import css from './ChatView.module.css'
 import classNames from 'classnames'
 import GPT3Tokenizer from 'gpt3-tokenizer'
-import { findLast, last, pick, reverse } from 'lodash-es'
-import { ReactElement, useEffect, useRef, useState } from 'react'
+import { findLast, last, pick } from 'lodash-es'
+import { ReactElement, useEffect, useRef } from 'react'
 import { useMount } from 'react-use'
 import clipboardy from 'clipboardy'
 import { initDatabase, Message, MessageService, PromptService, Session, SessionService } from '../../constants/db'
 import { v4 } from 'uuid'
 import { router } from '../../constants/router'
 import { useParams } from '@liuli-util/react-router'
-import { ReactSVG } from 'react-svg'
-import deleteSvg from './assets/delete.svg'
-import addSvg from './assets/add.svg'
-import closeSvg from './assets/close.svg'
-import menuSvg from './assets/menu.svg'
-import editSvg from './assets/edit.svg'
 import { MarkdownContent } from './components/MarkdownContent'
 import { getLanguage, t } from '../../constants/i18n'
 import { CompleteInput, Prompt, SystemPrompt } from './components/CompleteInput'
@@ -25,6 +19,8 @@ import { LanguageSelect } from './components/LanguageSelect'
 import saveAs from 'file-saver'
 import filenamify from 'filenamify'
 import { ga4 } from '../../constants/ga'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faBars, faClose, faPen, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
 
 function sliceMessages(
   messages: Pick<Message, 'role' | 'content'>[],
@@ -301,9 +297,9 @@ export const ChatMessages = observer(function (props: {
         ))}
         <li className={css.messageButtom}></li>
       </ul>
-      <footer className={classNames('container', css.footer)}>
+      <footer className={classNames('container', css.messageEditor)}>
         <div className={css.operations}>
-          <button onClick={onRegenerate}>Regenerate response</button>
+          <button onClick={onRegenerate}>{t('message.regenerate')}</button>
           <button onClick={props.onCopy}>{t('session.copy')}</button>
           <button onClick={props.onExport}>{t('session.export')}</button>
           <button onClick={props.onImport}>{t('session.import')}</button>
@@ -327,8 +323,8 @@ export const ChatMessages = observer(function (props: {
 const LinkListItem = (props: {
   className?: string
   onClick(ev: React.MouseEvent): void
-  left?: ReactElement<ReactSVG>
-  right?: ReactElement<ReactSVG>
+  left?: ReactElement
+  right?: ReactElement
   children: string
 }) => {
   return (
@@ -351,7 +347,8 @@ const SessionItem = observer(
   }) => {
     const store = useLocalStore(() => ({ value: props.value, edit: false, inputFlag: true }))
     const inputRef = useRef<HTMLInputElement>(null)
-    async function onEdit() {
+    async function onEdit(ev: React.MouseEvent) {
+      ev.stopPropagation()
       store.edit = true
       await new Promise((resolve) => setTimeout(resolve, 0))
       inputRef.current!.focus()
@@ -386,7 +383,7 @@ const SessionItem = observer(
             onCompositionStart={() => (store.inputFlag = false)}
             onCompositionEnd={() => (store.inputFlag = true)}
           ></input>
-          <ReactSVG src={closeSvg} onClick={onCancel}></ReactSVG>
+          <FontAwesomeIcon className={css.sessionOperator} icon={faClose} onClick={onCancel} />
         </div>
         <LinkListItem
           onClick={props.onClick}
@@ -396,14 +393,15 @@ const SessionItem = observer(
           })}
           right={
             <>
-              {props.active && <ReactSVG src={editSvg} onClick={onEdit}></ReactSVG>}
-              <ReactSVG
-                src={deleteSvg}
+              {props.active && <FontAwesomeIcon className={css.sessionOperator} icon={faPen} onClick={onEdit} />}
+              <FontAwesomeIcon
+                className={css.sessionOperator}
+                icon={faTrash}
                 onClick={(ev) => {
                   ev.stopPropagation()
                   props.onDeleteSession()
                 }}
-              ></ReactSVG>
+              />
             </>
           }
         >
@@ -467,9 +465,7 @@ const ChatSidebar = observer(
               GitHub
             </LinkListItem>
           </footer>
-          <button className={css.close} onClick={props.onCloseShowSidebar}>
-            <ReactSVG src={closeSvg}></ReactSVG>
-          </button>
+          <FontAwesomeIcon className={css.close} icon={faClose} onClick={props.onCloseShowSidebar} />
         </div>
       </div>
     )
@@ -640,13 +636,9 @@ export const ChatHomeView = observer(() => {
         onEditSession={onEditSession}
       ></ChatSidebar>
       <header className={css.header}>
-        <button onClick={() => (store.showSidebar = true)}>
-          <ReactSVG src={menuSvg}></ReactSVG>
-        </button>
+        <FontAwesomeIcon icon={faBars} onClick={() => (store.showSidebar = true)} />
         <span className={css.ellipsis}>{store.sessionName}</span>
-        <button onClick={() => onChangeActiveSessionId(undefined, true)}>
-          <ReactSVG src={addSvg}></ReactSVG>
-        </button>
+        <FontAwesomeIcon icon={faPlus} onClick={() => onChangeActiveSessionId(undefined, true)} />
       </header>
       <ChatMessages
         activeSession={store.activeSession}

@@ -5,13 +5,13 @@ import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import 'katex/dist/katex.min.css'
 import css from './MarkdownContent.module.css'
-import { ReactSVG } from 'react-svg'
-import copySvg from '../assets/copy.svg'
 import clipboardy from 'clipboardy'
 import { observer } from 'mobx-react-lite'
 import React, { ReactNode, useState } from 'react'
 import classNames from 'classnames'
 import { useUnmount } from 'react-use'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCopy } from '@fortawesome/free-solid-svg-icons'
 
 function attrs(o: Record<string, [pre: boolean, val: string]>) {
   return Object.entries(o).reduce((r, [k, v]) => {
@@ -40,13 +40,12 @@ const ClickTooltip = (props: { className?: string; children: ReactNode }) => {
 const CopyButton = (props: { children: ReactNode }) => {
   return (
     <ClickTooltip className={css.copy}>
-      <ReactSVG
-        wrapper={'span'}
-        src={copySvg}
+      <FontAwesomeIcon
+        icon={faCopy}
         width={'1em'}
         height={'1em'}
         onClick={() => clipboardy.write(String(props.children))}
-      ></ReactSVG>
+      />
     </ClickTooltip>
   )
 }
