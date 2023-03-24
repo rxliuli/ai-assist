@@ -1,5 +1,9 @@
 # changelog
 
+## 0.4.8
+
+- feat: 添加设置中的 openai api key 的本地化说明
+
 ## 0.4.7
 
 - fix: 修复样式问题
