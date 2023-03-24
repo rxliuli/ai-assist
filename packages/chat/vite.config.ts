@@ -16,6 +16,7 @@ export default defineConfig({
     }),
     VitePWA({
       registerType: 'autoUpdate',
+      // selfDestroying: true,
       manifest: {
         id: 'ai-assist.chat',
         short_name: ' Chat',
