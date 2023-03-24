@@ -43,7 +43,7 @@ function sliceMessages(
 
 const ChatMessage = observer((props: { message: Message }) => {
   return (
-    <li className={css.messageBox}>
+    <li className={css.messageBox} data-key={props.message.id}>
       <div className={classNames('container', css.message)}>
         <span>{props.message.role === 'user' ? t('message.you') : 'AI'}:</span>
         <div className={css.messageContent}>
@@ -274,16 +274,21 @@ export const ChatMessages = observer(function (props: {
     if (store.loading) {
       return
     }
-    const lastMsg = last(props.messages)
-    if (!lastMsg || lastMsg.role !== 'assistant') {
+    if (props.messages.length === 0) {
       return
     }
     const sessionId = props.activeSession?.id
     if (!sessionId) {
       return
     }
-    props.messages.splice(props.messages.length - 1, 1)
-    props.onNotifiDeleteMessage(lastMsg.id)
+    const lastMsg = last(props.messages)
+    if (!lastMsg) {
+      return
+    }
+    if (lastMsg.role === 'assistant') {
+      props.messages.splice(props.messages.length - 1, 1)
+      props.onNotifiDeleteMessage(lastMsg.id)
+    }
     await onGenerate(sessionId)
     ga4.track('chat_event', {
       eventType: 'chat.regenerate',
