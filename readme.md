@@ -4,6 +4,6 @@
 
 - chat: 基于 chatgpt 实现比官方客户端更多的功能，目前还在复刻阶段，但已经可用了，在线地址：<https://chat.ai-assist.moe/>
 
-如果你想了解更多或自行部署，请查看文档站点：<https://docs.ai-assist.moe/>
+如果你想了解更多或自行部署，请查看文档站点：<https://docs.ai-assist.moe/>，吾辈还创建了一个 discord 群组，感兴趣也可以加入：<https://discord.gg/u3Ag9y3A3D>
 
 > ps: 这个也名称是 chatgpt 建议的
