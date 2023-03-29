@@ -13,17 +13,15 @@ import path from 'path'
 import mount from 'koa-mount'
 import { fileURLToPath } from 'url'
 import { streamResp } from './services/test/streamResp'
+import { auth } from './services/user/auth'
+import { isEmpty } from 'lodash-es'
+import { signin, SignInInfo } from './services/user/signin'
+import { signup, SignUpInfo } from './services/user/signup'
 
 const app = new Application()
 const router = new Router()
 router.get('/api/ping', (ctx) => {
   ctx.body = 'pong'
-})
-
-router.post('/api/translate', async (ctx) => {
-  const params = ctx.request.body as TranslateParams
-  const r = await translate(params)
-  ctx.body = r
 })
 
 router.post('/api/chat', async (ctx) => {
@@ -45,6 +43,26 @@ router.get('/api/get-region-and-token', async (ctx) => {
   logger.info('getRegionAndToken result', JSON.stringify(r))
   ctx.body = r
 })
+router.post('/api/signin', async (ctx) => {
+  const loginInfo = ctx.request.body as SignInInfo
+  if (isEmpty(loginInfo.usernameOrEmail) || isEmpty(loginInfo.password)) {
+    ctx.status = 400
+    ctx.body = 'usernameOrEmail or password is empty'
+    return
+  }
+  ctx.body = await signin(loginInfo)
+})
+router.post('/api/signup', async (ctx) => {
+  const user = ctx.request.body as SignUpInfo
+  console.log('user', user)
+  if (isEmpty(user.email) || isEmpty(user.username) || isEmpty(user.password)) {
+    ctx.status = 400
+    ctx.body = 'usernameOrEmail or password is empty'
+    return
+  }
+  await signup(user)
+  ctx.body = 'ok'
+})
 
 if (process.env.NODE_ENV === 'development') {
   router.post('/api/test/stream', async (ctx) => {
@@ -52,6 +70,10 @@ if (process.env.NODE_ENV === 'development') {
     ctx.set('Content-Type', 'application/octet-stream')
     ctx.set('Content-Disposition', 'attachment; filename="file.txt"')
     ctx.body = stream
+  })
+  router.post('/api/test-body', async (ctx) => {
+    console.log('body', ctx.request)
+    ctx.body = ctx.request.body
   })
 }
 
@@ -61,6 +83,7 @@ app
   .use(httpLogger())
   .use(cors())
   .use(bodyParser())
+  .use(mount('/api', auth()))
   .use(router.routes())
   .use(mount('/', serve(path.resolve(__dirname, 'public'))))
 

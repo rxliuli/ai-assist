@@ -13,6 +13,7 @@ import { faAngleLeft, faHouse, faShare, faTrash } from '@fortawesome/free-solid-
 import clipboardy from 'clipboardy'
 import { t } from '../../constants/i18n'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
+import { ajaxClient } from '../../constants/ajax'
 
 const settingStore = observable({
   title: t('setting.title'),
@@ -197,6 +198,10 @@ export const SettingHomeView = observer(() => {
   useMount(() => {
     settingStore.title = t('setting.title')
   })
+  async function onLogout() {
+    await ajaxClient.post('/api/logout')
+    router.push('/signin')
+  }
   return (
     <aside>
       <nav>
@@ -206,6 +211,9 @@ export const SettingHomeView = observer(() => {
           </li>
           <li>
             <Link to={'/setting/prompt'}>{t('setting.prompt.title')}</Link>
+          </li>
+          <li>
+            <button onClick={onLogout}>logout</button>
           </li>
         </ul>
       </nav>

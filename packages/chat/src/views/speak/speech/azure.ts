@@ -1,16 +1,11 @@
 import { ISpeech } from './base'
 import * as sdk from 'microsoft-cognitiveservices-speech-sdk'
+import { ajaxClient } from '../../../constants/ajax'
 
 const azureConfig = {} as { region: string; token: string }
 
 const getRegionAndToken = async () =>
-  (await (
-    await fetch('/api/get-region-and-token', {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-  ).json()) as { region: string; token: string }
+  (await (await ajaxClient.get('/api/get-region-and-token')).json()) as { region: string; token: string }
 
 async function speechToText(callback: (interimTranscripts: string) => void) {
   const speechConfig = sdk.SpeechConfig.fromAuthorizationToken(azureConfig.token, azureConfig.region)

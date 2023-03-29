@@ -67,8 +67,8 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      // '/api/': 'http://localhost:8080/',
-      '/api/': 'http://chat.ai-assist.moe/',
+      '/api/': 'http://localhost:8080/',
+      // '/api/': 'http://chat.ai-assist.moe/',
     },
   },
 })

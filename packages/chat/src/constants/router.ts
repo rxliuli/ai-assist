@@ -11,6 +11,8 @@ import { SpeakView } from '../views/speak/SpeakView'
 import { AzureSpeechToText } from '../views/test/AzureSpeechToText'
 import { AzureTextToSpeech } from '../views/test/AzureTextToSpeech'
 import { CompleteInputDemo } from '../views/test/CompleteInputDemo'
+import { SignInView } from '../views/user/SignInView'
+import { SignUpView } from '../views/user/SignUpView'
 
 export const routes: RouteConfig[] = [
   { path: '/speak', component: SpeakView },
@@ -26,6 +28,8 @@ export const routes: RouteConfig[] = [
     ],
   },
   { path: '/:sessionId', component: ChatHomeView },
+  { path: '/signin', component: SignInView },
+  { path: '/signup', component: SignUpView },
   { path: '/', component: ChatHomeView },
 ]
 

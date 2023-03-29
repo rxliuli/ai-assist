@@ -3,24 +3,19 @@ import { last } from 'lodash-es'
 import { observer, useLocalStore } from 'mobx-react-lite'
 import ReactMarkdown from 'react-markdown'
 import { useMount } from 'react-use'
+import { ajaxClient } from '../../constants/ajax'
 import css from './SpeakView.module.css'
 import { azureSpeech } from './speech/azure'
 
 const speech = azureSpeech
 
 async function sendMessage(input: string) {
-  const resp = await fetch('/api/chat', {
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/json',
+  const resp = await ajaxClient.post('/api/chat', [
+    {
+      role: 'user',
+      content: input,
     },
-    body: JSON.stringify([
-      {
-        role: 'user',
-        content: input,
-      },
-    ]),
-  })
+  ])
   return await resp.text()
 }
 

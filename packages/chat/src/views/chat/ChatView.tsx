@@ -21,6 +21,8 @@ import filenamify from 'filenamify'
 import { ga4 } from '../../constants/ga'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars, faClose, faPen, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { ajaxClient } from '../../constants/ajax'
+import Swal from 'sweetalert2'
 
 function sliceMessages(
   messages: Pick<Message, 'role' | 'content'>[],
@@ -120,13 +122,10 @@ export const ChatMessages = observer(function (props: {
       ] as Message[]
       console.log('sendMessages ', finalList)
       const start = Date.now()
-      const resp = await fetch('/api/chat-stream', {
+      const resp = await ajaxClient.request({
         method: 'post',
-        headers: {
-          'Content-Type': 'application/json',
-          OPENAI_API_KEY: localStorage.getItem('OPENAI_API_KEY') ?? '',
-        },
-        body: JSON.stringify(finalList),
+        url: '/api/chat-stream',
+        body: finalList,
         signal: store.abort?.signal,
       })
       if (resp.status !== 200) {
@@ -145,7 +144,7 @@ export const ChatMessages = observer(function (props: {
             msg: resp.statusText,
           },
         })
-        alert(t('message.error.network'))
+        Swal.fire(t('message.error.network'))
         return
       }
       props.messages.push({ id: v4(), sessionId, content: '', role: 'assistant', date: new Date().toISOString() })
@@ -158,24 +157,23 @@ export const ChatMessages = observer(function (props: {
         const activeSessionId = props.activeSession?.id
         const userMsg = findLast(props.messages, (it) => it.role === 'user')!
         if (!activeSessionId) {
-          const generateTitle = await fetch('/api/chat', {
-            method: 'post',
-            headers: {
-              'Content-Type': 'application/json',
-              OPENAI_API_KEY: localStorage.getItem('OPENAI_API_KEY') ?? '',
-            },
-            body: JSON.stringify([
-              {
-                role: 'system',
-                content:
-                  'Please summarize the following content into a topic, no more than 10 words, do not add punctuation at the end, please use the original language of the following content',
-              },
-              {
-                role: 'user',
-                content: userMsg.content,
-              },
-            ] as Message[]),
-          }).then((res) => res.text())
+          const generateTitle = await ajaxClient
+            .request({
+              method: 'post',
+              url: '/api/chat',
+              body: [
+                {
+                  role: 'system',
+                  content:
+                    'Please summarize the following content into a topic, no more than 10 words, do not add punctuation at the end, please use the original language of the following content',
+                },
+                {
+                  role: 'user',
+                  content: userMsg.content,
+                },
+              ] as Message[],
+            })
+            .then((res) => res.text())
           const session: Session = { id: sessionId, name: generateTitle, date: new Date().toISOString() }
           props.onCreateSession(session)
           props.onChangeActiveSessionId(sessionId, false)
