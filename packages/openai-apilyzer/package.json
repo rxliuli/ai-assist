@@ -1,6 +1,6 @@
 {
   "name": "@ai-assist/openai-apilyzer",
-  "version": "0.1.6",
+  "version": "0.1.8",
   "type": "module",
   "bin": {
     "openai-apilyzer": "./bin.js"
@@ -24,6 +24,7 @@
     "url": "https://github.com/rxliuli/ai-assist",
     "directory": "packages/openai-apilyzer"
   },
+  "homepage": "https://github.com/rxliuli/ai-assist/tree/master/packages/openai-apilyzer",
   "devDependencies": {
     "@types/lodash-es": "^4.17.6",
     "@types/node": "^18.14.6",
