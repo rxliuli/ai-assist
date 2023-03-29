@@ -7,7 +7,7 @@ A CLI tool for downloading data from the OpenAI API to facilitate further analys
 > Prerequisite: Install [nodejs 18 lts](https://nodejs.org/en)
 
 ```bash
-npx i @ai-assist/openai-apilyzer --authorization '<authorization>' --organization '<organization>'
+npx @ai-assist/openai-apilyzer --authorization '<authorization>' --organization '<organization>'
 # downloaded
 # written to openai-api-usage-2023-02-28-2023-03-30.csv
 ```
