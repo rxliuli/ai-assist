@@ -1,19 +1,17 @@
 import { DBSchema, IDBPDatabase, openDB } from 'idb'
 import { sortBy } from 'lodash-es'
 import { once } from '@liuli-util/async'
-import { Lang } from './langs'
 
 export interface Session {
   id: string
   name: string
   date: string
-  systemContent?: string
 }
 
 export interface Message {
   id: string
   sessionId: string
-  role: 'user' | 'assistant'
+  role: 'user' | 'assistant' | 'system'
   content: string
   date: string
 }

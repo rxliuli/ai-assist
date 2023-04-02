@@ -64,9 +64,9 @@ const ChatMessage = observer((props: { message: Message }) => {
 export const ChatMessages = observer(function (props: {
   messages: Message[]
   activeSession?: Session
-  onChangeActiveSessionId(id: string, refresh: boolean): void
+  onChangeActiveSessionId(id: string, refresh: boolean): Promise<void>
   onCreateSession(session: Session): Promise<void>
-  onNotifiCreateMessage(message: Message): void
+  onNotifiCreateMessage(message: Message): Promise<void>
   onNotifiDeleteMessage(id: string): void
   onCopy(): void
   onExport(): void
@@ -115,9 +115,6 @@ export const ChatMessages = observer(function (props: {
           content:
             "Please return the message in markdown format, don't use h1,h2 etc headings, please do not wrap pictures and links in code blocks",
         },
-        ...(props.activeSession?.systemContent
-          ? [{ role: 'system', content: props.activeSession!.systemContent }]
-          : []),
         ...list,
       ] as Message[]
       console.log('sendMessages ', finalList)
@@ -235,10 +232,17 @@ export const ChatMessages = observer(function (props: {
       id: v4(),
       name: title,
       date: new Date().toISOString(),
-      systemContent,
     }
     await props.onCreateSession(session)
-    props.onChangeActiveSessionId(session.id, true)
+    const systemMessage: Message = {
+      id: v4(),
+      sessionId: session.id,
+      content: systemContent,
+      role: 'system',
+      date: new Date().toISOString(),
+    }
+    await props.onNotifiCreateMessage(systemMessage)
+    await props.onChangeActiveSessionId(session.id, true)
   }
 
   const promptStore = useLocalStore(() => ({
@@ -297,9 +301,11 @@ export const ChatMessages = observer(function (props: {
   return (
     <div className={css.chat}>
       <ul className={css.messages} ref={messagesRef}>
-        {props.messages.map((it) => (
-          <ChatMessage key={it.id} message={it}></ChatMessage>
-        ))}
+        {props.messages
+          .filter((it) => ['user', 'assistant'].includes(it.role))
+          .map((it) => (
+            <ChatMessage key={it.id} message={it}></ChatMessage>
+          ))}
         <li className={css.messageButtom}></li>
       </ul>
       <footer className={classNames('container', css.messageEditor)}>
@@ -517,9 +523,16 @@ export const ChatHomeView = observer(() => {
         id: v4(),
         name: prompt.title,
         date: new Date().toISOString(),
-        systemContent: prompt.detail,
       }
       await onCreateSession(session)
+      const systemMessage: Message = {
+        id: v4(),
+        sessionId: session.id,
+        content: prompt.detail,
+        role: 'system',
+        date: new Date().toISOString(),
+      }
+      await onNotifiCreateMessage(systemMessage)
       await onChangeActiveSessionId(session.id, true)
     }
   })
