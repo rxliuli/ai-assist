@@ -1,7 +1,9 @@
+import { Link } from '@liuli-util/react-router'
 import { observer, useLocalStore } from 'mobx-react-lite'
-import Swal from 'sweetalert2'
 import { ajaxClient } from '../../constants/ajax'
+import { t } from '../../constants/i18n'
 import { router } from '../../constants/router'
+import { ReactSwal } from '../../constants/swal'
 import { ServerError } from '../../utils/error'
 
 export const SignUpView = observer(() => {
@@ -17,68 +19,67 @@ export const SignUpView = observer(() => {
     if (!r.ok) {
       const resp = (await r.json()) as ServerError
       if (resp.code === 'USER_ALREADY_EXISTS') {
-        Swal.fire({
-          title: 'Sign up failed',
-          text: 'User already exists',
+        ReactSwal.fire({
+          title: t('user.signup.error.title'),
+          text: t('user.signup.error.USER_ALREADY_EXISTS'),
           icon: 'error',
         })
         return
       }
       if (resp.code === 'EMAIL_NOT_VERIFIED') {
-        Swal.fire({
-          title: 'Sign up failed',
-          text: 'Email not verified',
+        ReactSwal.fire({
+          title: t('user.signup.error.title'),
+          text: t('user.signup.error.EMAIL_NOT_VERIFIED'),
           icon: 'error',
-          footer: 'Please check your email and verify your email address.',
+          footer: t('user.success.checkEmail'),
         })
         return
       }
-      // handle other error, INVALID_EMAIL, INVALID_USERNAME, INVALID_PASSWORD
       if (resp.code === 'INVALID_EMAIL') {
-        Swal.fire({
-          title: 'Sign up failed',
-          text: 'Invalid email',
+        ReactSwal.fire({
+          title: t('user.signup.error.title'),
+          text: t('user.signup.error.INVALID_EMAIL'),
           icon: 'error',
         })
         return
       }
       if (resp.code === 'INVALID_USERNAME') {
-        Swal.fire({
-          title: 'Sign up failed',
-          text: 'Invalid username',
+        ReactSwal.fire({
+          title: t('user.signup.error.title'),
+          text: t('user.signup.error.INVALID_USERNAME'),
           icon: 'error',
         })
         return
       }
       if (resp.code === 'INVALID_PASSWORD') {
-        Swal.fire({
-          title: 'Sign up failed',
-          text: 'Invalid password',
+        ReactSwal.fire({
+          title: t('user.signup.error.title'),
+          text: t('user.signup.error.INVALID_PASSWORD'),
           icon: 'error',
         })
         return
       }
 
-      Swal.fire({
-        title: 'Sign up failed',
-        text: 'Server error',
+      ReactSwal.fire({
+        title: t('user.signup.error.title'),
+        text: t('user.signup.error.SERVER_ERROR'),
         icon: 'error',
       })
       return
     }
-    await Swal.fire({
-      title: 'Sign up success',
-      text: 'Please check your email and verify your email address.',
+    await ReactSwal.fire({
+      title: t('user.signup.success.title'),
+      text: t('user.success.checkEmail'),
       icon: 'success',
     })
     router.push('/signin')
   }
   return (
     <div className={'container'}>
-      <h2>Sign up to Chat</h2>
+      <h2>{t('user.signup.title')}</h2>
       <form onSubmit={onSignUp}>
         <div>
-          <label htmlFor={'email'}>Email:</label>
+          <label htmlFor={'email'}>{t('user.form.email')}:</label>
           <input
             type={'email'}
             id={'email'}
@@ -88,7 +89,7 @@ export const SignUpView = observer(() => {
           />
         </div>
         <div>
-          <label htmlFor={'username'}>Username:</label>
+          <label htmlFor={'username'}>{t('user.form.username')}:</label>
           <input
             type={'username'}
             id={'username'}
@@ -98,7 +99,7 @@ export const SignUpView = observer(() => {
           />
         </div>
         <div>
-          <label htmlFor={'password'}>Password:</label>
+          <label htmlFor={'password'}>{t('user.form.password')}:</label>
           <input
             type={'password'}
             id={'password'}
@@ -108,8 +109,12 @@ export const SignUpView = observer(() => {
           />
         </div>
         <div>
-          <button type={'submit'}>Sign Up</button>
+          <button type={'submit'}>{t('user.signup.submit')}</button>
         </div>
+        <article>
+          {t('user.signin.alreadyHaveAccount')}
+          <Link to={'/signin'}>{t('user.signin.title')}</Link>
+        </article>
       </form>
     </div>
   )

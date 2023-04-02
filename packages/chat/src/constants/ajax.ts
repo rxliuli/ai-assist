@@ -1,5 +1,4 @@
 import { omit } from 'lodash-es'
-import Swal from 'sweetalert2'
 import { router } from './router'
 
 interface RequestOptions {

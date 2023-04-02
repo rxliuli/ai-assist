@@ -29,11 +29,14 @@ export async function sendActiveEmail(user: User, origin: string) {
   const activeLink = origin + '/#/active?' + new URLSearchParams([['activeCode', activeCode]]).toString()
   logger.info('active link: ' + activeLink)
   // async send email
-  sendEmail({
-    to: user.email,
-    subject: 'Chat App - Active Account',
-    html: `Please click the link below to active your account: <a href="${activeLink}">${activeLink}</a>`,
-  })
+  if (process.env.NODE_ENV !== 'development') {
+    sendEmail({
+      to: user.email,
+      subject: 'Chat App - Active Account',
+      html: `Please click the link below to active your account: <a href="${activeLink}">${activeLink}</a>`,
+    })
+  }
+
   return activeCode
 }
 

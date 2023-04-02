@@ -213,7 +213,7 @@ export const SettingHomeView = observer(() => {
             <Link to={'/setting/prompt'}>{t('setting.prompt.title')}</Link>
           </li>
           <li>
-            <button onClick={onLogout}>logout</button>
+            <button onClick={onLogout}>{t('user.logout')}</button>
           </li>
         </ul>
       </nav>

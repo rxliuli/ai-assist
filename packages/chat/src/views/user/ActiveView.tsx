@@ -1,33 +1,38 @@
 import { observer } from 'mobx-react-lite'
 import { useMount } from 'react-use'
-import Swal from 'sweetalert2'
 import { ajaxClient } from '../../constants/ajax'
+import { t } from '../../constants/i18n'
 import { router } from '../../constants/router'
+import { ReactSwal } from '../../constants/swal'
 
 export const ActiveView = observer(() => {
   useMount(async () => {
     const q = new URLSearchParams(router.location.search)
     const activeCode = q.get('activeCode')
     if (!activeCode) {
-      await Swal.fire({
-        title: 'Error',
-        text: 'active code is required',
+      await ReactSwal.fire({
+        title: t('action.error.title'),
+        text: t('user.active.error.ACTIVE_CODE_IS_REQUIRE'),
         icon: 'error',
+        timer: 3000,
       })
+      router.push('/signin')
       return
     }
     const resp = await ajaxClient.post('/api/active', { code: activeCode })
     if (!resp.ok) {
-      await Swal.fire({
-        title: 'Error',
-        text: 'Active failed, please try again later',
+      await ReactSwal.fire({
+        title: t('action.error.title'),
+        text: t('user.active.error.ACTIVE_FAILED'),
         icon: 'error',
+        timer: 3000,
       })
+      router.push('/signin')
       return
     }
-    await Swal.fire({
-      title: 'Success',
-      text: 'Active success, please login',
+    await ReactSwal.fire({
+      title: t('action.success.title'),
+      text: t('user.active.success.text'),
       icon: 'success',
       timer: 3000,
     })

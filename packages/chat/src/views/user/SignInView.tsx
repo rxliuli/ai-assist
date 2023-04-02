@@ -1,9 +1,10 @@
 import { observer, useLocalStore } from 'mobx-react-lite'
 import { Link } from '@liuli-util/react-router'
-import Swal from 'sweetalert2'
 import { ajaxClient } from '../../constants/ajax'
 import { router } from '../../constants/router'
 import { ServerError } from '../../utils/error'
+import { t } from '../../constants/i18n'
+import { ReactSwal } from '../../constants/swal'
 
 export const SignInView = observer(() => {
   const store = useLocalStore(() => ({
@@ -17,34 +18,34 @@ export const SignInView = observer(() => {
       // handle error, USER_DISABLED, EMAIL_NOT_VERIFIED, USERNAME_OR_PASSWORD_INCORRECT
       const err = (await resp.json()) as ServerError
       if (err.code === 'USER_DISABLED') {
-        Swal.fire({
-          title: 'Sign in failed',
-          text: 'User disabled',
+        ReactSwal.fire({
+          title: t('user.signin.error.title'),
+          text: t('user.signin.error.USER_DISABLED'),
           icon: 'error',
         })
         return
       }
       if (err.code === 'EMAIL_NOT_VERIFIED') {
-        Swal.fire({
-          title: 'Sign in failed',
-          text: 'Email not verified',
+        ReactSwal.fire({
+          title: t('user.signin.error.title'),
+          text: t('user.signin.error.EMAIL_NOT_VERIFIED'),
           icon: 'error',
-          footer: 'Please check your email and verify your email address.',
+          footer: t('user.success.checkEmail'),
         })
         return
       }
       if (err.code === 'USERNAME_OR_PASSWORD_INCORRECT') {
-        Swal.fire({
-          title: 'Sign in failed',
-          text: 'Username or password is incorrect',
+        ReactSwal.fire({
+          title: t('user.signin.error.title'),
+          text: t('user.signin.error.USERNAME_OR_PASSWORD_INCORRECT'),
           icon: 'error',
         })
         return
       }
 
-      Swal.fire({
-        title: 'Sign in failed',
-        text: 'Username or password is incorrect',
+      ReactSwal.fire({
+        title: t('user.signin.error.title'),
+        text: t('user.signin.error.USERNAME_OR_PASSWORD_INCORRECT'),
         icon: 'error',
       })
       return
@@ -53,9 +54,9 @@ export const SignInView = observer(() => {
       token: string
     }
     localStorage.setItem('token', r.token)
-    await Swal.fire({
-      title: 'Sign in success',
-      text: 'Goto home view...',
+    await ReactSwal.fire({
+      title: t('user.signin.success.title'),
+      text: t('user.signin.success.gotoHome'),
       icon: 'success',
       timer: 3000,
     })
@@ -63,10 +64,10 @@ export const SignInView = observer(() => {
   }
   return (
     <div className={'container'}>
-      <h2>Sign in to Chat</h2>
+      <h2>{t('user.signin.title')}</h2>
       <form onSubmit={onSignIn}>
         <div>
-          <label htmlFor={'usernameOrEmail'}>Username or email address:</label>
+          <label htmlFor={'usernameOrEmail'}>{t('user.signin.form.emailOrUsername')}:</label>
           <input
             type={'text'}
             id={'usernameOrEmail'}
@@ -77,7 +78,7 @@ export const SignInView = observer(() => {
         </div>
         <div>
           <label htmlFor={'password'}>
-            <span>Password:</span>
+            <span>{t('user.form.password')}:</span>
           </label>
           <input
             type={'password'}
@@ -88,11 +89,12 @@ export const SignInView = observer(() => {
           />
         </div>
         <div>
-          <button type={'submit'}>Sign In</button>
+          <button type={'submit'}>{t('user.signin.form.submit')}</button>
         </div>
       </form>
       <article>
-        New to Chat? <Link to={'/signup'}>Create an account.</Link>
+        {t('user.signin.firstUsing')}
+        <Link to={'/signup'}>{t('user.signin.create')}</Link>
       </article>
     </div>
   )

@@ -1,3 +1,5 @@
+@import url('@sweetalert2/themes/dark/dark.css');
+
 html,
 body {
   margin: 0;
@@ -12,4 +14,17 @@ body {
 
 #root {
   height: 100%;
+}
+
+.swal2-modal {
+  box-shadow: var(--card-box-shadow);
+  background: var(--card-background-color);
+  border-radius: var(--border-radius);
+}
+
+.swal2-actions > .swal2-confirm {
+  background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
+  box-shadow: var(--button-hover-box-shadow, 0 0 0 rgba(0, 0, 0, 0));
+  color: var(--primary-inverse);
 }

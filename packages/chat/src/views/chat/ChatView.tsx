@@ -22,7 +22,7 @@ import { ga4 } from '../../constants/ga'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars, faClose, faPen, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { ajaxClient } from '../../constants/ajax'
-import Swal from 'sweetalert2'
+import { ReactSwal } from '../../constants/swal'
 
 function sliceMessages(
   messages: Pick<Message, 'role' | 'content'>[],
@@ -141,7 +141,7 @@ export const ChatMessages = observer(function (props: {
             msg: resp.statusText,
           },
         })
-        Swal.fire(t('message.error.network'))
+        ReactSwal.fire(t('message.error.network'))
         return
       }
       props.messages.push({ id: v4(), sessionId, content: '', role: 'assistant', date: new Date().toISOString() })
