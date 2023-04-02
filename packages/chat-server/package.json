@@ -9,7 +9,12 @@
     "docker-run": "tsx scripts/main.ts",
     "docker-publish": "tsx scripts/publish.ts"
   },
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "pg": "^8.10.0"
+  },
   "devDependencies": {
+    "pg-hstore": "^2.3.4",
     "@azure/communication-email": "1.0.0-beta.2",
     "@fortaine/openai": "^5.3.1",
     "@koa/cors": "^4.0.0",
@@ -27,7 +32,6 @@
     "@types/node": "^18.14.6",
     "@types/uuid": "^9.0.1",
     "@types/validator": "^13.7.14",
-    "bcrypt": "^5.1.0",
     "chatgpt": "^5.0.6",
     "dayjs": "^1.11.7",
     "dotenv": "^16.0.3",
@@ -40,8 +44,6 @@
     "lodash-es": "^4.17.21",
     "mockjs": "^1.1.0",
     "openai": "^3.2.1",
-    "pg": "^8.10.0",
-    "pg-hstore": "^2.3.4",
     "sequelize": "^6.30.0",
     "tsup": "^6.6.3",
     "tsx": "^3.12.3",

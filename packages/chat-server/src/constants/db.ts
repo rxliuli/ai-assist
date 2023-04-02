@@ -1,6 +1,8 @@
 import { DataTypes, Model, Sequelize } from 'sequelize'
 
-const sequelize: Sequelize = new Sequelize(process.env.DATABASE_URL!)
+const sequelize: Sequelize = new Sequelize(process.env.DATABASE_URL!, {
+  dialect: 'postgres',
+})
 
 export interface User {
   id: string
