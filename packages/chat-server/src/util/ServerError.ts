@@ -23,8 +23,13 @@ export function serverErrorHandle(): Middleware {
         }
         return
       }
+      console.error(err)
       logger.error({ type: 'error', message: JSON.stringify(err) })
-      throw err
+      ctx.status = 500
+      ctx.body = {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Internal Server Error',
+      }
     }
   }
 }
