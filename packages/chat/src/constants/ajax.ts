@@ -45,7 +45,7 @@ class AjaxClient {
       body: this.getBody(options),
     })
     if (r.status === 401) {
-      await Swal.fire('Unauthorized', 'Please sign in again', 'error')
+      // await Swal.fire('Unauthorized', 'Please sign in again', 'error')
       router.push('/signin')
       throw new Error('Unauthorized')
     }

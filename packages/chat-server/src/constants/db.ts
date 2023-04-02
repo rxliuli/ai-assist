@@ -45,7 +45,7 @@ export const UserModel = sequelize.define<Model<User>>(
     },
     disabled: {
       type: DataTypes.BOOLEAN,
-      field: 'email_verified',
+      field: 'disabled',
     },
   },
   {

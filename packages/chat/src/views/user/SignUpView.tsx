@@ -2,6 +2,7 @@ import { observer, useLocalStore } from 'mobx-react-lite'
 import Swal from 'sweetalert2'
 import { ajaxClient } from '../../constants/ajax'
 import { router } from '../../constants/router'
+import { ServerError } from '../../utils/error'
 
 export const SignUpView = observer(() => {
   const store = useLocalStore(() => ({
@@ -14,6 +15,50 @@ export const SignUpView = observer(() => {
     console.log('user', store)
     const r = await ajaxClient.post('/api/signup', store)
     if (!r.ok) {
+      const resp = (await r.json()) as ServerError
+      if (resp.code === 'USER_ALREADY_EXISTS') {
+        Swal.fire({
+          title: 'Sign up failed',
+          text: 'User already exists',
+          icon: 'error',
+        })
+        return
+      }
+      if (resp.code === 'EMAIL_NOT_VERIFIED') {
+        Swal.fire({
+          title: 'Sign up failed',
+          text: 'Email not verified',
+          icon: 'error',
+          footer: 'Please check your email and verify your email address.',
+        })
+        return
+      }
+      // handle other error, INVALID_EMAIL, INVALID_USERNAME, INVALID_PASSWORD
+      if (resp.code === 'INVALID_EMAIL') {
+        Swal.fire({
+          title: 'Sign up failed',
+          text: 'Invalid email',
+          icon: 'error',
+        })
+        return
+      }
+      if (resp.code === 'INVALID_USERNAME') {
+        Swal.fire({
+          title: 'Sign up failed',
+          text: 'Invalid username',
+          icon: 'error',
+        })
+        return
+      }
+      if (resp.code === 'INVALID_PASSWORD') {
+        Swal.fire({
+          title: 'Sign up failed',
+          text: 'Invalid password',
+          icon: 'error',
+        })
+        return
+      }
+
       Swal.fire({
         title: 'Sign up failed',
         text: 'Server error',
@@ -23,6 +68,7 @@ export const SignUpView = observer(() => {
     }
     await Swal.fire({
       title: 'Sign up success',
+      text: 'Please check your email and verify your email address.',
       icon: 'success',
     })
     router.push('/signin')

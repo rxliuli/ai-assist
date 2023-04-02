@@ -17,6 +17,9 @@ import { auth } from './services/user/auth'
 import { isEmpty } from 'lodash-es'
 import { signin, SignInInfo } from './services/user/signin'
 import { signup, SignUpInfo } from './services/user/signup'
+import { active, ActiveReq } from './services/user/active'
+import { serverErrorHandle } from './util/ServerError'
+import { logout } from './services/user/logout'
 
 const app = new Application()
 const router = new Router()
@@ -50,18 +53,33 @@ router.post('/api/signin', async (ctx) => {
     ctx.body = 'usernameOrEmail or password is empty'
     return
   }
-  ctx.body = await signin(loginInfo)
+  ctx.body = await signin(loginInfo, new URL(ctx.get('referer')).origin)
 })
 router.post('/api/signup', async (ctx) => {
   const user = ctx.request.body as SignUpInfo
-  console.log('user', user)
   if (isEmpty(user.email) || isEmpty(user.username) || isEmpty(user.password)) {
     ctx.status = 400
     ctx.body = 'usernameOrEmail or password is empty'
     return
   }
-  await signup(user)
+  await signup(user, new URL(ctx.get('referer')).origin)
   ctx.body = 'ok'
+})
+router.post('/api/active', async (ctx) => {
+  const activeInfo = ctx.request.body as ActiveReq
+  if (isEmpty(activeInfo.code)) {
+    ctx.status = 400
+    ctx.body = 'code is empty'
+    return
+  }
+  await active(activeInfo)
+  ctx.body = 'ok'
+})
+router.post('/api/logout', async (ctx) => {
+  const token = ctx.get('Authorization')
+  await logout(token)
+  ctx.status = 200
+  ctx.body = 'logout success'
 })
 
 if (process.env.NODE_ENV === 'development') {
@@ -82,6 +100,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 app
   .use(httpLogger())
   .use(cors())
+  .use(serverErrorHandle())
   .use(bodyParser())
   .use(mount('/api', auth()))
   .use(router.routes())

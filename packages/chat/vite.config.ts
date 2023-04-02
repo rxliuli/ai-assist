@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import { cssdts } from '@liuli-util/vite-plugin-css-dts'
 import { VitePWA } from 'vite-plugin-pwa'
 import { i18nextDtsGen } from '@liuli-util/rollup-plugin-i18next-dts-gen'
+import { visualizer } from 'rollup-plugin-visualizer'
 
 export default defineConfig({
   base: './',
@@ -61,6 +62,7 @@ export default defineConfig({
         ],
       },
     }),
+    visualizer(),
   ],
   build: {
     target: 'esnext',

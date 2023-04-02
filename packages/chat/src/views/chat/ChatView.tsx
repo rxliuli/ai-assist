@@ -629,6 +629,10 @@ export const ChatHomeView = observer(() => {
     ga4.track('chat_event', { eventType: 'chat.import', sessionId: store.activeSessionId })
   }
 
+  useMount(async () => {
+    await ajaxClient.get('/api/ping')
+  })
+
   return (
     <div className={css.chatHome}>
       <ChatSidebar

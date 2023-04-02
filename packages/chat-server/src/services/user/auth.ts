@@ -39,7 +39,7 @@ export async function revokeToken(token: string): Promise<void> {
 
 export function auth(): Middleware {
   return async (ctx, next) => {
-    if (['/signin', '/signup'].includes(ctx.path)) {
+    if (['/signin', '/signup', '/active'].includes(ctx.path)) {
       return next()
     }
     const token = ctx.get('Authorization')

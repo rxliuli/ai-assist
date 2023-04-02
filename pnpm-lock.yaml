@@ -50,6 +50,7 @@ importers:
       chatgpt: ^5.0.6
       classnames: ^2.3.2
       clipboardy: ^3.0.0
+      dayjs: ^1.11.7
       file-saver: ^2.0.5
       file-selector: ^0.6.0
       filenamify: ^5.1.1
@@ -75,6 +76,7 @@ importers:
       react-window: ^1.8.8
       rehype-katex: ^6.0.2
       remark-math: ^5.1.1
+      rollup-plugin-visualizer: ^5.9.0
       sweetalert2: ^11.7.3
       typescript: ^4.9.3
       utility-types: ^3.10.0
@@ -95,6 +97,7 @@ importers:
       chatgpt: 5.0.6
       classnames: 2.3.2
       clipboardy: 3.0.0
+      dayjs: 1.11.7
       file-saver: 2.0.5
       file-selector: 0.6.0
       filenamify: 5.1.1
@@ -140,6 +143,7 @@ importers:
       '@types/uuid': 9.0.1
       '@vitejs/plugin-react': 3.1.0_vite@4.1.4
       papaparse: 5.4.0
+      rollup-plugin-visualizer: 5.9.0
       typescript: 4.9.5
       vite: 4.1.4_@types+node@18.14.6
       vite-plugin-pwa: 0.14.4_vite@4.1.4
@@ -147,6 +151,7 @@ importers:
 
   packages/chat-server:
     specifiers:
+      '@azure/communication-email': 1.0.0-beta.2
       '@fortaine/openai': ^5.3.1
       '@koa/cors': ^4.0.0
       '@koa/router': ^12.0.0
@@ -159,8 +164,10 @@ importers:
       '@types/koa__cors': ^3.3.1
       '@types/koa__router': ^12.0.0
       '@types/lodash-es': ^4.17.6
+      '@types/mockjs': ^1.0.7
       '@types/node': ^18.14.6
       '@types/uuid': ^9.0.1
+      '@types/validator': ^13.7.14
       bcrypt: ^5.1.0
       chatgpt: ^5.0.6
       dayjs: ^1.11.7
@@ -172,6 +179,7 @@ importers:
       koa-mount: ^4.0.0
       koa-static: ^5.0.0
       lodash-es: ^4.17.21
+      mockjs: ^1.1.0
       openai: ^3.2.1
       pg: ^8.10.0
       pg-hstore: ^2.3.4
@@ -180,10 +188,12 @@ importers:
       tsx: ^3.12.3
       typescript: ^4.9.5
       uuid: ^9.0.0
+      validator: ^13.9.0
       vitest: ^0.29.2
       winston: ^3.8.2
       zx: ^7.2.0
     devDependencies:
+      '@azure/communication-email': 1.0.0-beta.2
       '@fortaine/openai': 5.3.1
       '@koa/cors': 4.0.0
       '@koa/router': 12.0.0
@@ -196,8 +206,10 @@ importers:
       '@types/koa__cors': 3.3.1
       '@types/koa__router': 12.0.0
       '@types/lodash-es': 4.17.6
+      '@types/mockjs': 1.0.7
       '@types/node': 18.14.6
       '@types/uuid': 9.0.1
+      '@types/validator': 13.7.14
       bcrypt: 5.1.0
       chatgpt: 5.0.6
       dayjs: 1.11.7
@@ -209,6 +221,7 @@ importers:
       koa-mount: 4.0.0
       koa-static: 5.0.0
       lodash-es: 4.17.21
+      mockjs: 1.1.0
       openai: 3.2.1
       pg: 8.10.0
       pg-hstore: 2.3.4
@@ -217,6 +230,7 @@ importers:
       tsx: 3.12.3
       typescript: 4.9.5
       uuid: 9.0.0
+      validator: 13.9.0
       vitest: 0.29.2
       winston: 3.8.2
       zx: 7.2.0
@@ -436,6 +450,117 @@ packages:
       json-schema: 0.4.0
       jsonpointer: 5.0.1
       leven: 3.1.0
+    dev: true
+
+  /@azure/abort-controller/1.1.0:
+    resolution: {integrity: sha512-TrRLIoSQVzfAJX9H1JeFjzAoDGcoK1IYX1UImfceTZpsyYfWr09Ss1aHW1y5TrrR3iq6RZLBwJ3E24uwPhwahw==}
+    engines: {node: '>=12.0.0'}
+    dependencies:
+      tslib: 2.5.0
+    dev: true
+
+  /@azure/communication-common/2.2.0:
+    resolution: {integrity: sha512-92zGSs+qwWHEqCRIGAudYhPgnUT270Y3Mb2xuYH253IF3da74A+GyNhSEma0Zy6qHb+c5oHkh4Ijr2ndhrBQ2A==}
+    engines: {node: '>=14.0.0'}
+    dependencies:
+      '@azure/abort-controller': 1.1.0
+      '@azure/core-auth': 1.4.0
+      '@azure/core-rest-pipeline': 1.10.2
+      '@azure/core-tracing': 1.0.1
+      '@azure/core-util': 1.2.0
+      events: 3.3.0
+      jwt-decode: 3.1.2
+      tslib: 2.5.0
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+
+  /@azure/communication-email/1.0.0-beta.2:
+    resolution: {integrity: sha512-brtvW9sYCz69UO8IW+y9DRNOZWIrhpa9E8Luz7XVPtiN+oMGAD3/4KgEj4T8eYDNCcgZRpYmKonpQqnXQtZFNQ==}
+    engines: {node: '>=14.0.0'}
+    dependencies:
+      '@azure/communication-common': 2.2.0
+      '@azure/core-auth': 1.4.0
+      '@azure/core-client': 1.7.2
+      '@azure/core-lro': 2.5.1
+      '@azure/core-rest-pipeline': 1.10.2
+      '@azure/logger': 1.0.4
+      tslib: 1.14.1
+      uuid: 8.3.2
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+
+  /@azure/core-auth/1.4.0:
+    resolution: {integrity: sha512-HFrcTgmuSuukRf/EdPmqBrc5l6Q5Uu+2TbuhaKbgaCpP2TfAeiNaQPAadxO+CYBRHGUzIDteMAjFspFLDLnKVQ==}
+    engines: {node: '>=12.0.0'}
+    dependencies:
+      '@azure/abort-controller': 1.1.0
+      tslib: 2.5.0
+    dev: true
+
+  /@azure/core-client/1.7.2:
+    resolution: {integrity: sha512-ye5554gnVnXdfZ64hptUtETgacXoRWxYv1JF5MctoAzTSH5dXhDPZd9gOjDPyWMcLIk58pnP5+p5vGX6PYn1ag==}
+    engines: {node: '>=14.0.0'}
+    dependencies:
+      '@azure/abort-controller': 1.1.0
+      '@azure/core-auth': 1.4.0
+      '@azure/core-rest-pipeline': 1.10.2
+      '@azure/core-tracing': 1.0.1
+      '@azure/core-util': 1.2.0
+      '@azure/logger': 1.0.4
+      tslib: 2.5.0
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+
+  /@azure/core-lro/2.5.1:
+    resolution: {integrity: sha512-JHQy/bA3NOz2WuzOi5zEk6n/TJdAropupxUT521JIJvW7EXV2YN2SFYZrf/2RHeD28QAClGdynYadZsbmP+nyQ==}
+    engines: {node: '>=14.0.0'}
+    dependencies:
+      '@azure/abort-controller': 1.1.0
+      '@azure/logger': 1.0.4
+      tslib: 2.5.0
+    dev: true
+
+  /@azure/core-rest-pipeline/1.10.2:
+    resolution: {integrity: sha512-e3WzAsRKLor5EgK2bQqR1OY5D7VBqzORHtlqtygZZQGCYOIBsynqrZBa8MFD1Ue9r8TPtofOLditalnlQHS45Q==}
+    engines: {node: '>=14.0.0'}
+    dependencies:
+      '@azure/abort-controller': 1.1.0
+      '@azure/core-auth': 1.4.0
+      '@azure/core-tracing': 1.0.1
+      '@azure/core-util': 1.2.0
+      '@azure/logger': 1.0.4
+      form-data: 4.0.0
+      http-proxy-agent: 5.0.0
+      https-proxy-agent: 5.0.1
+      tslib: 2.5.0
+      uuid: 8.3.2
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+
+  /@azure/core-tracing/1.0.1:
+    resolution: {integrity: sha512-I5CGMoLtX+pI17ZdiFJZgxMJApsK6jjfm85hpgp3oazCdq5Wxgh4wMr7ge/TTWW1B5WBuvIOI1fMU/FrOAMKrw==}
+    engines: {node: '>=12.0.0'}
+    dependencies:
+      tslib: 2.5.0
+    dev: true
+
+  /@azure/core-util/1.2.0:
+    resolution: {integrity: sha512-ffGIw+Qs8bNKNLxz5UPkz4/VBM/EZY07mPve1ZYFqYUdPwFqRj0RPk0U7LZMOfT7GCck9YjuT1Rfp1PApNl1ng==}
+    engines: {node: '>=14.0.0'}
+    dependencies:
+      '@azure/abort-controller': 1.1.0
+      tslib: 2.5.0
+    dev: true
+
+  /@azure/logger/1.0.4:
+    resolution: {integrity: sha512-ustrPY8MryhloQj7OWGe+HrYx+aoiOxzbXTtgblbV3xwCqpzUK36phH3XNHQKj3EPonyFUuDTfR3qFhTEAuZEg==}
+    engines: {node: '>=14.0.0'}
+    dependencies:
+      tslib: 2.5.0
     dev: true
 
   /@babel/code-frame/7.18.6:
@@ -2644,6 +2769,11 @@ packages:
       tslib: 2.5.0
     dev: false
 
+  /@tootallnate/once/2.0.0:
+    resolution: {integrity: sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==}
+    engines: {node: '>= 10'}
+    dev: true
+
   /@tsconfig/node10/1.0.9:
     resolution: {integrity: sha512-jNsYVVxU8v5g43Erja32laIDHXeoNvFEpX33OK4d6hljo3jDhCBDhx5dhCCTMWUojscpAagGiRkBKxpdl9fxqA==}
     dev: true
@@ -2883,6 +3013,10 @@ packages:
 
   /@types/minimist/1.2.2:
     resolution: {integrity: sha512-jhuKLIRrhvCPLqwPcx6INqmKeiA5EWrsCOPhrlFSrbrmU4ZMPjj5Ul/oLCMDO98XRUIwVm78xICz4EPCektzeQ==}
+    dev: true
+
+  /@types/mockjs/1.0.7:
+    resolution: {integrity: sha512-OCxXz6hEaJOVpRwuJMiVY5a6LtJcih+br9gwB/Q8ooOBikvk5FpBQ31OlNimXo3EqKha1Z7PFBni+q9m+8NCWg==}
     dev: true
 
   /@types/ms/0.7.31:
@@ -4282,6 +4416,11 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
+  /define-lazy-prop/2.0.0:
+    resolution: {integrity: sha512-Ds09qNh8yw3khSjiJjiUInaGX9xlqZDY7JVryGxdxV7NPeuqQfplOpQ66yJFZut3jLa5zOwkXw1g9EI2uKh4Og==}
+    engines: {node: '>=8'}
+    dev: true
+
   /define-properties/1.2.0:
     resolution: {integrity: sha512-xvqAVKGfT1+UAvPwKTVw/njhdQ8ZhXK4lI0bCIuCMrp2up9nPnaDftrLtmpTazqd1o+UY4zgzU+avtMbDP+ldA==}
     engines: {node: '>= 0.4'}
@@ -4848,6 +4987,11 @@ packages:
 
   /eventemitter3/5.0.0:
     resolution: {integrity: sha512-riuVbElZZNXLeLEoprfNYoDSwTBRR44X3mnhdI1YcnENpWTCsTTVZ2zFuqQcpoyqPQIUXdiPEU0ECAq0KQRaHg==}
+    dev: true
+
+  /events/3.3.0:
+    resolution: {integrity: sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==}
+    engines: {node: '>=0.8.x'}
     dev: true
 
   /eventsource-parser/0.0.5:
@@ -5516,6 +5660,17 @@ packages:
       toidentifier: 1.0.1
     dev: true
 
+  /http-proxy-agent/5.0.0:
+    resolution: {integrity: sha512-n2hY8YdoRE1i7r6M0w9DIw5GgZN0G25P8zLCRQ8rjXtTU3vsNFBI/vWK/UIeE6g5MUUz6avwAPXmL6Fy9D/90w==}
+    engines: {node: '>= 6'}
+    dependencies:
+      '@tootallnate/once': 2.0.0
+      agent-base: 6.0.2
+      debug: 4.3.4
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+
   /https-proxy-agent/4.0.0:
     resolution: {integrity: sha512-zoDhWrkR3of1l9QAL8/scJZyLu8j/gBkcwcaQOZh7Gyh/+uJQzGVETdgT30akuwkpL8HTRfssqI3BZuV18teDg==}
     engines: {node: '>= 6.0.0'}
@@ -5719,7 +5874,6 @@ packages:
     resolution: {integrity: sha512-F+i2BKsFrH66iaUFc0woD8sLy8getkwTwtOBjvs56Cx4CgJDeKQeqfz8wAYiSb8JOprWhHH5p77PbmYCvvUuXQ==}
     engines: {node: '>=8'}
     hasBin: true
-    dev: false
 
   /is-extglob/2.1.1:
     resolution: {integrity: sha512-SbKbANkN603Vi4jEZv49LeVJMn4yGwsbzZworEoyEiutsN3nJYdbO36zfhGJ6QEDpOZIFkDtnq5JRxmvl3jsoQ==}
@@ -5866,7 +6020,6 @@ packages:
     engines: {node: '>=8'}
     dependencies:
       is-docker: 2.2.1
-    dev: false
 
   /isexe/2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
@@ -5978,6 +6131,10 @@ packages:
   /jsonpointer/5.0.1:
     resolution: {integrity: sha512-p/nXbhSEcu3pZRdkW1OfJhpsVtW1gd4Wa1fnQc9YLiTfAjn0312eMKimbdIQzuZl9aa9xUGaRlP9T/CJE/ditQ==}
     engines: {node: '>=0.10.0'}
+    dev: true
+
+  /jwt-decode/3.1.2:
+    resolution: {integrity: sha512-UfpWE/VZn0iP50d8cz9NrZLM9lSWhcJ+0Gt/nm4by88UL+J1SiKN8/5dkjMmbEzwL2CAe+67GsegCbIKtbp75A==}
     dev: true
 
   /katex/0.13.24:
@@ -6802,6 +6959,13 @@ packages:
     resolution: {integrity: sha512-+o/DrHa4zykFMSKfS8Z+CPSEg5LW9tSNGTuN8o6MF1GKxlfkSHSeJn5UtgxvPkGgaouplnrLXCF+duAsmm6FHQ==}
     dev: false
 
+  /mockjs/1.1.0:
+    resolution: {integrity: sha512-eQsKcWzIaZzEZ07NuEyO4Nw65g0hdWAyurVol1IPl1gahRwY+svqzfgfey8U8dahLwG44d6/RwEzuK52rSa/JQ==}
+    hasBin: true
+    dependencies:
+      commander: 9.5.0
+    dev: true
+
   /moment-timezone/0.5.42:
     resolution: {integrity: sha512-tjI9goqwzkflKSTxJo+jC/W8riTFwEjjunssmFvAWlvNVApjbkJM7UHggyKO0q1Fd/kZVKY77H7C9A0XKhhAFw==}
     dependencies:
@@ -7000,6 +7164,15 @@ packages:
 
   /only/0.0.2:
     resolution: {integrity: sha512-Fvw+Jemq5fjjyWz6CpKx6w9s7xxqo3+JCyM0WXWeCSOboZ8ABkyvP8ID4CZuChA/wxSx+XSJmdOm8rGVyJ1hdQ==}
+    dev: true
+
+  /open/8.4.2:
+    resolution: {integrity: sha512-7x81NCL719oNbsq/3mh+hVrAWmFuEYUqrq/Iw3kUzH8ReypT9QQ0BLoJS7/G9k6N81XjW4qHWtjWwe/9eLy1EQ==}
+    engines: {node: '>=12'}
+    dependencies:
+      define-lazy-prop: 2.0.0
+      is-docker: 2.2.1
+      is-wsl: 2.2.0
     dev: true
 
   /openai/3.2.1:
@@ -7908,6 +8081,22 @@ packages:
       rollup: 2.79.1
       serialize-javascript: 4.0.0
       terser: 5.16.5
+    dev: true
+
+  /rollup-plugin-visualizer/5.9.0:
+    resolution: {integrity: sha512-bbDOv47+Bw4C/cgs0czZqfm8L82xOZssk4ayZjG40y9zbXclNk7YikrZTDao6p7+HDiGxrN0b65SgZiVm9k1Cg==}
+    engines: {node: '>=14'}
+    hasBin: true
+    peerDependencies:
+      rollup: 2.x || 3.x
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+    dependencies:
+      open: 8.4.2
+      picomatch: 2.3.1
+      source-map: 0.7.4
+      yargs: 17.7.1
     dev: true
 
   /rollup/2.79.1:
