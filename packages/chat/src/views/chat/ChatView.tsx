@@ -3,11 +3,11 @@ import { toJS } from 'mobx'
 import css from './ChatView.module.css'
 import classNames from 'classnames'
 import GPT3Tokenizer from 'gpt3-tokenizer'
-import { findLast, last, pick } from 'lodash-es'
+import { findLast, last, omit, pick } from 'lodash-es'
 import { ReactElement, useEffect, useRef } from 'react'
 import { useMount } from 'react-use'
 import clipboardy from 'clipboardy'
-import { initDatabase, Message, MessageService, PromptService, Session, SessionService } from '../../constants/db'
+import { Message, MessageService, PromptService, Session, SessionService } from '../../constants/db'
 import { v4 } from 'uuid'
 import { router } from '../../constants/router'
 import { useParams } from '@liuli-util/react-router'
@@ -65,8 +65,8 @@ export const ChatMessages = observer(function (props: {
   messages: Message[]
   activeSession?: Session
   onChangeActiveSessionId(id: string, refresh: boolean): Promise<void>
-  onCreateSession(session: Session): Promise<void>
-  onNotifiCreateMessage(message: Message): Promise<void>
+  onCreateSession(session: Pick<Session, 'name'>): Promise<Session>
+  onNotifiCreateMessage(message: Pick<Message, 'sessionId' | 'role' | 'content'>): Promise<Message>
   onNotifiDeleteMessage(id: string): void
   onCopy(): void
   onExport(): void
@@ -84,19 +84,36 @@ export const ChatMessages = observer(function (props: {
   }, [props.messages])
 
   // 保存消息与生成会话
-  function onSave(msg: string) {
+  async function onSave(msg: string) {
     const activeSessionId = props.activeSession?.id
-    const sessionId = activeSessionId ?? v4()
-
-    const userMsg: Message = {
-      id: v4(),
+    let sessionId = activeSessionId
+    if (!sessionId) {
+      const generateTitle = await ajaxClient
+        .request({
+          method: 'post',
+          url: '/api/chat',
+          body: [
+            {
+              role: 'system',
+              content:
+                'Please summarize the following content into a topic, no more than 10 words, do not add punctuation at the end, please use the original language of the following content',
+            },
+            {
+              role: 'user',
+              content: msg.trim(),
+            },
+          ] as Message[],
+        })
+        .then((res) => res.text())
+      const session = await props.onCreateSession({ name: generateTitle })
+      sessionId = session.id
+    }
+    const userMsg = await props.onNotifiCreateMessage({
       sessionId: sessionId,
       content: msg.trim(),
       role: 'user',
-      date: new Date().toISOString(),
-    }
+    })
     props.messages.push(userMsg)
-    props.onNotifiCreateMessage(userMsg)
 
     return sessionId
   }
@@ -144,7 +161,7 @@ export const ChatMessages = observer(function (props: {
         ReactSwal.fire(t('message.error.network'))
         return
       }
-      props.messages.push({ id: v4(), sessionId, content: '', role: 'assistant', date: new Date().toISOString() })
+      props.messages.push({ id: v4(), sessionId, content: '', role: 'assistant' })
       const m = props.messages[props.messages.length - 1]
       const reader = resp.body!.getReader()
       let chunk = await reader.read()
@@ -152,30 +169,10 @@ export const ChatMessages = observer(function (props: {
 
       async function onGenerated() {
         const activeSessionId = props.activeSession?.id
-        const userMsg = findLast(props.messages, (it) => it.role === 'user')!
         if (!activeSessionId) {
-          const generateTitle = await ajaxClient
-            .request({
-              method: 'post',
-              url: '/api/chat',
-              body: [
-                {
-                  role: 'system',
-                  content:
-                    'Please summarize the following content into a topic, no more than 10 words, do not add punctuation at the end, please use the original language of the following content',
-                },
-                {
-                  role: 'user',
-                  content: userMsg.content,
-                },
-              ] as Message[],
-            })
-            .then((res) => res.text())
-          const session: Session = { id: sessionId, name: generateTitle, date: new Date().toISOString() }
-          props.onCreateSession(session)
-          props.onChangeActiveSessionId(sessionId, false)
+          await props.onChangeActiveSessionId(sessionId, false)
         }
-        props.onNotifiCreateMessage(m)
+        await props.onNotifiCreateMessage(omit(m, 'id'))
         const end = Date.now()
 
         const tokenizer = new GPT3Tokenizer({ type: 'gpt3' })
@@ -222,24 +219,20 @@ export const ChatMessages = observer(function (props: {
     if (msg.trim().length === 0) {
       return
     }
-    const sessionId = onSave(msg)
+    const sessionId = await onSave(msg)
     messagesRef.current!.lastElementChild!.scrollIntoView({ behavior: 'smooth', block: 'end' })
     await onGenerate(sessionId)
   }
 
   async function onPrompt(title: string, systemContent: string) {
-    const session: Session = {
-      id: v4(),
+    const session = await props.onCreateSession({
       name: title,
-      date: new Date().toISOString(),
-    }
-    await props.onCreateSession(session)
+    })
     const systemMessage: Message = {
       id: v4(),
       sessionId: session.id,
       content: systemContent,
       role: 'system',
-      date: new Date().toISOString(),
     }
     await props.onNotifiCreateMessage(systemMessage)
     await props.onChangeActiveSessionId(session.id, true)
@@ -249,16 +242,15 @@ export const ChatMessages = observer(function (props: {
     prompts: [] as Prompt[],
   }))
   useMount(async () => {
-    const db = await initDatabase()
-    const service = new PromptService(db)
+    const service = new PromptService()
     const language = getLanguage()
     promptStore.prompts = [
       ...(promptData.prompts as unknown as SystemPrompt[]).map((it) => {
         const locale = it.locale[language] ?? it.locale[it.fallback]
         return {
           id: it.id,
-          title: locale.title,
-          detail: locale.detail,
+          name: locale.title,
+          content: locale.detail,
         } as Prompt
       }),
       ...(await service.list()),
@@ -504,9 +496,8 @@ export const ChatHomeView = observer(() => {
     Reflect.set(globalThis, 'store', store)
     Reflect.set(globalThis, 'router', router)
     Reflect.set(globalThis, 'ga4', ga4)
-    const db = await initDatabase()
-    const sessionService = new SessionService(db)
-    const messageService = new MessageService(db)
+    const sessionService = new SessionService()
+    const messageService = new MessageService()
     store.sessionService = sessionService
     store.messageService = messageService
     store.sessions = await sessionService.list()
@@ -517,20 +508,18 @@ export const ChatHomeView = observer(() => {
     const s = new URLSearchParams(router.location.search)
     if (s.get('action') === 'newPrompt' && s.has('prompt')) {
       const prompt = { ...JSON.parse(s.get('prompt')!), id: v4() } as Prompt
-      const service = new PromptService(db)
+      const service = new PromptService()
       await service.add(prompt)
       const session: Session = {
         id: v4(),
-        name: prompt.title,
-        date: new Date().toISOString(),
+        name: prompt.name,
       }
       await onCreateSession(session)
       const systemMessage: Message = {
         id: v4(),
         sessionId: session.id,
-        content: prompt.detail,
+        content: prompt.content,
         role: 'system',
-        date: new Date().toISOString(),
       }
       await onNotifiCreateMessage(systemMessage)
       await onChangeActiveSessionId(session.id, true)
@@ -550,11 +539,12 @@ export const ChatHomeView = observer(() => {
   }
   async function onCreateSession(session: Session) {
     store.sessions.unshift(session)
-    await store.sessionService!.add(toJS(session))
+    const r = await store.sessionService!.add(toJS(session))
     router.push(`/${session.id}`)
+    return r
   }
-  async function onNotifiCreateMessage(message: Message) {
-    await store.messageService!.add(toJS(message))
+  async function onNotifiCreateMessage(message: Pick<Message, 'sessionId' | 'role' | 'content'>) {
+    return await store.messageService!.add(toJS(message))
   }
   async function onNotifiDeleteMessage(id: string) {
     await store.messageService!.remove(id)
@@ -626,13 +616,11 @@ export const ChatHomeView = observer(() => {
           alert(t('session.import.error'))
           return
         }
-        const sessionId = v4()
-        const session: Session = { id: sessionId, name: data.session.name, date: new Date().toISOString() }
-        await store.sessionService!.add(session)
+        const session = await store.sessionService!.add({ name: data.session.name })
         store.sessions.unshift(session)
-        const messages = data.messages.map((it) => ({ ...it, id: v4(), sessionId } as Message))
+        const messages = data.messages.map((it) => ({ ...it, id: v4(), sessionId: session.id } as Message))
         await store.messageService!.batchAdd(messages)
-        await onChangeActiveSessionId(sessionId, true)
+        await onChangeActiveSessionId(session.id, true)
       } catch (e) {
         alert(t('session.import.error'))
         throw e
@@ -641,10 +629,6 @@ export const ChatHomeView = observer(() => {
     input.click()
     ga4.track('chat_event', { eventType: 'chat.import', sessionId: store.activeSessionId })
   }
-
-  useMount(async () => {
-    await ajaxClient.get('/api/ping')
-  })
 
   return (
     <div className={css.chatHome}>

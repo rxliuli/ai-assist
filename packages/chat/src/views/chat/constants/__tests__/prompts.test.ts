@@ -17,8 +17,8 @@ it('convert', async () => {
     (it) =>
       ({
         id: it.title,
-        title: format(it.title),
-        detail: format(it.descn),
+        name: format(it.title),
+        content: format(it.descn),
       } as Prompt),
   )
   await writeFile(path.resolve(tempPath, 'prompts.json'), JSON.stringify(r, null, 2))
@@ -37,8 +37,8 @@ it('parse', async () => {
       (it) =>
         ({
           id: it.act,
-          title: it.act,
-          detail: it.prompt,
+          name: it.act,
+          content: it.prompt,
         } as Prompt),
     )
   await writeFile(path.resolve(tempPath, 'prompts.json'), JSON.stringify(r, null, 2))

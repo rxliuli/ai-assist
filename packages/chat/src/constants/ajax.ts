@@ -1,5 +1,8 @@
-import { omit } from 'lodash-es'
+import { wait } from '@liuli-util/async'
+import { debounce, omit } from 'lodash-es'
+import Swal from 'sweetalert2'
 import { router } from './router'
+import { ReactSwal } from './swal'
 
 interface RequestOptions {
   url: string
@@ -28,12 +31,13 @@ class AjaxClient {
     return options.body
   }
   private getUrl(options: RequestOptions) {
-    const r = new URLSearchParams()
-    if (options.query) {
-      Object.entries(options.query).forEach(([k, v]) => {
-        Array.isArray(v) ? v.forEach((v) => r.append(k, v)) : r.append(k, String(v))
-      })
+    if (!options.query) {
+      return options.url
     }
+    const r = new URLSearchParams()
+    Object.entries(options.query).forEach(([k, v]) => {
+      Array.isArray(v) ? v.forEach((v) => r.append(k, v)) : r.append(k, String(v))
+    })
     return options.url + '?' + r.toString()
   }
   async request(options: RequestOptions & Partial<Omit<RequestInit, 'body'>>) {
@@ -43,6 +47,7 @@ class AjaxClient {
       headers: this.getHeaders(options),
       body: this.getBody(options),
     })
+
     if (r.status === 401) {
       // await Swal.fire('Unauthorized', 'Please sign in again', 'error')
       router.push('/signin')

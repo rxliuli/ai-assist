@@ -30,8 +30,8 @@ export interface SystemPrompt {
 
 export interface Prompt {
   id: string
-  title: string
-  detail: string
+  name: string
+  content: string
 }
 
 interface CompleteInputProps {
@@ -65,7 +65,7 @@ export const CompleteInput = observer(
 
     const clacPrompt = throttle(() => {
       const t = store.value.slice(1).toLowerCase()
-      store.list = props.prompts.filter((it) => it.title.toLowerCase().includes(t))
+      store.list = props.prompts.filter((it) => it.name.toLowerCase().includes(t))
       console.log('list', toJS(store.list))
       store.acitve = 0
       listRef.current?.scrollToItem(0, 'smart')
@@ -121,7 +121,7 @@ export const CompleteInput = observer(
 
     async function selectPrompt(i: number) {
       const item = store.list[i]
-      props.onPrompt(item.title, item.detail)
+      props.onPrompt(item.name, item.content)
       store.value = ''
       props.onChange('')
       ga4.track('chat_event', { eventType: 'chat.selectPrompt', text: item.id })
@@ -188,7 +188,7 @@ export const CompleteInput = observer(
                   textareaRef.current?.focus()
                 }}
               >
-                {data[index].title}
+                {data[index].name}
               </li>
             ))}
           </List>

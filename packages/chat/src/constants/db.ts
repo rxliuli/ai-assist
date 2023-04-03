@@ -1,11 +1,11 @@
 import { DBSchema, IDBPDatabase, openDB } from 'idb'
-import { sortBy } from 'lodash-es'
+import { pick, sortBy } from 'lodash-es'
 import { once } from '@liuli-util/async'
+import { ajaxClient } from './ajax'
 
 export interface Session {
   id: string
   name: string
-  date: string
 }
 
 export interface Message {
@@ -13,106 +13,72 @@ export interface Message {
   sessionId: string
   role: 'user' | 'assistant' | 'system'
   content: string
-  date: string
 }
-
-export interface AllDBSchema extends DBSchema {
-  session: {
-    key: string
-    value: Session
-  }
-  message: {
-    key: string
-    value: Message
-    indexes: {
-      sessionId: string
-    }
-  }
-  prompt: {
-    key: string
-    value: Prompt
-  }
-}
-
-export const initDatabase = once(async () => {
-  return await openDB<AllDBSchema>('chat', 2, {
-    upgrade(db) {
-      if (!db.objectStoreNames.contains('session')) {
-        db.createObjectStore('session', { keyPath: 'id' })
-      }
-      if (!db.objectStoreNames.contains('message')) {
-        db.createObjectStore('message', { keyPath: 'id' }).createIndex('sessionId', 'sessionId')
-      }
-      if (!db.objectStoreNames.contains('prompt')) {
-        db.createObjectStore('prompt', { keyPath: 'id' })
-      }
-    },
-  })
-})
 
 export class SessionService {
-  constructor(private readonly db: IDBPDatabase<AllDBSchema>) {}
   async put(session: Session): Promise<void> {
-    await this.db.put('session', session)
+    await ajaxClient.put(`/api/session/${session.id}`, pick(session, 'name'))
   }
-  async add(session: Session): Promise<void> {
-    await this.db.add('session', session)
+  async add(session: Omit<Session, 'id'>): Promise<Session> {
+    const r = await ajaxClient.post(`/api/session`, pick(session, 'name'))
+    return (await r.json()) as Session
   }
   async list(): Promise<Session[]> {
-    const list = await this.db.getAll('session')
-    return sortBy(list, (it) => -new Date(it.date).valueOf())
+    const r = await ajaxClient.get('/api/session')
+    return await r.json()
   }
   async remove(id: string): Promise<void> {
-    const list = await this.db.getAllKeysFromIndex('message', 'sessionId', id)
-    await Promise.all(list.map((it) => this.db.delete('message', it)))
-    await this.db.delete('session', id)
+    await ajaxClient.delete(`/api/session/${id}`)
   }
 }
 
 export class MessageService {
-  constructor(private readonly db: IDBPDatabase<AllDBSchema>) {}
   async list(sessionId: string): Promise<Message[]> {
-    return sortBy(await this.db.getAllFromIndex('message', 'sessionId', sessionId), (it) => new Date(it.date).valueOf())
+    const r = await ajaxClient.get(`/api/message`, { sessionId })
+    return sortBy(
+      (await r.json()) as (Message & {
+        createdAt?: string
+      })[],
+      (it) => it.createdAt,
+    )
   }
   async remove(id: string): Promise<void> {
-    await this.db.delete('message', id)
+    await ajaxClient.delete(`/api/message/${id}`)
   }
-  async add(msg: Message): Promise<void> {
-    await this.db.add('message', msg)
+  async add(msg: Omit<Message, 'id'>): Promise<Message> {
+    const r = await ajaxClient.post(`/api/message`, msg)
+    return (await r.json()) as Message
   }
-  async batchAdd(msgs: Message[]): Promise<void> {
-    const tx = this.db.transaction('message', 'readwrite')
-    for (const msg of msgs) {
-      await tx.objectStore('message').add(msg)
-    }
-    await tx.done
+  async batchAdd(msgs: Omit<Message, 'id' | 'sessionId'>[]): Promise<void> {
+    await ajaxClient.post(`/api/message/batch`, msgs)
   }
   async put(msg: Message): Promise<void> {
-    await this.db.put('message', msg)
+    await ajaxClient.put('/api/message', msg)
   }
 }
 
 export interface Prompt {
   id: string
-  title: string
-  detail: string
+  name: string
+  content: string
 }
 
 export class PromptService {
-  constructor(private readonly db: IDBPDatabase<AllDBSchema>) {}
   async list() {
-    return await this.db.getAll('prompt')
+    const r = await ajaxClient.get('/api/prompt')
+    return (await r.json()) as Prompt[]
   }
-  async add(prompt: Prompt) {
-    await this.db.add('prompt', prompt)
+  async add(prompt: Pick<Prompt, 'id' | 'name' | 'content'>) {
+    return await ajaxClient.post('/api/prompt', prompt)
   }
-  async get(id: string) {
-    return await this.db.get('prompt', id)
+  async get(id: string): Promise<Prompt> {
+    const r = await ajaxClient.get(`/api/prompt/${id}`)
+    return await r.json()
   }
   async update(prompt: Prompt) {
-    await this.db.put('prompt', prompt)
+    return await ajaxClient.put('/api/prompt', prompt)
   }
   async delete(id: string) {
-    await this.db.delete('prompt', id)
+    await ajaxClient.delete(`/api/prompt/${id}`)
   }
 }

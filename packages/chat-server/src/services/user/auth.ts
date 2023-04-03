@@ -37,6 +37,16 @@ export async function revokeToken(token: string): Promise<void> {
   })
 }
 
+export async function getUserIdByToken(token: string): Promise<string | undefined> {
+  const r = await TokenModel.findOne({
+    where: { accessToken: token },
+  })
+  if (!r) {
+    return
+  }
+  return r.get().userId
+}
+
 export function auth(): Middleware {
   return async (ctx, next) => {
     if (['/signin', '/signup', '/active'].includes(ctx.path)) {

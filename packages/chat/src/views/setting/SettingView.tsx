@@ -5,7 +5,7 @@ import { Link, RouterView, useParams } from '@liuli-util/react-router'
 import { router } from '../../constants/router'
 import { FormEvent, useState } from 'react'
 import { useMount } from 'react-use'
-import { initDatabase, Prompt, PromptService } from '../../constants/db'
+import { Prompt, PromptService } from '../../constants/db'
 import { v4 } from 'uuid'
 import { observable, toJS } from 'mobx'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -14,6 +14,8 @@ import clipboardy from 'clipboardy'
 import { t } from '../../constants/i18n'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 import { ajaxClient } from '../../constants/ajax'
+import Swal from 'sweetalert2'
+import { ReactSwal } from '../../constants/swal'
 
 const settingStore = observable({
   title: t('setting.title'),
@@ -61,8 +63,7 @@ export const SettingPromptView = observer(() => {
     list: [] as Prompt[],
   }))
   useMount(async () => {
-    const db = await initDatabase()
-    const service = new PromptService(db)
+    const service = new PromptService()
     store.list = await service.list()
     setPromptService(service)
     settingStore.title = t('setting.prompt.title')
@@ -99,7 +100,7 @@ export const SettingPromptView = observer(() => {
           {store.list.map((it) => (
             <li key={it.id} className={css.prompt}>
               <Link to={`/setting/prompt/${it.id}`}>
-                <span>{it.title}</span>
+                <span>{it.name}</span>
               </Link>
               <FontAwesomeIcon
                 icon={faTrash}
@@ -129,14 +130,13 @@ export const SettingPromptEditView = observer(() => {
     },
     prompt: {
       id: v4(),
-      title: '',
-      detail: '',
+      name: '',
+      content: '',
     } as Prompt,
   }))
   const [promptService, setPromptService] = useState<PromptService>()
   useMount(async () => {
-    const db = await initDatabase()
-    const service = new PromptService(db)
+    const service = new PromptService()
     setPromptService(service)
     if (store.edit) {
       store.prompt = (await service.get(params.promptId!))!
@@ -149,11 +149,15 @@ export const SettingPromptEditView = observer(() => {
 
   async function onSave(ev: FormEvent) {
     ev.preventDefault()
-    if (store.edit) {
-      await promptService!.update(toJS(store.prompt))
-    } else {
-      await promptService!.add(toJS(store.prompt))
+    const r = await (store.edit ? promptService!.update(toJS(store.prompt)) : promptService!.add(toJS(store.prompt)))
+    if (!r.ok) {
+      ReactSwal.fire({
+        title: 'Save prompt failed',
+        icon: 'error',
+      })
+      return
     }
+    await ReactSwal.fire({ title: 'Save prompt success', icon: 'success', timer: 1000 })
     router.back()
   }
 
@@ -161,13 +165,13 @@ export const SettingPromptEditView = observer(() => {
     <form onSubmit={onSave}>
       <div>
         <label htmlFor={'title'}>{t('setting.prompt.new.form.title')}:</label>
-        <input value={store.prompt.title} onChange={(ev) => (store.prompt.title = ev.target.value)} required></input>
+        <input value={store.prompt.name} onChange={(ev) => (store.prompt.name = ev.target.value)} required></input>
       </div>
       <div>
         <label htmlFor={'detail'}>{t('setting.prompt.new.form.detail')}:</label>
         <textarea
-          value={store.prompt.detail}
-          onChange={(ev) => (store.prompt.detail = ev.target.value)}
+          value={store.prompt.content}
+          onChange={(ev) => (store.prompt.content = ev.target.value)}
           required
         ></textarea>
       </div>
