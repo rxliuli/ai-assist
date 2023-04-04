@@ -1,5 +1,22 @@
 # changelog
 
+## 0.5.2
+
+- fix: 修复会话时返回第一条消息很慢的问题
+- feat: 支持同步会话、消息和 prompt
+- perf: 使用缓存提升 token 校验相关的性能
+- refactor: 实现会话、消息同步(wip)
+
+## 0.5.1
+
+- feat: 更新 i18n 配置
+- refactor: 将系统消息放到 message 中而不是绑定到 session
+- chore: 调整 docker 构建脚本及原生依赖的配置
+
+## 0.5.0
+
+- feat: 实现用户系统
+
 ## 0.4.8
 
 - feat: 添加设置中的 openai api key 的本地化说明
