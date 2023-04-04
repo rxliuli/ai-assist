@@ -7,7 +7,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const c = parse(await fs.readFile(path.resolve(__dirname, '../.env'), 'utf-8'))
 
 await $`pnpm build`
-// await $`pnpm --prefix ../chat build`
+await $`pnpm --prefix ../chat build`
 await fs.copy(path.resolve(__dirname, '../../chat/dist'), path.resolve(__dirname, '../dist/public'))
 await $`docker buildx build --platform=linux/amd64 -t chat-server .`
 

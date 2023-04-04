@@ -32,9 +32,12 @@ router.get('/api/ping', (ctx) => {
 
 router.post('/api/chat', async (ctx) => {
   const params = ctx.request.body as Array<ChatCompletionRequestMessage>
-  // const r = await chat(params, ctx.get('OPENAI_API_KEY'))
-  // ctx.body = r
-  ctx.body = 'hello world'
+  if (!Array.isArray(params)) {
+    ctx.status = 400
+    throw new ServerError('params is not array', 'PARAMS_NOT_ARRAY')
+  }
+  const r = await chat(params, ctx.get('OPENAI_API_KEY'))
+  ctx.body = r
 })
 router.post('/api/chat-stream', async (ctx) => {
   const params = ctx.request.body as Array<ChatCompletionRequestMessage>

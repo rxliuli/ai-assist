@@ -68,6 +68,7 @@ export const ChatMessages = observer(function (props: {
   onCreateSession(session: Pick<Session, 'name'>): Promise<Session>
   onNotifiCreateMessage(message: Pick<Message, 'sessionId' | 'role' | 'content'>): Promise<Message>
   onNotifiDeleteMessage(id: string): void
+  onEditSession(id: string, name: string): Promise<void>
   onCopy(): void
   onExport(): void
   onImport(): void
@@ -88,25 +89,9 @@ export const ChatMessages = observer(function (props: {
     const activeSessionId = props.activeSession?.id
     let sessionId = activeSessionId
     if (!sessionId) {
-      const generateTitle = await ajaxClient
-        .request({
-          method: 'post',
-          url: '/api/chat',
-          body: [
-            {
-              role: 'system',
-              content:
-                'Please summarize the following content into a topic, no more than 10 words, do not add punctuation at the end, please use the original language of the following content',
-            },
-            {
-              role: 'user',
-              content: msg.trim(),
-            },
-          ] as Message[],
-        })
-        .then((res) => res.text())
-      const session = await props.onCreateSession({ name: generateTitle })
+      const session = await props.onCreateSession({ name: 'New Chat' })
       sessionId = session.id
+      await props.onChangeActiveSessionId(sessionId, false)
     }
     const userMsg = await props.onNotifiCreateMessage({
       sessionId: sessionId,
@@ -118,7 +103,7 @@ export const ChatMessages = observer(function (props: {
     return sessionId
   }
   // 根据前文生成答案，不负责保存用户输入的消息
-  async function onGenerate(sessionId: string) {
+  async function onGenerate(sessionId: string, msg: string) {
     try {
       store.loading = true
       store.abort = new AbortController()
@@ -170,7 +155,27 @@ export const ChatMessages = observer(function (props: {
       async function onGenerated() {
         const activeSessionId = props.activeSession?.id
         if (!activeSessionId) {
-          await props.onChangeActiveSessionId(sessionId, false)
+          const generateName = await ajaxClient
+            .request({
+              method: 'post',
+              url: '/api/chat',
+              body: [
+                {
+                  role: 'system',
+                  content:
+                    'Please summarize the following content into a topic, no more than 10 words, do not add punctuation at the end, please use the original language of the following content',
+                },
+                {
+                  role: 'user',
+                  content: msg.trim(),
+                },
+              ] as Message[],
+            })
+            .then((res) => res.text())
+          await ajaxClient.put('/api/session/' + sessionId, {
+            name: generateName,
+          })
+          await props.onEditSession(sessionId, generateName)
         }
         await props.onNotifiCreateMessage(omit(m, 'id'))
         const end = Date.now()
@@ -221,7 +226,7 @@ export const ChatMessages = observer(function (props: {
     }
     const sessionId = await onSave(msg)
     messagesRef.current!.lastElementChild!.scrollIntoView({ behavior: 'smooth', block: 'end' })
-    await onGenerate(sessionId)
+    await onGenerate(sessionId, msg)
   }
 
   async function onPrompt(title: string, systemContent: string) {
@@ -283,7 +288,7 @@ export const ChatMessages = observer(function (props: {
       props.messages.splice(props.messages.length - 1, 1)
       props.onNotifiDeleteMessage(lastMsg.id)
     }
-    await onGenerate(sessionId)
+    await onGenerate(sessionId, lastMsg.content)
     ga4.track('chat_event', {
       eventType: 'chat.regenerate',
       sessionId: props.activeSession!.id,
@@ -447,7 +452,7 @@ const ChatSidebar = observer(
           </LinkListItem>
           <ul className={css.sessions}>
             {props.sessions.map((it) => (
-              <li key={it.id}>
+              <li key={it.id} data-key={it.id}>
                 <SessionItem
                   value={it.name}
                   onChange={(name) => props.onEditSession(it.id, name)}
@@ -496,6 +501,7 @@ export const ChatHomeView = observer(() => {
     Reflect.set(globalThis, 'store', store)
     Reflect.set(globalThis, 'router', router)
     Reflect.set(globalThis, 'ga4', ga4)
+    Reflect.set(globalThis, 'toJS', toJS)
     const sessionService = new SessionService()
     const messageService = new MessageService()
     store.sessionService = sessionService
@@ -538,8 +544,8 @@ export const ChatHomeView = observer(() => {
     store.messages = await store.messageService!.list(id)
   }
   async function onCreateSession(session: Session) {
-    store.sessions.unshift(session)
     const r = await store.sessionService!.add(toJS(session))
+    store.sessions.unshift(r)
     router.push(`/${session.id}`)
     return r
   }
@@ -559,6 +565,7 @@ export const ChatHomeView = observer(() => {
     if (sessionId === store.activeSessionId) {
       store.activeSessionId = undefined
       store.messages = []
+      router.push('/')
     }
   }
   async function onEditSession(id: string, name: string) {
@@ -653,6 +660,7 @@ export const ChatHomeView = observer(() => {
         onChangeActiveSessionId={onChangeActiveSessionId}
         onNotifiCreateMessage={onNotifiCreateMessage}
         onNotifiDeleteMessage={onNotifiDeleteMessage}
+        onEditSession={onEditSession}
         onCopy={onCopy}
         onExport={onExport}
         onImport={onImport}
