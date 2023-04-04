@@ -23,6 +23,7 @@ import { addSession, deleteSession, listSession, updateSessionName } from './ser
 import { addMessage, batchAddMessage, deleteMessage, listMessage } from './services/message/messages'
 import { addPrompt, deletePrompt, getPromptById, listPromptByUserId, updatePrompt } from './services/prompt/prompt'
 import { Message } from './constants/db'
+import { ResetPasswordReq, resetPassword, sendResetPasswordEmail } from './services/user/reset'
 
 const app = new Application()
 const router = new Router()
@@ -80,6 +81,27 @@ router.post('/api/active', async (ctx) => {
     return
   }
   await active(activeInfo)
+  ctx.body = 'ok'
+})
+router.post('/api/reset-password-sent', async (ctx) => {
+  const reqInfo = ctx.request.body as {
+    email: string
+  }
+  if (isEmpty(reqInfo.email)) {
+    throw new ServerError('email is empty', 'EMAIL_EMPTY', 400)
+  }
+  await sendResetPasswordEmail(reqInfo.email, new URL(ctx.get('referer')).origin)
+  ctx.body = 'ok'
+})
+router.post('/api/reset-password', async (ctx) => {
+  const reqInfo = ctx.request.body as ResetPasswordReq
+  if (isEmpty(reqInfo.code)) {
+    throw new ServerError('code is empty', 'CODE_EMPTY', 400)
+  }
+  if (isEmpty(reqInfo.password)) {
+    throw new ServerError('password is empty', 'PASSWORD_EMPTY', 400)
+  }
+  await resetPassword(reqInfo)
   ctx.body = 'ok'
 })
 router.post('/api/logout', async (ctx) => {

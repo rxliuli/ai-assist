@@ -5,7 +5,7 @@ import { logger } from '../constants/logger'
  * A server error that can be thrown to return a specific HTTP status code.
  */
 export class ServerError extends Error {
-  constructor(message: string, public readonly code: string) {
+  constructor(message: string, public readonly code: string, readonly status: number = 500) {
     super(message)
   }
 }
@@ -16,7 +16,7 @@ export function serverErrorHandle(): Middleware {
       await next()
     } catch (err) {
       if (err instanceof ServerError) {
-        ctx.status = 500
+        ctx.status = err.status
         ctx.body = {
           code: err.code,
           message: err.message,

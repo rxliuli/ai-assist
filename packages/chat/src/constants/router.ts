@@ -14,6 +14,7 @@ import { CompleteInputDemo } from '../views/test/CompleteInputDemo'
 import { ActiveView } from '../views/user/ActiveView'
 import { SignInView } from '../views/user/SignInView'
 import { SignUpView } from '../views/user/SignUpView'
+import { PasswordResetSendView as PasswordResetSentView, PasswordResetView } from '../views/user/PasswordResetView'
 
 export const routes: RouteConfig[] = [
   { path: '/speak', component: SpeakView },
@@ -30,6 +31,8 @@ export const routes: RouteConfig[] = [
   },
   { path: '/:sessionId', component: ChatHomeView },
   { path: '/signin', component: SignInView },
+  { path: '/reset-password-sent', component: PasswordResetSentView },
+  { path: '/reset-password', component: PasswordResetView },
   { path: '/signup', component: SignUpView },
   { path: '/active', component: ActiveView },
   { path: '/', component: ChatHomeView },

@@ -5,6 +5,7 @@ import { router } from '../../constants/router'
 import { ServerError } from '../../utils/error'
 import { t } from '../../constants/i18n'
 import { ReactSwal } from '../../constants/swal'
+import css from './SignInView.module.css'
 
 export const SignInView = observer(() => {
   const store = useLocalStore(() => ({
@@ -77,8 +78,9 @@ export const SignInView = observer(() => {
           />
         </div>
         <div>
-          <label htmlFor={'password'}>
+          <label htmlFor={'password'} className={css.passwordLabel}>
             <span>{t('user.form.password')}:</span>
+            <Link to={'/reset-password-sent'}>Forgot Password</Link>
           </label>
           <input
             type={'password'}
