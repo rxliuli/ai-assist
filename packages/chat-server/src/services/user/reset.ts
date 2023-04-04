@@ -6,6 +6,7 @@ import { logger } from '../../constants/logger'
 import { ServerError } from '../../util/ServerError'
 import bcrypt from 'bcrypt'
 import { SaltRounds } from './auth'
+import validator from 'validator'
 
 const resetCodeCache = new LRUCache<string, { email: string }>({
   max: 1000, // 缓存最大条目数，根据实际需求调整
@@ -59,6 +60,9 @@ export async function resetPassword({ password, code }: ResetPasswordReq) {
   })
   if (!user) {
     throw new ServerError('User not found', 'USER_NOT_FOUND')
+  }
+  if (!validator.isStrongPassword(password, { minLength: 8 })) {
+    throw new ServerError('Invalid password', 'INVALID_PASSWORD')
   }
   // 生成随机盐值
   const salt = bcrypt.genSaltSync(SaltRounds)

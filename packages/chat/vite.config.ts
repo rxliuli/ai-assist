@@ -9,7 +9,7 @@ export default defineConfig({
   base: './',
   plugins: [
     react({
-      // fastRefresh: false,
+      fastRefresh: false,
     }),
     cssdts(),
     i18nextDtsGen({

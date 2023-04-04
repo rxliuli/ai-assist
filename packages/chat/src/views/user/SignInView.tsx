@@ -80,7 +80,7 @@ export const SignInView = observer(() => {
         <div>
           <label htmlFor={'password'} className={css.passwordLabel}>
             <span>{t('user.form.password')}:</span>
-            <Link to={'/reset-password-sent'}>Forgot Password</Link>
+            <Link to={'/reset-password-sent'}>{t('user.signin.forgotPassword')}</Link>
           </label>
           <input
             type={'password'}

@@ -3,6 +3,7 @@ import { ajaxClient } from '../../constants/ajax'
 import { ReactSwal } from '../../constants/swal'
 import { ServerError } from '../../utils/error'
 import { router } from '../../constants/router'
+import { t } from '../../constants/i18n'
 
 export const PasswordResetSendView = observer(() => {
   const store = useLocalStore(() => ({
@@ -20,15 +21,16 @@ export const PasswordResetSendView = observer(() => {
       const r = (await resp.json()) as ServerError
       ReactSwal.fire({
         icon: 'error',
-        title: r.message,
+        title: t(('user.reset.errors.' + r.code) as any),
       })
       return
     }
     ReactSwal.fire({
       icon: 'success',
-      title: 'Password reset email sent',
-      text: 'Please check your email for a password reset link.',
+      title: t('user.reset.success.title'),
+      text: t('user.reset.success.text'),
     })
+    store.email = ''
   }
   function onKeydown(ev: React.KeyboardEvent<HTMLInputElement>) {
     if (ev.key === 'Enter') {
@@ -38,12 +40,10 @@ export const PasswordResetSendView = observer(() => {
   }
   return (
     <div className={'container'}>
-      <h2>Reset your password</h2>
+      <h2>{t('user.reset.title')}</h2>
       <form onSubmit={onSendPasswordResetEmail}>
         <div>
-          <label htmlFor={'email'}>
-            Enter your user account's verified email address and we will send you a password reset link.
-          </label>
+          <label htmlFor={'email'}>{t('user.reset.sent.form.email')}</label>
           <input
             type={'email'}
             id={'email'}
@@ -54,7 +54,7 @@ export const PasswordResetSendView = observer(() => {
           />
         </div>
         <div>
-          <button type={'submit'}>Send password reset email</button>
+          <button type={'submit'}>{t('user.reset.sent.form.submit')}</button>
         </div>
       </form>
     </div>
@@ -76,14 +76,13 @@ export const PasswordResetView = observer(() => {
       const r = (await resp.json()) as ServerError
       ReactSwal.fire({
         icon: 'error',
-        title: r.message,
+        title: t(('user.reset.errors.' + r.code) as any),
       })
       return
     }
     await ReactSwal.fire({
       icon: 'success',
-      title: 'Password reset',
-      text: 'Your password has been reset, you can now login with your new password.',
+      title: t('user.reset.new.success.title'),
       timer: 3000,
     })
     router.push('/login')
@@ -96,10 +95,10 @@ export const PasswordResetView = observer(() => {
   }
   return (
     <div className={'container'}>
-      <h2>Reset your password</h2>
+      <h2>{t('user.reset.title')}</h2>
       <form onSubmit={onResetPassword}>
         <div>
-          <label htmlFor={'password'}>New password</label>
+          <label htmlFor={'password'}>{t('user.reset.new.form.newPassword')}:</label>
           <input
             type={'password'}
             id={'password'}
@@ -110,7 +109,7 @@ export const PasswordResetView = observer(() => {
           />
         </div>
         <div>
-          <button type={'submit'}>Reset password</button>
+          <button type={'submit'}>{t('user.reset.new.form.submit')}</button>
         </div>
       </form>
     </div>
