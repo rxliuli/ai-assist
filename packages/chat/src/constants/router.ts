@@ -14,6 +14,7 @@ import { CompleteInputDemo } from '../views/test/CompleteInputDemo'
 import { ActiveView } from '../views/user/ActiveView'
 import { SignInView } from '../views/user/SignInView'
 import { SignUpView } from '../views/user/SignUpView'
+import { SyncLocalView } from '../views/setting/SyncLocalView'
 
 export const routes: RouteConfig[] = [
   { path: '/speak', component: SpeakView },
@@ -26,6 +27,7 @@ export const routes: RouteConfig[] = [
       { path: '/setting/prompt', component: SettingPromptView },
       { path: '/setting/prompt/new', component: SettingPromptEditView },
       { path: '/setting/prompt/:promptId', component: SettingPromptEditView },
+      { path: '/setting/sync', component: SyncLocalView },
     ],
   },
   { path: '/:sessionId', component: ChatHomeView },

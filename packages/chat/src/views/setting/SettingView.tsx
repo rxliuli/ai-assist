@@ -217,6 +217,9 @@ export const SettingHomeView = observer(() => {
             <Link to={'/setting/prompt'}>{t('setting.prompt.title')}</Link>
           </li>
           <li>
+            <Link to={'/setting/sync'}>Sync Local Data</Link>
+          </li>
+          <li>
             <button onClick={onLogout}>{t('user.logout')}</button>
           </li>
         </ul>
