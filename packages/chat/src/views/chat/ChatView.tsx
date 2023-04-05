@@ -23,7 +23,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars, faClose, faPen, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { ajaxClient } from '../../constants/ajax'
 import { ReactSwal } from '../../constants/swal'
-
+import { message } from 'antd'
 function sliceMessages(
   messages: Pick<Message, 'role' | 'content'>[],
   max: number,
@@ -481,6 +481,7 @@ const ChatSidebar = observer(
 )
 
 export const ChatHomeView = observer(() => {
+  const [messageApi, contextHolder] = message.useMessage()
   const store = useLocalStore(() => ({
     activeSessionId: undefined as string | undefined,
     sessions: [] as Session[],
@@ -579,18 +580,33 @@ export const ChatHomeView = observer(() => {
 
   async function onCopy() {
     if (store.messages.length === 0) {
-      window.alert(t('session.copy.empty'))
+      messageApi.open({
+        type: 'warning',
+        content: t('session.copy.empty'),
+      })
       return
     }
-    const r = store.messages.map((it) => it.content).join('\n\n---\n\n')
+    const r = store.messages
+      .map((it) => {
+        return it.content
+      })
+      .join('\n\n---\n\n')
+
     await clipboardy.write(r)
-    window.alert(t('session.copy.success'))
+    messageApi.open({
+      type: 'success',
+      content: t('session.copy.success'),
+    })
+
     ga4.track('chat_event', { eventType: 'chat.copy', sessionId: store.activeSessionId })
   }
 
   function onExport() {
     if (store.messages.length === 0) {
-      window.alert(t('session.export.empty'))
+      messageApi.open({
+        type: 'warning',
+        content: t('session.export.empty'),
+      })
       return
     }
     const r = {
@@ -620,7 +636,12 @@ export const ChatHomeView = observer(() => {
       try {
         const data = JSON.parse(r) as { session: Session; messages: Message[] }
         if (!data.session || !data.messages) {
-          alert(t('session.import.error'))
+          // alert(t('session.import.error'))
+
+          messageApi.open({
+            type: 'error',
+            content: t('session.import.error'),
+          })
           return
         }
         const session = await store.sessionService!.add({ name: data.session.name })
@@ -629,7 +650,11 @@ export const ChatHomeView = observer(() => {
         await store.messageService!.batchAdd(messages)
         await onChangeActiveSessionId(session.id, true)
       } catch (e) {
-        alert(t('session.import.error'))
+        messageApi.open({
+          type: 'error',
+          content: t('session.import.error'),
+        })
+
         throw e
       }
     }
@@ -639,6 +664,7 @@ export const ChatHomeView = observer(() => {
 
   return (
     <div className={css.chatHome}>
+      {contextHolder}
       <ChatSidebar
         sessions={store.sessions}
         activeSessionId={store.activeSessionId}
