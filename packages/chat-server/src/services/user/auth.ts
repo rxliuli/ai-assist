@@ -79,7 +79,7 @@ export async function getUserIdByToken(token: string): Promise<string | undefine
 
 export function auth(): Middleware {
   return async (ctx, next) => {
-    if (['/signin', '/signup', '/active'].includes(ctx.path)) {
+    if (['/signin', '/signup', '/active', '/reset-password-sent', '/reset-password'].includes(ctx.path)) {
       return next()
     }
     const token = ctx.get('Authorization')

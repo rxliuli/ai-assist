@@ -22,6 +22,7 @@ export async function listSession(userId: string): Promise<Session[]> {
       where: {
         userId,
       },
+      attributes: ['id', 'name'],
       order: [['created_at', 'DESC']],
     })
   ).map((it) => it.get())

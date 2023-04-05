@@ -16,6 +16,7 @@ export async function listPromptByUserId(userId: string) {
       where: {
         userId,
       },
+      attributes: ['id', 'name', 'content', 'prefix'],
     })
   ).map((it) => it.get())
 }

@@ -5,6 +5,7 @@ import { t } from '../../constants/i18n'
 import { router } from '../../constants/router'
 import { ReactSwal } from '../../constants/swal'
 import { ServerError } from '../../utils/error'
+import validator from 'validator'
 
 export const SignUpView = observer(() => {
   const store = useLocalStore(() => ({
@@ -15,6 +16,30 @@ export const SignUpView = observer(() => {
   async function onSignUp(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault()
     console.log('user', store)
+    if (!validator.isEmail(store.email)) {
+      ReactSwal.fire({
+        title: t('user.signup.error.title'),
+        text: t('user.signup.error.INVALID_EMAIL'),
+        icon: 'error',
+      })
+      return
+    }
+    if (!validator.isLength(store.username, { min: 6, max: 20 })) {
+      ReactSwal.fire({
+        title: t('user.signup.error.title'),
+        text: t('user.signup.error.INVALID_USERNAME'),
+        icon: 'error',
+      })
+      return
+    }
+    if (!validator.isLength(store.password, { min: 8, max: 20 }) || !validator.isStrongPassword(store.password)) {
+      ReactSwal.fire({
+        title: t('user.signup.error.title'),
+        text: t('user.signup.error.INVALID_PASSWORD'),
+        icon: 'error',
+      })
+      return
+    }
     const r = await ajaxClient.post('/api/signup', store)
     if (!r.ok) {
       const resp = (await r.json()) as ServerError
@@ -86,6 +111,7 @@ export const SignUpView = observer(() => {
             required
             value={store.email}
             onInput={(ev) => (store.email = ev.currentTarget.value)}
+            placeholder={t('user.form.email.placeholder')}
           />
         </div>
         <div>
@@ -96,6 +122,7 @@ export const SignUpView = observer(() => {
             required
             value={store.username}
             onInput={(ev) => (store.username = ev.currentTarget.value)}
+            placeholder={t('user.form.username.placeholder')}
           />
         </div>
         <div>
@@ -106,6 +133,7 @@ export const SignUpView = observer(() => {
             required
             value={store.password}
             onInput={(ev) => (store.password = ev.currentTarget.value)}
+            placeholder={t('user.form.password.placeholder')}
           />
         </div>
         <div>
