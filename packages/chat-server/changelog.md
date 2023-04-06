@@ -1,5 +1,12 @@
 # changelog
 
+## 0.5.4
+
+- feat: 实现同步本地会话到远端
+- perf: 返回会话、消息列表时删除无用的字段
+- docs: update build config
+- docs: 更新开发文档
+
 ## 0.5.3
 
 - feat: 在注册页面给出更好的提示信息
