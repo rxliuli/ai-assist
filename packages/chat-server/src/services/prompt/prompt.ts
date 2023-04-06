@@ -48,3 +48,14 @@ export async function getPromptById(prompt: Pick<Prompt, 'id' | 'userId'>) {
   })
   return r?.get()
 }
+
+export type BatchImportPromptReq = Pick<Prompt, 'content' | 'name' | 'createdAt'>
+export async function batchImportPrompt(prompts: BatchImportPromptReq[], userId: string) {
+  await PromptModel.bulkCreate(
+    prompts.map((it) => ({
+      ...it,
+      id: v4(),
+      userId,
+    })),
+  )
+}

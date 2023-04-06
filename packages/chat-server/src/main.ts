@@ -19,9 +19,24 @@ import { signup, SignUpInfo } from './services/user/signup'
 import { active, ActiveReq } from './services/user/active'
 import { ServerError, serverErrorHandle } from './util/ServerError'
 import { logout } from './services/user/logout'
-import { addSession, deleteSession, listSession, updateSessionName } from './services/message/sessions'
+import {
+  BatchImportSessionReq,
+  addSession,
+  batchImportSession,
+  deleteSession,
+  listSession,
+  updateSessionName,
+} from './services/message/sessions'
 import { addMessage, batchAddMessage, deleteMessage, listMessage } from './services/message/messages'
-import { addPrompt, deletePrompt, getPromptById, listPromptByUserId, updatePrompt } from './services/prompt/prompt'
+import {
+  BatchImportPromptReq,
+  addPrompt,
+  batchImportPrompt,
+  deletePrompt,
+  getPromptById,
+  listPromptByUserId,
+  updatePrompt,
+} from './services/prompt/prompt'
 import { Message } from './constants/db'
 import { ResetPasswordReq, resetPassword, sendResetPasswordEmail } from './services/user/reset'
 
@@ -133,6 +148,25 @@ router.post('/api/session', async (ctx) => {
     userId,
     name: req.name,
   })
+})
+router.post('/api/session/import', async (ctx) => {
+  const token = ctx.get('Authorization')
+  const userId = await getUserIdByToken(token)
+  if (!userId) {
+    throw new ServerError('user not found', 'USER_NOT_FOUND')
+  }
+  const req = ctx.request.body as BatchImportSessionReq
+  if (!req.name) {
+    throw new ServerError('name is empty', 'NAME_EMPTY')
+  }
+  if (!req.createdAt) {
+    throw new ServerError('data is empty', 'DATA_EMPTY')
+  }
+  if (!req.messages) {
+    throw new ServerError('messages is empty', 'MESSAGES_EMPTY')
+  }
+  ctx.body = await batchImportSession(req, userId)
+  ctx.status = 200
 })
 router.put('/api/session/:id', async (ctx) => {
   const sessionId = ctx.params.id
@@ -295,6 +329,18 @@ router.get('/api/prompt/:id', async (ctx) => {
     userId,
     id,
   })
+  ctx.status = 200
+})
+router.post('/api/prompt/import', async (ctx) => {
+  const userId = await getUserIdByToken(ctx.get('Authorization'))
+  if (!userId) {
+    throw new ServerError('user not found', 'USER_NOT_FOUND')
+  }
+  const req = ctx.request.body as BatchImportPromptReq[]
+  if (!req || req.length === 0) {
+    throw new ServerError('prompts is empty', 'PROMPTS_EMPTY')
+  }
+  await batchImportPrompt(req, userId)
   ctx.status = 200
 })
 

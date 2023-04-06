@@ -7,19 +7,15 @@ import { FormEvent, useState } from 'react'
 import { useMount } from 'react-use'
 import { Prompt, PromptService } from '../../constants/db'
 import { v4 } from 'uuid'
-import { observable, toJS } from 'mobx'
+import { toJS } from 'mobx'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleLeft, faHouse, faShare, faTrash } from '@fortawesome/free-solid-svg-icons'
 import clipboardy from 'clipboardy'
 import { t } from '../../constants/i18n'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 import { ajaxClient } from '../../constants/ajax'
-import Swal from 'sweetalert2'
 import { ReactSwal } from '../../constants/swal'
-
-const settingStore = observable({
-  title: t('setting.title'),
-})
+import { settingStore } from './store/settingStore'
 
 export const SettingOpenAPIKeyView = observer(() => {
   const apiKey = useLocalStore(() => ({ value: localStorage.getItem('OPENAI_API_KEY') ?? '' }))
@@ -217,7 +213,7 @@ export const SettingHomeView = observer(() => {
             <Link to={'/setting/prompt'}>{t('setting.prompt.title')}</Link>
           </li>
           <li>
-            <Link to={'/setting/sync'}>Sync Local Data</Link>
+            <Link to={'/setting/sync'}>{t('setting.syncLocal.title')}</Link>
           </li>
           <li>
             <button onClick={onLogout}>{t('user.logout')}</button>

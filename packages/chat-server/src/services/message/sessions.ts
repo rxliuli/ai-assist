@@ -1,6 +1,5 @@
-import { literal, Sequelize } from 'sequelize'
 import { v4 } from 'uuid'
-import { MessageModel, sequelize, Session, SessionModel } from '../../constants/db'
+import { Message, MessageModel, sequelize, Session, SessionModel } from '../../constants/db'
 import { ServerError } from '../../util/ServerError'
 
 export async function addSession(session: Pick<Session, 'name' | 'userId'>): Promise<Session> {
@@ -40,12 +39,14 @@ export async function deleteSession(session: Pick<Session, 'id' | 'userId'>): Pr
       where: {
         sessionId: session.id,
       },
+      transaction: t,
     })
     await SessionModel.destroy({
       where: {
         id: session.id,
         userId: session.userId,
       },
+      transaction: t,
     })
   } catch (err) {
     await t.rollback()
@@ -64,4 +65,37 @@ export async function updateSessionName(session: Pick<Session, 'id' | 'userId' |
     throw new ServerError('session not found', 'SESSION_NOT_FOUND')
   }
   await r.set('name', session.name).save()
+}
+
+export type BatchImportSessionReq = Pick<Session, 'name' | 'createdAt'> & {
+  messages: Pick<Message, 'content' | 'role' | 'createdAt'>[]
+}
+export async function batchImportSession(session: BatchImportSessionReq, userId: string) {
+  const t = await sequelize.transaction()
+  try {
+    const sessionId = v4()
+    await SessionModel.create(
+      {
+        ...session,
+        userId,
+        id: sessionId,
+        updatedAt: session.createdAt,
+      },
+      { transaction: t },
+    )
+    await MessageModel.bulkCreate(
+      session.messages.map((it) => ({
+        ...it,
+        id: v4(),
+        sessionId,
+        userId,
+        updatedAt: it.createdAt,
+      })),
+      { transaction: t },
+    )
+    await t.commit()
+  } catch (err) {
+    await t.rollback()
+    throw err
+  }
 }

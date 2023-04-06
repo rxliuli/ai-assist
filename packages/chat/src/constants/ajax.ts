@@ -1,8 +1,5 @@
-import { wait } from '@liuli-util/async'
-import { debounce, omit } from 'lodash-es'
-import Swal from 'sweetalert2'
+import { omit } from 'lodash-es'
 import { router } from './router'
-import { ReactSwal } from './swal'
 
 interface RequestOptions {
   url: string
@@ -49,7 +46,7 @@ class AjaxClient {
     })
 
     if (r.status === 401) {
-      // await Swal.fire('Unauthorized', 'Please sign in again', 'error')
+      // await ReactSwal.fire('Unauthorized', 'Please sign in again', 'error')
       router.push('/signin')
       throw new Error('Unauthorized')
     }
