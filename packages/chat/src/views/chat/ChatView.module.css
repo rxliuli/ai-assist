@@ -225,3 +225,8 @@
 .hide {
   display: none;
 }
+/* swal提示样式 */
+
+.swal2Container {
+  position: absolute;
+}

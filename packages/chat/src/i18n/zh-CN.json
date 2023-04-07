@@ -36,7 +36,7 @@
   "user.form.password": "密码",
   "user.form.email.placeholder": "请输入您的电子邮件",
   "user.form.username.placeholder": "请输入您的用户名，长度必须在 6 到 20 个字符之间。",
-  "user.form.password.placeholder": "请输入您的密码，至少 8 个字符，包含数字、字母(必须一个大写一个小写)和特殊字符",
+  "user.form.password.placeholder": "请输入您的密码，至少 8 个字符，包含数字、大小写字母和特殊字符",
   "user.success.checkEmail": "请检查您的邮箱并验证您的电子邮件地址。",
   "user.signin.title": "登录 Chat",
   "user.signin.form.emailOrUsername": "用户名或电子邮件地址",

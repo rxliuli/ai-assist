@@ -4,7 +4,7 @@ import css from './ChatView.module.css'
 import classNames from 'classnames'
 import GPT3Tokenizer from 'gpt3-tokenizer'
 import { findLast, last, omit, pick } from 'lodash-es'
-import { ReactElement, useEffect, useRef } from 'react'
+import { ReactElement, useEffect, useRef, useState } from 'react'
 import { useMount } from 'react-use'
 import clipboardy from 'clipboardy'
 import { Message, MessageService, PromptService, Session, SessionService } from '../../constants/db'
@@ -23,7 +23,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars, faClose, faPen, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { ajaxClient } from '../../constants/ajax'
 import { ReactSwal } from '../../constants/swal'
-import { message } from 'antd'
+import ToastContainer, { ToastContainerRef } from './components/SwalToast'
+
 function sliceMessages(
   messages: Pick<Message, 'role' | 'content'>[],
   max: number,
@@ -481,7 +482,7 @@ const ChatSidebar = observer(
 )
 
 export const ChatHomeView = observer(() => {
-  const [messageApi, contextHolder] = message.useMessage()
+  const toastContainerRef = useRef<ToastContainerRef>(null)
   const store = useLocalStore(() => ({
     activeSessionId: undefined as string | undefined,
     sessions: [] as Session[],
@@ -580,10 +581,7 @@ export const ChatHomeView = observer(() => {
 
   async function onCopy() {
     if (store.messages.length === 0) {
-      messageApi.open({
-        type: 'warning',
-        content: t('session.copy.empty'),
-      })
+      toastContainerRef.current?.showToast({ message: t('session.copy.empty'), duration: 3000 })
       return
     }
     const r = store.messages
@@ -593,9 +591,15 @@ export const ChatHomeView = observer(() => {
       .join('\n\n---\n\n')
 
     await clipboardy.write(r)
-    messageApi.open({
-      type: 'success',
-      content: t('session.copy.success'),
+
+    toastContainerRef.current?.showToast({ message: t('session.copy.success'), duration: 3000 })
+
+    ReactSwal.fire({
+      title: 'Hello, world!',
+      text: '这是一条提示消息。',
+      icon: 'info',
+      showConfirmButton: false, // 隐藏确定按钮
+      timer: 2000, // 2秒后自动关闭
     })
 
     ga4.track('chat_event', { eventType: 'chat.copy', sessionId: store.activeSessionId })
@@ -603,10 +607,7 @@ export const ChatHomeView = observer(() => {
 
   function onExport() {
     if (store.messages.length === 0) {
-      messageApi.open({
-        type: 'warning',
-        content: t('session.export.empty'),
-      })
+      toastContainerRef.current?.showToast({ message: t('session.export.empty'), duration: 3000 })
       return
     }
     const r = {
@@ -636,12 +637,7 @@ export const ChatHomeView = observer(() => {
       try {
         const data = JSON.parse(r) as { session: Session; messages: Message[] }
         if (!data.session || !data.messages) {
-          // alert(t('session.import.error'))
-
-          messageApi.open({
-            type: 'error',
-            content: t('session.import.error'),
-          })
+          toastContainerRef.current?.showToast({ message: t('session.import.error'), duration: 3000 })
           return
         }
         const session = await store.sessionService!.add({ name: data.session.name })
@@ -650,11 +646,7 @@ export const ChatHomeView = observer(() => {
         await store.messageService!.batchAdd(messages)
         await onChangeActiveSessionId(session.id, true)
       } catch (e) {
-        messageApi.open({
-          type: 'error',
-          content: t('session.import.error'),
-        })
-
+        toastContainerRef.current?.showToast({ message: t('session.import.error'), duration: 3000 })
         throw e
       }
     }
@@ -664,7 +656,7 @@ export const ChatHomeView = observer(() => {
 
   return (
     <div className={css.chatHome}>
-      {contextHolder}
+      <ToastContainer ref={toastContainerRef} />
       <ChatSidebar
         sessions={store.sessions}
         activeSessionId={store.activeSessionId}
@@ -679,6 +671,7 @@ export const ChatHomeView = observer(() => {
         <span className={css.ellipsis}>{store.sessionName}</span>
         <FontAwesomeIcon icon={faPlus} onClick={() => onChangeActiveSessionId(undefined, true)} />
       </header>
+
       <ChatMessages
         activeSession={store.activeSession}
         messages={store.messages}
