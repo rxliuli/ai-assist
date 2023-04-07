@@ -7,8 +7,8 @@ export async function listMessage(session: Pick<Session, 'id' | 'userId'>) {
       where: {
         sessionId: session.id,
       },
-      attributes: ['id', 'content', 'role'],
-      order: [['created_at', 'DESC']],
+      attributes: ['id', 'content', 'role', 'created_at'],
+      order: [['created_at', 'ASC']],
     })
   ).map((it) => it.get())
 }

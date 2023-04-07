@@ -21,7 +21,7 @@ export async function listSession(userId: string): Promise<Session[]> {
       where: {
         userId,
       },
-      attributes: ['id', 'name'],
+      attributes: ['id', 'name', 'created_at'],
       order: [['created_at', 'DESC']],
     })
   ).map((it) => it.get())
@@ -48,6 +48,7 @@ export async function deleteSession(session: Pick<Session, 'id' | 'userId'>): Pr
       },
       transaction: t,
     })
+    await t.commit()
   } catch (err) {
     await t.rollback()
     throw err

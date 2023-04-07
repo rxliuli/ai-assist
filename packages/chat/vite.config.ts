@@ -12,7 +12,10 @@ export default defineConfig(async () => {
   let SERVER_URL = 'http://chat.ai-assist.moe/'
   if (await fs.pathExists(envPath)) {
     const env = await fs.readFile(envPath, 'utf-8')
-    SERVER_URL = dotenv.parse(env).SERVER_URL
+    const url = dotenv.parse(env).SERVER_URL
+    if (url) {
+      SERVER_URL = url
+    }
   }
   console.log('SERVER_URL', SERVER_URL)
   return {

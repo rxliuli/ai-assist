@@ -1,6 +1,4 @@
-import { DBSchema, IDBPDatabase, openDB } from 'idb'
-import { pick, sortBy } from 'lodash-es'
-import { once } from '@liuli-util/async'
+import { pick, reverse, sortBy } from 'lodash-es'
 import { ajaxClient } from './ajax'
 
 export interface Session {
@@ -25,7 +23,12 @@ export class SessionService {
   }
   async list(): Promise<Session[]> {
     const r = await ajaxClient.get('/api/session')
-    return await r.json()
+    return sortBy(
+      (await r.json()) as (Session & {
+        createdAt: string
+      })[],
+      (it) => -new Date(it.createdAt).valueOf(),
+    )
   }
   async remove(id: string): Promise<void> {
     await ajaxClient.delete(`/api/session/${id}`)
@@ -37,9 +40,9 @@ export class MessageService {
     const r = await ajaxClient.get(`/api/message`, { sessionId })
     return sortBy(
       (await r.json()) as (Message & {
-        createdAt?: string
+        createdAt: string
       })[],
-      (it) => it.createdAt,
+      (it) => new Date(it.createdAt).valueOf(),
     )
   }
   async remove(id: string): Promise<void> {

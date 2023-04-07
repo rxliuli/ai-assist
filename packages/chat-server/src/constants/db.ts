@@ -2,6 +2,15 @@ import { DataTypes, Model, Sequelize } from 'sequelize'
 
 export const sequelize: Sequelize = new Sequelize(process.env.DATABASE_URL!, {
   dialect: 'postgres',
+  pool: {
+    max: 100,
+    idle: 10000,
+  },
+  dialectOptions: {
+    statement_timeout: 1000,
+    query_timeout: 10000,
+    idle_in_transaction_session_timeout: 10000,
+  },
 })
 
 export interface User {
