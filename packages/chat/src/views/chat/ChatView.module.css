@@ -116,6 +116,7 @@
 }
 .session .name {
   flex-grow: 1;
+  user-select: none;
 }
 .session .input {
   flex-grow: 1;
