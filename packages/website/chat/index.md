@@ -29,7 +29,7 @@ docker run -itd --name chat-server \
 | 环境变量         | 必填 | 说明                  |
 | ---------------- | ---- | --------------------- |
 | `OPENAI_API_KEY` | 是   | OpenAI API Key        |
-| `DATABASE_URL`   | 否   | postgresql 数据库 url |
+| `DATABASE_URL`   | 是   | postgresql 数据库 url |
 
 ## 开发
 
