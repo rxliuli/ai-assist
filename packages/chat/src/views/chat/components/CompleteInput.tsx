@@ -79,31 +79,9 @@ export const CompleteInput = observer(
       // 设置行高
       textarea.style.height = '24px'
       textarea.style.height = textarea.scrollHeight + 'px'
-
-      const maxLines = 5
-      // 控制最大高度为4行
-      if (textarea.clientHeight >= textarea.scrollHeight) {
-        textarea.style.overflowY = 'hidden'
-        textarea.style.height = 'auto'
-      } else if (
-        textarea.clientHeight < textarea.scrollHeight &&
-        textarea.clientHeight >= maxLines * parseFloat(window.getComputedStyle(textarea).lineHeight)
-      ) {
-        textarea.style.overflowY = 'scroll'
-        textarea.style.height = maxLines * parseFloat(window.getComputedStyle(textarea).lineHeight) + 'px'
-      } else {
-        textarea.style.overflowY = 'hidden'
-      }
     }
 
     useMount(setRows)
-    useObserver(async () => {
-      // 这里的声明依赖是必不可少的
-      store.value
-      await new Promise((resolve) => setTimeout(resolve, 0))
-      setRows()
-    })
-
     async function onInput(ev: React.FormEvent<HTMLTextAreaElement>) {
       store.value = ev.currentTarget.value
       if (store.promptMode) {
@@ -112,6 +90,8 @@ export const CompleteInput = observer(
         store.list = []
       }
       props.onChange(store.value)
+      await new Promise((resolve) => setTimeout(resolve, 0))
+      setRows()
     }
 
     function gotoPrompt(i: number) {

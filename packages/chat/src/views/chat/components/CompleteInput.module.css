@@ -55,7 +55,7 @@
 }
 
 .textarea {
-  max-height: 200px;
+  max-height: 120px;
   overflow-y: auto;
   resize: none;
   margin-bottom: 0;

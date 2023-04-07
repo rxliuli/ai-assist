@@ -42,7 +42,7 @@
   "user.form.password": "Password",
   "user.form.email.placeholder": "Please enter your email",
   "user.form.username.placeholder": "Please enter your username, the length must be between 6 and 20 characters.",
-  "user.form.password.placeholder": "Please enter your password, at least 8 characters, including numbers, letters, and special characters",
+  "user.form.password.placeholder": "Please enter your password, at least 8 characters, including numbers, Uppercase and lowercase letters, and special characters",
   "user.success.checkEmail": "Please check your email and verify your email address.",
   "user.logout": "Logout",
   "user.signin.title": "Sign in to Chat",

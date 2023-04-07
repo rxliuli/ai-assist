@@ -4,7 +4,7 @@ import css from './ChatView.module.css'
 import classNames from 'classnames'
 import GPT3Tokenizer from 'gpt3-tokenizer'
 import { findLast, last, omit, pick } from 'lodash-es'
-import { ReactElement, useEffect, useRef } from 'react'
+import { ReactElement, useEffect, useRef, useState } from 'react'
 import { useMount } from 'react-use'
 import clipboardy from 'clipboardy'
 import { Message, MessageService, PromptService, Session, SessionService } from '../../constants/db'
@@ -23,6 +23,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars, faClose, faPen, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { ajaxClient } from '../../constants/ajax'
 import { ReactSwal } from '../../constants/swal'
+import ToastContainer, { ToastContainerRef } from './components/SwalToast'
 
 function sliceMessages(
   messages: Pick<Message, 'role' | 'content'>[],
@@ -481,6 +482,7 @@ const ChatSidebar = observer(
 )
 
 export const ChatHomeView = observer(() => {
+  const toastContainerRef = useRef<ToastContainerRef>(null)
   const store = useLocalStore(() => ({
     activeSessionId: undefined as string | undefined,
     sessions: [] as Session[],
@@ -579,18 +581,25 @@ export const ChatHomeView = observer(() => {
 
   async function onCopy() {
     if (store.messages.length === 0) {
-      window.alert(t('session.copy.empty'))
+      toastContainerRef.current?.showToast({ message: t('session.copy.empty'), duration: 3000 })
       return
     }
-    const r = store.messages.map((it) => it.content).join('\n\n---\n\n')
+    const r = store.messages
+      .map((it) => {
+        return it.content
+      })
+      .join('\n\n---\n\n')
+
     await clipboardy.write(r)
-    window.alert(t('session.copy.success'))
+
+    toastContainerRef.current?.showToast({ message: t('session.copy.success'), duration: 3000 })
+
     ga4.track('chat_event', { eventType: 'chat.copy', sessionId: store.activeSessionId })
   }
 
   function onExport() {
     if (store.messages.length === 0) {
-      window.alert(t('session.export.empty'))
+      toastContainerRef.current?.showToast({ message: t('session.export.empty'), duration: 3000 })
       return
     }
     const r = {
@@ -620,7 +629,7 @@ export const ChatHomeView = observer(() => {
       try {
         const data = JSON.parse(r) as { session: Session; messages: Message[] }
         if (!data.session || !data.messages) {
-          alert(t('session.import.error'))
+          toastContainerRef.current?.showToast({ message: t('session.import.error'), duration: 3000 })
           return
         }
         const session = await store.sessionService!.add({ name: data.session.name })
@@ -629,7 +638,7 @@ export const ChatHomeView = observer(() => {
         await store.messageService!.batchAdd(messages)
         await onChangeActiveSessionId(session.id, true)
       } catch (e) {
-        alert(t('session.import.error'))
+        toastContainerRef.current?.showToast({ message: t('session.import.error'), duration: 3000 })
         throw e
       }
     }
@@ -639,6 +648,7 @@ export const ChatHomeView = observer(() => {
 
   return (
     <div className={css.chatHome}>
+      <ToastContainer ref={toastContainerRef} />
       <ChatSidebar
         sessions={store.sessions}
         activeSessionId={store.activeSessionId}
@@ -653,6 +663,7 @@ export const ChatHomeView = observer(() => {
         <span className={css.ellipsis}>{store.sessionName}</span>
         <FontAwesomeIcon icon={faPlus} onClick={() => onChangeActiveSessionId(undefined, true)} />
       </header>
+
       <ChatMessages
         activeSession={store.activeSession}
         messages={store.messages}
