@@ -594,14 +594,6 @@ export const ChatHomeView = observer(() => {
 
     toastContainerRef.current?.showToast({ message: t('session.copy.success'), duration: 3000 })
 
-    ReactSwal.fire({
-      title: 'Hello, world!',
-      text: '这是一条提示消息。',
-      icon: 'info',
-      showConfirmButton: false, // 隐藏确定按钮
-      timer: 2000, // 2秒后自动关闭
-    })
-
     ga4.track('chat_event', { eventType: 'chat.copy', sessionId: store.activeSessionId })
   }
 

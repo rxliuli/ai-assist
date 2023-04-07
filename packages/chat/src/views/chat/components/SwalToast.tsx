@@ -21,7 +21,7 @@ interface ToastContainerProps {
 
 // 定义一个接口，用于描述要暴露给外部组件的接口
 // 在本例中，该接口中包含一个 `showToast` 方法
-interface ToastContainerRef {
+export interface ToastContainerRef {
   showToast: (toastProps: ToastProps) => void
 }
 
@@ -90,6 +90,6 @@ type WrappedToastContainer = React.ForwardRefRenderFunction<
 > & {
   defaultProps?: undefined
 }
-const WrappedToastContainer: WrappedToastContainer = ToastContainer
+const WrappedToastContainer = ToastContainer as WrappedToastContainer
 
 export default WrappedToastContainer
