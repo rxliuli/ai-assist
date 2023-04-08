@@ -301,9 +301,9 @@ export const ChatMessages = observer(function (props: {
       <ul className={css.messages} ref={messagesRef}>
         {props.messages
           .filter((it) => ['user', 'assistant'].includes(it.role))
-          .map((it) => (
-            <ChatMessage key={it.id} message={it}></ChatMessage>
-          ))}
+          .map((it) => {
+            return <ChatMessage key={it.id} message={it}></ChatMessage>
+          })}
         <li className={css.messageButtom}></li>
       </ul>
       <footer className={classNames('container', css.messageEditor)}>

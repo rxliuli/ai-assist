@@ -174,8 +174,8 @@
   width: 100%;
   overflow: auto;
 }
-.messageContent > p:last-of-type {
-  margin-bottom: 0;
+.messageContent p:last-child {
+  margin-bottom: 0 !important;
 }
 .messageBox:nth-child(odd) {
   background-color: #2e3234;
