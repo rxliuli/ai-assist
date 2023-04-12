@@ -2,6 +2,7 @@ import { Configuration, OpenAIApi } from 'openai'
 
 const c = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
+  basePath: process.env.OPENAI_BASE_PATH,
 })
 export const openai = new OpenAIApi(c)
 

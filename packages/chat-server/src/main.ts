@@ -345,7 +345,7 @@ router.post('/api/prompt/import', async (ctx) => {
 })
 
 if (process.env.NODE_ENV === 'development') {
-  router.post('/api/test/stream', async (ctx) => {
+  router.post('/api/chat-stream', async (ctx) => {
     const stream = streamResp()
     ctx.set('Content-Type', 'application/octet-stream')
     ctx.set('Content-Disposition', 'attachment; filename="file.txt"')

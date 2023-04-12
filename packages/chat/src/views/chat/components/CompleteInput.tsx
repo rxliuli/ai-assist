@@ -107,10 +107,12 @@ export const CompleteInput = observer(
       ga4.track('chat_event', { eventType: 'chat.selectPrompt', text: item.id })
     }
 
-    function onEnter() {
+    async function onEnter() {
       props.onEnter(store.value)
       store.value = ''
       props.onChange(store.value)
+      await new Promise((resolve) => setTimeout(resolve, 0))
+      setRows()
     }
 
     const query = useMedia('(max-width: 768px)', false)
