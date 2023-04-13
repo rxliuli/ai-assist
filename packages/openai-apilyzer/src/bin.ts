@@ -13,6 +13,7 @@ new Command()
   .option('--end [end]', 'end date, default is today', dayjs().format('YYYY-MM-DD'))
   .option('--format [format]', 'json/csv format of output, default is json', 'csv')
   .option('--output [output]', 'output file, default is usage.[format]')
+  .option('--baseUrl [baseUrl]', 'base url of openai api, default is https://api.openai.com', 'https://api.openai.com')
   .action(
     async (options: {
       authorization: string
@@ -21,6 +22,7 @@ new Command()
       end: string
       format: 'json' | 'csv'
       output?: string
+      baseUrl: string
     }) => {
       console.log(chalk.blue('start downloading'))
       try {
@@ -32,6 +34,8 @@ new Command()
           callback: (date: string) => {
             console.log(chalk.blue(`downloading ${date}`))
           },
+          // other https://openai.ai-assist.moe
+          baseUrl: options.baseUrl,
         })
         console.log(chalk.green('downloaded'))
         const output = options.output ?? `openai-api-usage-${options.start}-${options.end}.${options.format}`

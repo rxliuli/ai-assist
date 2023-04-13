@@ -27,20 +27,23 @@ export async function downloadByDate(
   options: {
     authorization: string
     organization: string
+    baseUrl: string
   },
 ): Promise<Usage> {
-  const resp = await fetch(`https://api.openai.com/v1/usage?date=${date}`, {
+  const resp = await fetch(`${options.baseUrl}/v1/usage?date=${date}`, {
     headers: {
-      accept: '*/*',
-      'accept-language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7,ja-JP;q=0.6,ja;q=0.5',
+      // "accept": "*/*",
+      // "accept-language": "zh-CN,zh;q=0.9,en;q=0.8,ja-JP;q=0.7,ja;q=0.6",
+      'cache-control': 'no-cache',
       authorization: options.authorization,
       'openai-organization': options.organization,
-      'sec-ch-ua': '"Google Chrome";v="111", "Not(A:Brand";v="8", "Chromium";v="111"',
-      'sec-ch-ua-mobile': '?0',
-      'sec-ch-ua-platform': '"macOS"',
-      'sec-fetch-dest': 'empty',
-      'sec-fetch-mode': 'cors',
-      'sec-fetch-site': 'same-site',
+      // "pragma": "no-cache",
+      // "sec-ch-ua": "\"Google Chrome\";v=\"111\", \"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"111\"",
+      // "sec-ch-ua-mobile": "?0",
+      // "sec-ch-ua-platform": "\"Windows\"",
+      // "sec-fetch-dest": "empty",
+      // "sec-fetch-mode": "cors",
+      // "sec-fetch-site": "same-site"
     },
     referrer: 'https://platform.openai.com/',
     referrerPolicy: 'strict-origin-when-cross-origin',
@@ -80,6 +83,7 @@ export async function downloadUsage(options: {
   authorization: string
   organization: string
   callback: (date: string) => void
+  baseUrl: string
 }) {
   if (options.start.isAfter(options.end)) {
     throw new Error('start date should be before end date')
