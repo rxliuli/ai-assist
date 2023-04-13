@@ -30,6 +30,7 @@ Options:
   --format [format]                json/csv format of output, default is json (default: "csv")
   --output [output]                output file, default is openai-api-usage-{options.start}-{options.end}.{options.format}
   --baseUrl [baseUrl]              base url of openai api (default: "https://api.openai.com")
+  --verbose                        verbose output (default: false)
   -V, --version                    output the version number
   -h, --help                       display help for command
 ```
