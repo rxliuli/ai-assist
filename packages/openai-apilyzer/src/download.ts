@@ -37,7 +37,6 @@ export async function downloadByDate(
     s.append('user_public_id', options.userPublicId)
   }
   const url = `${options.baseUrl}/v1/usage?${s.toString()}`
-  console.log(url)
   const resp = await fetch(url, {
     headers: {
       // "accept": "*/*",
