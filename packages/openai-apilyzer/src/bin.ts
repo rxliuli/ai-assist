@@ -5,6 +5,7 @@ import { writeFile } from 'fs/promises'
 import path from 'path'
 import { version } from '../package.json'
 import { downloadUsage, formats } from './download'
+import { pick } from 'lodash-es'
 
 new Command()
   .requiredOption('--authorization <authorization>', 'authorization token')
@@ -16,8 +17,10 @@ new Command()
     '--output [output]',
     'output file, default is openai-api-usage-{options.start}-{options.end}.{options.format}',
   )
+  // other https://openai.ai-assist.moe
   .option('--baseUrl [baseUrl]', 'base url of openai api', 'https://api.openai.com')
   .option('--verbose', 'verbose output', false)
+  .option('--userPublicId [userPublicId]', 'user public id')
   .action(
     async (options: {
       authorization: string
@@ -28,19 +31,17 @@ new Command()
       output?: string
       baseUrl: string
       verbose: boolean
+      userPublicId: string
     }) => {
       console.log(chalk.blue('start downloading'))
       try {
         const r = await downloadUsage({
-          authorization: options.authorization,
-          organization: options.organization,
+          ...pick(options, 'authorization', 'organization', 'baseUrl', 'userPublicId', 'verbose'),
           start: dayjs(options.start),
           end: dayjs(options.end),
           callback: (date: string) => {
             console.log(chalk.blue(`downloading ${date}`))
           },
-          // other https://openai.ai-assist.moe
-          baseUrl: options.baseUrl,
         })
         console.log(chalk.green('downloaded'))
         const output = options.output ?? `openai-api-usage-${options.start}-${options.end}.${options.format}`

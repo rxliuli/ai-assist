@@ -28,9 +28,17 @@ export async function downloadByDate(
     authorization: string
     organization: string
     baseUrl: string
+    userPublicId?: string
   },
 ): Promise<Usage> {
-  const resp = await fetch(`${options.baseUrl}/v1/usage?date=${date}`, {
+  const s = new URLSearchParams()
+  s.append('date', date)
+  if (options.userPublicId) {
+    s.append('user_public_id', options.userPublicId)
+  }
+  const url = `${options.baseUrl}/v1/usage?${s.toString()}`
+  console.log(url)
+  const resp = await fetch(url, {
     headers: {
       // "accept": "*/*",
       // "accept-language": "zh-CN,zh;q=0.9,en;q=0.8,ja-JP;q=0.7,ja;q=0.6",
@@ -84,6 +92,7 @@ export async function downloadUsage(options: {
   organization: string
   callback: (date: string) => void
   baseUrl: string
+  userPublicId?: string
 }) {
   if (options.start.isAfter(options.end)) {
     throw new Error('start date should be before end date')
