@@ -12,8 +12,11 @@ new Command()
   .option('--start [start]', 'start date, default is 30 days ago', dayjs().subtract(30, 'day').format('YYYY-MM-DD'))
   .option('--end [end]', 'end date, default is today', dayjs().format('YYYY-MM-DD'))
   .option('--format [format]', 'json/csv format of output, default is json', 'csv')
-  .option('--output [output]', 'output file, default is usage.[format]')
-  .option('--baseUrl [baseUrl]', 'base url of openai api, default is https://api.openai.com', 'https://api.openai.com')
+  .option(
+    '--output [output]',
+    'output file, default is openai-api-usage-{options.start}-{options.end}.{options.format}',
+  )
+  .option('--baseUrl [baseUrl]', 'base url of openai api', 'https://api.openai.com')
   .action(
     async (options: {
       authorization: string

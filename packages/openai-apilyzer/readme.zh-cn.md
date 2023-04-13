@@ -25,13 +25,13 @@ Usage: openai-apilyzer [options]
 Options:
   --authorization <authorization>  authorization token
   --organization <organization>    organization id
-  --start [start]                  start date, default is 30 days ago (default:
-                                   "2023-02-28")
-  --end [end]                      end date, default is today (default:
-                                   "2023-03-30")
-  --format [format]                json/csv format of output, default is json
-                                   (default: "csv")
-  --output [output]                output file, default is usage.[format]
+  --start [start]                  start date, default is 30 days ago (default: "2023-03-14")
+  --end [end]                      end date, default is today (default: "2023-04-13")
+  --format [format]                json/csv format of output, default is json (default: "csv")
+  --output [output]                output file, default is openai-api-usage-{options.start}-{options.end}.{options.format}
+  --baseUrl [baseUrl]              base url of openai api (default: "https://api.openai.com")
   -V, --version                    output the version number
   -h, --help                       display help for command
 ```
+
+> 注意，如果你在中国或其它无法正常访问 openai api 的地区，可以使用 `--baseUrl` 参数指定一个镜像地址，例如：<https://openai.ai-assist.moe>，它可以通过开源项目 [openai-proxy](https://github.com/fuergaosi233/openai-proxy) 零成本部署到 cloudflare worker 上。
