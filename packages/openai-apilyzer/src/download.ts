@@ -62,14 +62,14 @@ function retry<T extends (...args: any[]) => Promise<any>>(fn: T, count: number)
       function attempt() {
         fn(...args)
           .then(resolve)
-          .catch((error) => {
+          .catch((err) => {
             if (count > 0) {
               count--
-              console.log(chalk.red(`Error occurred (${error.message}). Retrying (${count} attempts left)...`))
+              console.log(chalk.red(`Error occurred (${err.message}). Retrying (${count} attempts left)...`))
               attempt()
               return
             }
-            reject(new Error(`No more attempts to retry (${error.message})`))
+            reject(err)
           })
       }
 
@@ -94,8 +94,11 @@ export async function downloadUsage(options: {
     options.callback(s)
     try {
       usage.push(await retry(downloadByDate, 3)(s, options))
-    } catch {
-      throw new Error('download failed, please check your authorization and organization id')
+    } catch (err) {
+      if (err instanceof Error) {
+        err.message = 'download failed, please check your authorization and organization id' + err.message
+        throw err
+      }
     }
   }
   return usage

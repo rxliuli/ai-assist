@@ -17,6 +17,7 @@ new Command()
     'output file, default is openai-api-usage-{options.start}-{options.end}.{options.format}',
   )
   .option('--baseUrl [baseUrl]', 'base url of openai api', 'https://api.openai.com')
+  .option('--verbose', 'verbose output', false)
   .action(
     async (options: {
       authorization: string
@@ -26,6 +27,7 @@ new Command()
       format: 'json' | 'csv'
       output?: string
       baseUrl: string
+      verbose: boolean
     }) => {
       console.log(chalk.blue('start downloading'))
       try {
@@ -46,7 +48,11 @@ new Command()
         console.log(chalk.green(`written to ${output}`))
       } catch (err) {
         if (err instanceof Error) {
-          console.log(chalk.red(err.message))
+          if (options.verbose) {
+            console.error(err)
+          } else {
+            console.error(chalk.red(err.message))
+          }
           return
         }
         throw err
