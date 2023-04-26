@@ -2,12 +2,19 @@
   "name": "@ai-assist/openai-apilyzer",
   "version": "0.1.13",
   "type": "module",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "default": "./dist/index.js",
+      "types": "./src/index.ts"
+    }
+  },
   "bin": {
     "openai-apilyzer": "./bin.js"
   },
   "scripts": {
     "init": "pnpm build",
-    "build": "tsup src/bin.ts --format esm --target esnext --sourcemap --clean",
+    "build": "tsup src/bin.ts src/index.ts --format esm --target esnext --sourcemap --clean",
     "dev": "pnpm build --watch",
     "test": "vitest run"
   },
@@ -26,16 +33,16 @@
   },
   "homepage": "https://github.com/rxliuli/ai-assist/tree/master/packages/openai-apilyzer",
   "devDependencies": {
-    "@types/lodash-es": "^4.17.6",
-    "@types/node": "^18.14.6",
-    "tsup": "^6.3.0",
-    "typescript": "^4.6.3",
-    "vitest": "^0.24.4"
+    "@types/lodash-es": "^4.17.7",
+    "@types/node": "^18.16.0",
+    "tsup": "^6.7.0",
+    "typescript": "^5.0.4",
+    "vitest": "^0.30.1"
   },
   "dependencies": {
     "chalk": "^5.2.0",
-    "commander": "^9.4.1",
-    "csv": "^6.2.8",
+    "commander": "^10.0.1",
+    "csv-stringify": "^6.3.2",
     "dayjs": "^1.11.7",
     "lodash-es": "^4.17.21"
   }

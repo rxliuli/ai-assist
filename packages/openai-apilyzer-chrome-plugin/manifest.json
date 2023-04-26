@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "OpenAI API Usage Data Export",
+  "description": "Export the usage data of the OpenAI API to a CSV file to facilitate further data analysis in Excel.",
+  "version": "0.1.0",
+  "action": { "default_popup": "index.html", "matches": ["https://*.openai.com/*"] },
+  "icons": {
+    "16": "src/assets/16.png",
+    "32": "src/assets/32.png",
+    "48": "src/assets/48.png",
+    "128": "src/assets/128.png"
+  },
+  "host_permissions": ["https://*.openai.com/*"],
+  "permissions": ["webRequest", "storage"],
+  "background": {
+    "service_worker": "src/background.ts",
+    "type": "module"
+  }
+}

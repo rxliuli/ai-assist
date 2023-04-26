@@ -4,8 +4,9 @@ import dayjs from 'dayjs'
 import { writeFile } from 'fs/promises'
 import path from 'path'
 import { version } from '../package.json'
-import { downloadUsage, formats } from './download'
+import { downloadUsage } from './download'
 import { pick } from 'lodash-es'
+import { formats } from './formats'
 
 new Command()
   .requiredOption('--authorization <authorization>', 'authorization token')

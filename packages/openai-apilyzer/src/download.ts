@@ -1,8 +1,6 @@
-import dayjs, { Dayjs } from 'dayjs'
-import * as csv from 'csv'
-import chalk from 'chalk'
+import { Dayjs } from 'dayjs'
 
-interface Message {
+export interface Message {
   aggregation_timestamp: number
   n_requests: number
   operation: string
@@ -13,7 +11,7 @@ interface Message {
   n_generated_tokens_total: number
 }
 
-interface Usage {
+export interface Usage {
   object: string
   data: Message[]
   ft_data: any[]
@@ -72,7 +70,7 @@ function retry<T extends (...args: any[]) => Promise<any>>(fn: T, count: number)
           .catch((err) => {
             if (count > 0) {
               count--
-              console.log(chalk.red(`Error occurred (${err.message}). Retrying (${count} attempts left)...`))
+              console.error(`Error occurred (${err.message}). Retrying (${count} attempts left)...`)
               attempt()
               return
             }
@@ -110,41 +108,4 @@ export async function downloadUsage(options: {
     }
   }
   return usage
-}
-
-export function formatJson(usage: Usage[]): string {
-  return JSON.stringify(usage, null, 2)
-}
-
-export async function formatCSV(usage: Usage[]): Promise<string> {
-  const r = usage
-    .flatMap((it) => it.data)
-    .map((it) => [
-      dayjs(it.aggregation_timestamp * 1000).toISOString(),
-      it.n_requests,
-      it.operation,
-      it.snapshot_id,
-      it.n_context,
-      it.n_context_tokens_total,
-      it.n_generated,
-      it.n_generated_tokens_total,
-    ])
-  r.unshift([
-    'aggregation_timestamp',
-    'n_requests',
-    'operation',
-    'snapshot_id',
-    'n_context',
-    'n_context_tokens_total',
-    'n_generated',
-    'n_generated_tokens_total',
-  ])
-  return await new Promise((resolve, reject) =>
-    csv.stringify(r, (err, output) => (err ? reject(err) : resolve(output))),
-  )
-}
-
-export const formats = {
-  json: formatJson,
-  csv: formatCSV,
 }
