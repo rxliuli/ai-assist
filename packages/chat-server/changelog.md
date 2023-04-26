@@ -1,5 +1,13 @@
 # changelog
 
+## 0.5.7
+
+- perf: 尝试不缓存 OpenAI client 实例，避免 context 过长（超过 150k）-- 等待下周验证
+- fix: 修复 textarea 输入抖动问题
+- fix: 修复输入框回车后没有重新计算高度的错误
+- fix: 修正一些数据库查询的问题
+- style: 禁止选中会话文字
+
 ## 0.5.4
 
 - feat: 实现同步本地会话到远端
