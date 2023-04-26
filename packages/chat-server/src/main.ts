@@ -52,12 +52,16 @@ router.post('/api/chat', async (ctx) => {
     ctx.status = 400
     throw new ServerError('params is not array', 'PARAMS_NOT_ARRAY')
   }
-  const r = await chat(params, ctx.get('OPENAI_API_KEY'))
+  const token = ctx.get('Authorization')
+  const userId = await getUserIdByToken(token)
+  const r = await chat(params, ctx.get('OPENAI_API_KEY'), userId!)
   ctx.body = r
 })
 router.post('/api/chat-stream', async (ctx) => {
   const params = ctx.request.body as Array<ChatCompletionRequestMessage>
-  const stream = chatStream(params, ctx.get('OPENAI_API_KEY'))
+  const token = ctx.get('Authorization')
+  const userId = await getUserIdByToken(token)
+  const stream = chatStream(params, ctx.get('OPENAI_API_KEY'), userId!)
   // 设置响应头
   ctx.set('Content-Type', 'application/octet-stream')
   ctx.set('Content-Disposition', 'attachment; filename="file.txt"')

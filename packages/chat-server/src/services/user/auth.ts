@@ -4,7 +4,6 @@ import bcrypt from 'bcrypt'
 import { v4 } from 'uuid'
 import dayjs from 'dayjs'
 import LRUCache from 'lru-cache'
-import { logger } from '../../constants/logger'
 
 export const SaltRounds = 10
 

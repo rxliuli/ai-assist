@@ -23,7 +23,7 @@ interface ChatCompletion {
  * @param messages
  * @returns
  */
-export function chatStream(messages: Array<ChatCompletionRequestMessage>, apiKey: string) {
+export function chatStream(messages: Array<ChatCompletionRequestMessage>, apiKey: string, userId: string) {
   const stream = new Stream.Readable({
     read(size) {
       // do nothing
@@ -40,6 +40,7 @@ export function chatStream(messages: Array<ChatCompletionRequestMessage>, apiKey
           model: 'gpt-3.5-turbo',
           messages,
           stream: true,
+          user: userId,
         },
         {
           responseType: 'stream',
