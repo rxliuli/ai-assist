@@ -30,6 +30,10 @@ export const routes: RouteConfig[] = [
     component: () => import('../views/layout/LayoutView'),
     children: menus,
   },
+  {
+    path: '/signin',
+    component: () => import('../views/auth/SignInView'),
+  },
 ]
 
 export const router = createHashHistory()

@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { UserConfig, defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { cssdts } from '@liuli-util/vite-plugin-css-dts'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -85,5 +85,5 @@ export default defineConfig(async () => {
         '/api/': SERVER_URL,
       },
     },
-  }
+  } as UserConfig
 })

@@ -11,8 +11,10 @@
   "dependencies": {
     "@ai-assist/utils": "workspace:^",
     "@ant-design/icons": "^5.0.1",
-    "@liuli-util/react-router": "^0.8.0",
+    "@liuli-util/react-router": "^0.9.1",
     "antd": "^5.4.6",
+    "mobx": "^6.8.0",
+    "mobx-react-lite": "^3.4.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.9.0",
@@ -23,7 +25,9 @@
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.1",
     "@vitejs/plugin-react": "^4.0.0",
+    "dotenv": "^16.0.3",
     "typescript": "^5.0.4",
-    "vite": "^4.3.3"
+    "vite": "^4.3.3",
+    "zx": "^7.2.0"
   }
 }

@@ -3,17 +3,13 @@ import { UserModel } from '../../constants/db'
 import bcrypt from 'bcrypt'
 import { generateToken } from './auth'
 import { ServerError } from '../../util/ServerError'
-import { sendActiveEmail } from './signup'
 
 export interface SignInInfo {
   usernameOrEmail: string
   password: string
 }
 
-export async function signin(
-  loginInfo: SignInInfo,
-  origin: string,
-): Promise<{
+export async function signin(loginInfo: SignInInfo): Promise<{
   token: string
 }> {
   const r = (
@@ -31,7 +27,6 @@ export async function signin(
     throw new ServerError('User is disabled', 'USER_DISABLED')
   }
   if (!r.emailVerified) {
-    await sendActiveEmail(r, origin)
     throw new ServerError('Email not verified', 'EMAIL_NOT_VERIFIED')
   }
   if (r.passwordHash !== hashPassword) {

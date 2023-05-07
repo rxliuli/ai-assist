@@ -40,7 +40,7 @@ import {
 import { Message } from './constants/db'
 import { ResetPasswordReq, resetPassword, sendResetPasswordEmail } from './services/user/reset'
 import { listUser } from './services/admin/user'
-import { adminAuth } from './services/admin/adminAuth'
+import { adminAuth, adminSignIn } from './services/admin/adminAuth'
 
 const app = new Application()
 const router = new Router()
@@ -82,7 +82,8 @@ router.post('/api/signin', async (ctx) => {
     ctx.body = 'usernameOrEmail or password is empty'
     return
   }
-  ctx.body = await signin(loginInfo, new URL(ctx.get('referer')).origin)
+  // ctx.body = await signin(loginInfo, new URL(ctx.get('referer')).origin)
+  ctx.body = await signin(loginInfo)
 })
 // router.post('/api/signup', async (ctx) => {
 //   const user = ctx.request.body as SignUpInfo
@@ -348,6 +349,17 @@ router.post('/api/prompt/import', async (ctx) => {
   }
   await batchImportPrompt(req, userId)
   ctx.status = 200
+})
+router.post('/api/admin/signin', async (ctx) => {
+  const loginInfo = ctx.request.body as SignInInfo
+  console.log('loginInfo', loginInfo)
+  if (isEmpty(loginInfo.usernameOrEmail) || isEmpty(loginInfo.password)) {
+    ctx.status = 400
+    ctx.body = 'usernameOrEmail or password is empty'
+    return
+  }
+  // ctx.body = await signin(loginInfo, new URL(ctx.get('referer')).origin)
+  ctx.body = await adminSignIn(loginInfo)
 })
 router.get('/api/admin/user', async (ctx) => {
   if (ctx.query.offset === undefined) {

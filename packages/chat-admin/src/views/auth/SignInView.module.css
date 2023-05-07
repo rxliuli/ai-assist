@@ -1,0 +1,9 @@
+.signin {
+  width: 100%;
+  margin: auto;
+  max-width: 768px;
+}
+
+.signinContent {
+  margin: 0 8px;
+}
