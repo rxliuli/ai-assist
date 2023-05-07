@@ -1,0 +1,31 @@
+{
+  "name": "@ai-assist/utils",
+  "version": "0.1.0",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
+  "types": "./src/index.ts",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "sideEffects": false,
+  "devDependencies": {
+    "@types/lodash-es": "^4.17.7",
+    "tsup": "^6.2.3",
+    "tsx": "^3.9.0",
+    "typescript": "^4.8.4",
+    "vitest": "^0.23.4"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "dependencies": {
+    "lodash-es": "^4.17.21"
+  }
+}

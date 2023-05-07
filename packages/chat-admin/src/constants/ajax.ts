@@ -7,7 +7,6 @@ export const ajaxClient = new AjaxClient({
   },
   getHeaders() {
     return {
-      OPENAI_API_KEY: localStorage.getItem('OPENAI_API_KEY')!,
       Authorization: localStorage.getItem('token')!,
     }
   },

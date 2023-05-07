@@ -39,6 +39,8 @@ import {
 } from './services/prompt/prompt'
 import { Message } from './constants/db'
 import { ResetPasswordReq, resetPassword, sendResetPasswordEmail } from './services/user/reset'
+import { listUser } from './services/admin/user'
+import { adminAuth } from './services/admin/adminAuth'
 
 const app = new Application()
 const router = new Router()
@@ -347,6 +349,18 @@ router.post('/api/prompt/import', async (ctx) => {
   await batchImportPrompt(req, userId)
   ctx.status = 200
 })
+router.get('/api/admin/user', async (ctx) => {
+  if (ctx.query.offset === undefined) {
+    throw new ServerError('offset is empty', 'OFFSET_EMPTY')
+  }
+  if (ctx.query.limit === undefined) {
+    throw new ServerError('limit is empty', 'LIMIT_EMPTY')
+  }
+  ctx.body = await listUser({
+    offset: Number(ctx.query.offset),
+    limit: Number(ctx.query.limit),
+  })
+})
 
 if (process.env.NODE_ENV === 'development') {
   router.post('/api/chat-stream', async (ctx) => {
@@ -369,6 +383,7 @@ app
   .use(serverErrorHandle())
   .use(bodyParser())
   .use(mount('/api', auth()))
+  .use(mount('/api/admin', adminAuth()))
   .use(router.routes())
   .use(mount('/', serve(path.resolve(__dirname, 'public'))))
 
