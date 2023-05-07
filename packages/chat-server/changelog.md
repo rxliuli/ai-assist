@@ -1,5 +1,9 @@
 # changelog
 
+## 0.6.0
+
+- feat: 禁止开放注册，后续将仅允许在后台添加用户
+
 ## 0.5.7
 
 - perf: 尝试不缓存 OpenAI client 实例，避免 context 过长（超过 150k）-- 等待下周验证
