@@ -94,10 +94,10 @@ export const SignInView = observer(() => {
           <button type={'submit'}>{t('user.signin.form.submit')}</button>
         </div>
       </form>
-      <article>
+      {/* <article>
         {t('user.signin.firstUsing')}
         <Link to={'/signup'}>{t('user.signin.create')}</Link>
-      </article>
+      </article> */}
     </div>
   )
 })
