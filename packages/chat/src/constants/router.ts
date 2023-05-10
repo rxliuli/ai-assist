@@ -6,6 +6,7 @@ import {
   SettingPromptEditView,
   SettingPromptView,
   SettingLayoutView,
+  ChangeLogView,
 } from '../views/setting/SettingView'
 import { SpeakView } from '../views/speak/SpeakView'
 import { AzureSpeechToText } from '../views/test/AzureSpeechToText'
@@ -29,6 +30,7 @@ export const routes: RouteConfig[] = [
       { path: '/setting/prompt/new', component: SettingPromptEditView },
       { path: '/setting/prompt/:promptId', component: SettingPromptEditView },
       { path: '/setting/sync', component: SyncLocalView },
+      { path: '/setting/changelog', component: ChangeLogView },
     ],
   },
   { path: '/:sessionId', component: ChatHomeView },

@@ -37,6 +37,7 @@
   "setting.syncLocal.errors.session": "Session sync failed",
   "setting.syncLocal.success": "Sync success",
   "setting.syncLocal.syncNow": "Sync now",
+  "setting.changelog.title": "Changelog",
   "user.form.email": "Email",
   "user.form.username": "Username",
   "user.form.password": "Password",

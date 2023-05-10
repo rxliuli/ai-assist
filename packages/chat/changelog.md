@@ -1,5 +1,11 @@
 # changelog
 
+## 0.6.1
+
+- chore: docker 镜像发布名称更新为 [rxliuli/chat](https://hub.docker.com/repository/docker/rxliuli/chat)
+- feat: 增加 [更新日志页面](http://chat.ai-assist.moe/#/setting/changelog)
+- fix: 修复 chatgpt api 请求错误的问题
+
 ## 0.6.0
 
 - feat: 禁止开放注册，后续将仅允许在后台添加用户

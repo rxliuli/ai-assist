@@ -16,6 +16,8 @@ import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 import { ajaxClient } from '../../constants/ajax'
 import { ReactSwal } from '../../constants/swal'
 import { settingStore } from './store/settingStore'
+import { isEmpty } from 'lodash-es'
+import changelog from '../../../changelog.md?raw'
 
 export const SettingOpenAPIKeyView = observer(() => {
   const apiKey = useLocalStore(() => ({ value: localStorage.getItem('OPENAI_API_KEY') ?? '' }))
@@ -26,7 +28,12 @@ export const SettingOpenAPIKeyView = observer(() => {
 
   function onSave(ev: FormEvent) {
     ev.preventDefault()
-    localStorage.setItem('OPENAI_API_KEY', apiKey.value)
+    debugger
+    if (isEmpty(apiKey.value)) {
+      localStorage.removeItem('OPENAI_API_KEY')
+    } else {
+      localStorage.setItem('OPENAI_API_KEY', apiKey.value)
+    }
     apiKey.value = ''
     alert(t('setting.save.success'))
     router.back()
@@ -40,7 +47,6 @@ export const SettingOpenAPIKeyView = observer(() => {
           id={'OpenAPIKey'}
           value={apiKey.value}
           onChange={(ev) => (apiKey.value = ev.target.value)}
-          required
         ></input>
       </div>
       <div>
@@ -213,6 +219,9 @@ export const SettingHomeView = observer(() => {
             <Link to={'/setting/prompt'}>{t('setting.prompt.title')}</Link>
           </li>
           <li>
+            <Link to={'/setting/changelog'}>{t('setting.changelog.title')}</Link>
+          </li>
+          <li>
             <Link to={'/setting/sync'}>{t('setting.syncLocal.title')}</Link>
           </li>
           <li>
@@ -260,3 +269,10 @@ export const SettingLayoutView = observer(() => {
     </div>
   )
 })
+
+export const ChangeLogView = () => {
+  useMount(() => {
+    settingStore.title = t('setting.changelog.title')
+  })
+  return <ReactMarkdown>{changelog}</ReactMarkdown>
+}

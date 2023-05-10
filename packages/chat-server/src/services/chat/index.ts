@@ -1,5 +1,5 @@
 import { ChatCompletionRequestMessage } from 'openai'
-import { getOpenAIApi, openai } from '../../constants/chatgpt'
+import { getOpenAIApi } from '../../constants/chatgpt'
 
 export async function chat(messages: Array<ChatCompletionRequestMessage>, apiKey: string, userId: string) {
   const r = await getOpenAIApi(apiKey).createChatCompletion({

@@ -24,6 +24,7 @@ import { faBars, faClose, faPen, faPlus, faTrash } from '@fortawesome/free-solid
 import { ajaxClient } from '../../constants/ajax'
 import { ReactSwal } from '../../constants/swal'
 import ToastContainer, { ToastContainerRef } from './components/SwalToast'
+import { version } from '../../../package.json'
 
 function sliceMessages(
   messages: Pick<Message, 'role' | 'content'>[],
@@ -504,6 +505,11 @@ export const ChatHomeView = observer(() => {
     Reflect.set(globalThis, 'router', router)
     Reflect.set(globalThis, 'ga4', ga4)
     Reflect.set(globalThis, 'toJS', toJS)
+    if (localStorage.getItem('latestVersion') !== version) {
+      localStorage.setItem('latestVersion', version)
+      router.push('/setting/changelog')
+      return
+    }
     const sessionService = new SessionService()
     const messageService = new MessageService()
     store.sessionService = sessionService

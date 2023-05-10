@@ -37,6 +37,7 @@
   "setting.syncLocal.errors.session": "会话同步失败",
   "setting.syncLocal.success": "同步成功",
   "setting.syncLocal.syncNow": "立即同步",
+  "setting.changelog.title": "更新日志",
   "user.logout": "注销",
   "user.form.email": "邮件",
   "user.form.username": "用户名",

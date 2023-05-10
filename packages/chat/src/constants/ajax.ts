@@ -6,9 +6,13 @@ export const ajaxClient = new AjaxClient({
     router.push('/signin')
   },
   getHeaders() {
-    return {
-      OPENAI_API_KEY: localStorage.getItem('OPENAI_API_KEY')!,
+    const r: Record<string, string> = {
       Authorization: localStorage.getItem('token')!,
     }
+    const key = localStorage.getItem('OPENAI_API_KEY')
+    if (key) {
+      r.OPENAI_API_KEY = key
+    }
+    return r
   },
 })
