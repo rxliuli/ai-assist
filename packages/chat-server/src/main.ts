@@ -39,7 +39,7 @@ import {
 } from './services/prompt/prompt'
 import { Message } from './constants/db'
 import { ResetPasswordReq, resetPassword, sendResetPasswordEmail } from './services/user/reset'
-import { listUser } from './services/admin/user'
+import { listUser, switchUserDisabled, switchUserEmailValidate } from './services/admin/user'
 import { adminAuth, adminSignIn } from './services/admin/adminAuth'
 
 const app = new Application()
@@ -371,7 +371,27 @@ router.get('/api/admin/user', async (ctx) => {
   ctx.body = await listUser({
     offset: Number(ctx.query.offset),
     limit: Number(ctx.query.limit),
+    keyword: (ctx.query.keyword as string) ?? '',
+    emailVerified: ctx.query.emailVerified ? ctx.query.emailVerified === 'true' : undefined,
+    disabled: ctx.query.disabled ? ctx.query.disabled === 'true' : undefined,
   })
+})
+router.put('/api/admin/user/:id', async (ctx) => {
+  const params = ctx.request.body as {
+    emailVerified?: boolean
+    disabled?: boolean
+  }
+  if (params.emailVerified !== undefined) {
+    await switchUserEmailValidate(ctx.params.id, params.emailVerified)
+    ctx.body = 'ok'
+    return
+  }
+  if (params.disabled !== undefined) {
+    await switchUserDisabled(ctx.params.id, params.disabled)
+    ctx.body = 'ok'
+    return
+  }
+  throw new ServerError('params is empty', 'PARAMS_EMPTY')
 })
 
 if (process.env.NODE_ENV === 'development') {
@@ -397,6 +417,7 @@ app
   .use(mount('/api', auth()))
   .use(mount('/api/admin', adminAuth()))
   .use(router.routes())
+  .use(mount('/admin', serve(path.resolve(__dirname, 'admin'))))
   .use(mount('/', serve(path.resolve(__dirname, 'public'))))
 
 app.listen(8080)

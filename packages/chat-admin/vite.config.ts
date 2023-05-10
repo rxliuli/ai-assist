@@ -15,6 +15,7 @@ export default defineConfig(async () => {
     }
   }
   return {
+    base: './',
     plugins: [react(), cssdts()],
     server: {
       port: 9000,

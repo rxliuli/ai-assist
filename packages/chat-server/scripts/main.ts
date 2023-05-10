@@ -6,9 +6,9 @@ import { execSync } from 'child_process'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const c = parse(await fs.readFile(path.resolve(__dirname, '../.env'), 'utf-8'))
 
-await $`pnpm build`
-await $`pnpm --prefix ../chat build`
+await Promise.all([$`pnpm build`, $`pnpm --prefix ../chat build`, $`pnpm --prefix ../chat-admin build`])
 await fs.copy(path.resolve(__dirname, '../../chat/dist'), path.resolve(__dirname, '../dist/public'))
+await fs.copy(path.resolve(__dirname, '../../chat-admin/dist'), path.resolve(__dirname, '../dist/admin'))
 await $`docker buildx build --platform=linux/amd64 -t chat .`
 
 if ((await $`docker ps -a --format '{{.Names}}'`).stdout.includes('chat')) {
