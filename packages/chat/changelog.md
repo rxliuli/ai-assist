@@ -1,5 +1,9 @@
 # changelog
 
+## 0.6.3
+
+- docs: update error message for user disabled
+
 ## 0.6.2
 
 - feat: 实现基本的用户管理后台页面
