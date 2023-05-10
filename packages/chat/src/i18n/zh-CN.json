@@ -53,7 +53,7 @@
   "user.signin.create": "创建账户",
   "user.signin.forgotPassword": "忘记密码？",
   "user.signin.error.title": "登录失败",
-  "user.signin.error.USER_DISABLED": "用户已被禁用",
+  "user.signin.error.USER_DISABLED": "用户已被禁用（由于近期被滥用，所以请发送邮件至 rxliuli@gmail.com 解除限制）",
   "user.signin.error.EMAIL_NOT_VERIFIED": "未验证电子邮件",
   "user.signin.error.USERNAME_OR_PASSWORD_INCORRECT": "用户名或密码不正确",
   "user.signin.success.title": "登录成功",
