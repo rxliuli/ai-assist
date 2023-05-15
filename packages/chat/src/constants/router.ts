@@ -37,7 +37,7 @@ export const routes: RouteConfig[] = [
   { path: '/signin', component: SignInView },
   { path: '/reset-password-sent', component: PasswordResetSentView },
   { path: '/reset-password', component: PasswordResetView },
-  // { path: '/signup', component: SignUpView },
+  { path: '/signup', component: SignUpView },
   { path: '/active', component: ActiveView },
   { path: '/', component: ChatHomeView },
 ]

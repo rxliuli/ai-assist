@@ -88,16 +88,16 @@ router.post('/api/signin', async (ctx) => {
   // ctx.body = await signin(loginInfo, new URL(ctx.get('referer')).origin)
   ctx.body = await signin(loginInfo)
 })
-// router.post('/api/signup', async (ctx) => {
-//   const user = ctx.request.body as SignUpInfo
-//   if (isEmpty(user.email) || isEmpty(user.username) || isEmpty(user.password)) {
-//     ctx.status = 400
-//     ctx.body = 'usernameOrEmail or password is empty'
-//     return
-//   }
-//   await signup(user, new URL(ctx.get('referer')).origin)
-//   ctx.body = 'ok'
-// })
+router.post('/api/signup', async (ctx) => {
+  const user = ctx.request.body as SignUpInfo
+  if (isEmpty(user.email) || isEmpty(user.username) || isEmpty(user.password)) {
+    ctx.status = 400
+    ctx.body = 'usernameOrEmail or password is empty'
+    return
+  }
+  await signup(user, new URL(ctx.get('referer')).origin)
+  ctx.body = 'ok'
+})
 router.post('/api/active', async (ctx) => {
   const activeInfo = ctx.request.body as ActiveReq
   if (isEmpty(activeInfo.code)) {
