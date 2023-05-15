@@ -66,7 +66,12 @@ router.post('/api/chat-stream', async (ctx) => {
   const params = ctx.request.body as Array<ChatCompletionRequestMessage>
   const token = ctx.get('Authorization')
   const userId = await getUserIdByToken(token)
-  const stream = chatStream(params, ctx.get('OPENAI_API_KEY'), userId!)
+  const stream = chatStream({
+    messages: params,
+    apiKey: ctx.get('OPENAI_API_KEY'),
+    userId: userId!,
+    model: ctx.get('OPENAI_MODEL'),
+  })
   // 设置响应头
   ctx.set('Content-Type', 'application/octet-stream')
   ctx.set('Content-Disposition', 'attachment; filename="file.txt"')

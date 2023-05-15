@@ -20,40 +20,62 @@ import { isEmpty } from 'lodash-es'
 import changelog from '../../../changelog.md?raw'
 
 export const SettingOpenAPIKeyView = observer(() => {
-  const apiKey = useLocalStore(() => ({ value: localStorage.getItem('OPENAI_API_KEY') ?? '' }))
+  const settings = useLocalStore(() => ({
+    apiKey: localStorage.getItem('OPENAI_API_KEY') ?? '',
+    model: localStorage.getItem('OPENAI_MODEL') ?? 'gpt-3.5-turbo',
+  }))
 
   useMount(() => {
-    settingStore.title = t('setting.openApiKey.title')
+    settingStore.title = t('setting.openai.title')
   })
 
   function onSave(ev: FormEvent) {
     ev.preventDefault()
-    debugger
-    if (isEmpty(apiKey.value)) {
+    if (isEmpty(settings.apiKey)) {
       localStorage.removeItem('OPENAI_API_KEY')
     } else {
-      localStorage.setItem('OPENAI_API_KEY', apiKey.value)
+      localStorage.setItem('OPENAI_API_KEY', settings.apiKey)
     }
-    apiKey.value = ''
+    localStorage.setItem('OPENAI_MODEL', settings.model)
+    settings.apiKey = ''
     alert(t('setting.save.success'))
     router.back()
   }
   return (
     <form onSubmit={onSave}>
       <div>
-        <label htmlFor={'OpenAPIKey'}>{t('setting.openApiKey.form.key')}:</label>
+        <label htmlFor={'OpenAPIKey'}>{t('setting.openai.form.key')}:</label>
         <input
           type={'password'}
           id={'OpenAPIKey'}
-          value={apiKey.value}
-          onChange={(ev) => (apiKey.value = ev.target.value)}
+          value={settings.apiKey}
+          onChange={(ev) => (settings.apiKey = ev.target.value)}
         ></input>
+      </div>
+      <div>
+        <label htmlFor={'model'}>{t('setting.openai.form.model')}:</label>
+        <select
+          id={'model'}
+          value={settings.model}
+          onChange={(ev) => {
+            settings.model = ev.target.value
+          }}
+        >
+          {[
+            { value: 'gpt-3.5-turbo', label: 'GPT-3.5' },
+            { value: 'gpt-4', label: 'GPT-4' },
+          ].map((it) => (
+            <option key={it.value} value={it.value}>
+              {it.label}
+            </option>
+          ))}
+        </select>
       </div>
       <div>
         <button type={'submit'}>{t('setting.save')}</button>
       </div>
       <article>
-        <ReactMarkdown children={t('setting.openApiKey.desc').trim()}></ReactMarkdown>
+        <ReactMarkdown children={t('setting.openai.desc').trim()}></ReactMarkdown>
       </article>
     </form>
   )
@@ -213,7 +235,7 @@ export const SettingHomeView = observer(() => {
       <nav>
         <ul>
           <li>
-            <Link to={'/setting/open-api-key'}>{t('setting.openApiKey.title')}</Link>
+            <Link to={'/setting/open-api-key'}>{t('setting.openai.title')}</Link>
           </li>
           <li>
             <Link to={'/setting/prompt'}>{t('setting.prompt.title')}</Link>

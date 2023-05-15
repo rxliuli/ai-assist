@@ -13,6 +13,10 @@ export const ajaxClient = new AjaxClient({
     if (key) {
       r.OPENAI_API_KEY = key
     }
+    const model = localStorage.getItem('OPENAI_MODEL')
+    if (model) {
+      r.OPENAI_MODEL = model
+    }
     return r
   },
 })
