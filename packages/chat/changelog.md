@@ -1,5 +1,10 @@
 # changelog
 
+## 0.7.0
+
+- feat(chat): 要求指定 OpenAI api key 才能使用
+- feat(chat-admin): 后台管理添加管理消息的功能
+
 ## 0.6.3
 
 - docs: update error message for user disabled
