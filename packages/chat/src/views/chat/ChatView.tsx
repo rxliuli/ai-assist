@@ -230,11 +230,6 @@ export const ChatMessages = observer(function (props: {
     if (store.loading) {
       return
     }
-    if (!localStorage.getItem('OPENAI_API_KEY')) {
-      ReactSwal.fire(t('message.error.OPENAI_API_KEY_REQUIRE'))
-      router.push('/setting/open-api-key')
-      return
-    }
     if (msg.trim().length === 0) {
       return
     }
@@ -244,11 +239,6 @@ export const ChatMessages = observer(function (props: {
   }
 
   async function onPrompt(title: string, systemContent: string) {
-    if (!localStorage.getItem('OPENAI_API_KEY')) {
-      ReactSwal.fire(t('message.error.OPENAI_API_KEY_REQUIRE'))
-      router.push('/setting/open-api-key')
-      return
-    }
     const session = await props.onCreateSession({
       name: title,
     })
@@ -290,11 +280,6 @@ export const ChatMessages = observer(function (props: {
   }
   async function onRegenerate() {
     if (store.loading) {
-      return
-    }
-    if (!localStorage.getItem('OPENAI_API_KEY')) {
-      ReactSwal.fire(t('message.error.OPENAI_API_KEY_REQUIRE'))
-      router.push('/setting/open-api-key')
       return
     }
     if (props.messages.length === 0) {
