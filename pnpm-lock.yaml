@@ -251,6 +251,9 @@ importers:
       antd:
         specifier: ^5.4.6
         version: 5.4.6(react-dom@18.2.0)(react@18.2.0)
+      dayjs:
+        specifier: ^1.11.7
+        version: 1.11.7
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21

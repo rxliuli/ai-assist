@@ -48,6 +48,7 @@ export function listUser(args: {
     where: {
       [Op.and]: wheres,
     },
+    order: [['createdAt', 'DESC']],
   })
 }
 

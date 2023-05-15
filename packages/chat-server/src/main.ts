@@ -41,6 +41,7 @@ import { Message } from './constants/db'
 import { ResetPasswordReq, resetPassword, sendResetPasswordEmail } from './services/user/reset'
 import { listUser, switchUserDisabled, switchUserEmailValidate } from './services/admin/user'
 import { adminAuth, adminSignIn } from './services/admin/adminAuth'
+import { messages } from './services/admin/message'
 
 const app = new Application()
 const router = new Router()
@@ -393,19 +394,19 @@ router.put('/api/admin/user/:id', async (ctx) => {
   }
   throw new ServerError('params is empty', 'PARAMS_EMPTY')
 })
-
-if (process.env.NODE_ENV === 'development') {
-  router.post('/api/chat-stream', async (ctx) => {
-    const stream = streamResp()
-    ctx.set('Content-Type', 'application/octet-stream')
-    ctx.set('Content-Disposition', 'attachment; filename="file.txt"')
-    ctx.body = stream
+router.get('/api/admin/message', async (ctx) => {
+  if (ctx.query.offset === undefined) {
+    throw new ServerError('offset is empty', 'OFFSET_EMPTY')
+  }
+  if (ctx.query.limit === undefined) {
+    throw new ServerError('limit is empty', 'LIMIT_EMPTY')
+  }
+  ctx.body = await messages.listMessage({
+    ...(pick(ctx.query, 'keyword', 'start', 'end') as any),
+    offset: Number(ctx.query.offset),
+    limit: Number(ctx.query.limit),
   })
-  router.post('/api/test-body', async (ctx) => {
-    console.log('body', ctx.request)
-    ctx.body = ctx.request.body
-  })
-}
+})
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 

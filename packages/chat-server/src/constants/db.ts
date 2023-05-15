@@ -178,6 +178,8 @@ export const MessageModel = sequelize.define<Model<Message>>(
     deletedAt: 'deleted_at',
   },
 )
+MessageModel.belongsTo(UserModel, { foreignKey: 'userId', targetKey: 'id' })
+MessageModel.belongsTo(SessionModel, { foreignKey: 'sessionId', targetKey: 'id' })
 
 export interface Prompt {
   id: string

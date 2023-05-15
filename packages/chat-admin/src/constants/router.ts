@@ -22,6 +22,13 @@ export const menus: MenuConfig[] = [
       title: '用户管理',
     },
   },
+  {
+    path: '/message',
+    component: () => import('../views/message/MessageView'),
+    meta: {
+      title: '消息管理',
+    },
+  },
 ]
 
 export const routes: RouteConfig[] = [
@@ -37,3 +44,4 @@ export const routes: RouteConfig[] = [
 ]
 
 export const router = createHashHistory()
+Reflect.set(globalThis, 'router', router)

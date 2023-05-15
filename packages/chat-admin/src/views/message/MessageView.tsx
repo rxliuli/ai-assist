@@ -1,29 +1,38 @@
-import { Button, Col, Form, Input, Row, Space, Switch, Table, TablePaginationConfig } from 'antd'
-import { useAsyncFn, useMount } from 'react-use'
-import { ajaxClient } from '../../constants/ajax'
+import { Button, Col, DatePicker, Form, Input, Row, Select, Space, Switch, Table, TablePaginationConfig } from 'antd'
 import { observer } from 'mobx-react-lite'
 import { useLocalReactive } from '../../utils/mobx'
-import { omitBy, pick } from 'lodash-es'
-import { Link, useNavigate } from 'react-router-dom'
-import { router } from '../../constants/router'
+import { debounce, omitBy, pick } from 'lodash-es'
+import { useAsyncFn, useMount } from 'react-use'
+import { ajaxClient } from '../../constants/ajax'
+import dayjs from 'dayjs'
+import { useSearchParams } from '@liuli-util/react-router'
 
 export interface User {
   id: string
-  username: string
-  email: string
+  sessionId: string
+  userId: string
+  role: 'user' | 'assistant' | 'system'
+  content: string
   createdAt: Date
-  emailVerified: boolean
-  disabled: boolean
+  session: {
+    name: string
+  }
+  user: {
+    username: string
+  }
 }
 
-export const UserView = observer(() => {
+export const MessageView = observer(() => {
+  const [params] = useSearchParams()
   const store = useLocalReactive({
     offset: 0,
     limit: 10,
     total: 0,
-    keyword: '',
-    emailVerified: undefined,
-    disabled: undefined,
+    keyword: params.get('keyword') ?? '',
+    start: undefined as string | undefined,
+    end: undefined as string | undefined,
+    userIdList: [] as string[],
+    sessionIdList: [] as string[],
     list: [] as User[],
     get config() {
       return {
@@ -36,8 +45,8 @@ export const UserView = observer(() => {
   })
   const [refreshState, refresh] = useAsyncFn(async () => {
     const resp = await ajaxClient.get(
-      '/api/admin/user',
-      omitBy(pick(store, ['offset', 'limit', 'keyword', 'emailVerified', 'disabled']), (it) => it === undefined),
+      '/api/admin/message',
+      omitBy(pick(store, ['offset', 'limit', 'keyword', 'start', 'end']), (it) => it === undefined),
     )
     const r = await resp.json()
     store.list = r.rows
@@ -53,7 +62,9 @@ export const UserView = observer(() => {
     Object.assign(store, value)
     await refresh()
   }
-  const navigate = useNavigate()
+  const onSearchUser = debounce(() => {
+    console.log('onSearch')
+  }, 500)
   return (
     <div>
       <header>
@@ -64,7 +75,7 @@ export const UserView = observer(() => {
             keyword: '',
           }}
         >
-          <Form.Item label={'搜索用户名或邮箱'} name={'keyword'}>
+          <Form.Item label={'搜索用户名、会话或消息'} name={'keyword'}>
             <Input.Search
               allowClear={true}
               onSearch={async (value, ev) => {
@@ -77,27 +88,35 @@ export const UserView = observer(() => {
           </Form.Item>
           <Row justify={'space-between'}>
             <Col>
-              <Form.Item label={'邮箱是否验证'} name={'emailVerified'}>
-                <Switch
-                  onChange={async (value, ev) => {
-                    ev?.preventDefault()
-                    form.setFieldValue('emailVerified', value)
+              <Form.Item label={'邮箱是否验证'} name={'dateRange'}>
+                <DatePicker.RangePicker
+                  onChange={async (value) => {
+                    console.log('value', value)
+                    if (value) {
+                      store.start = value[0]!.toJSON()
+                      store.end = value[1]!.toJSON()
+                    } else {
+                      store.start = undefined
+                      store.end = undefined
+                    }
                     await onFilter()
                   }}
-                ></Switch>
+                  disabledDate={(date) => date.isAfter(dayjs())}
+                />
               </Form.Item>
             </Col>
-            <Col>
-              <Form.Item label={'是否禁用'} name={'disabled'}>
-                <Switch
-                  onChange={async (value, ev) => {
-                    ev?.preventDefault()
-                    form.setFieldValue('disabled', value)
-                    await onFilter()
+            {/* <Col>
+              <Form.Item label={'按用户筛选'} name={'userIdList'}>
+                <Select
+                  mode="multiple"
+                  allowClear
+                  style={{
+                    minWidth: '4rem',
                   }}
-                ></Switch>
+                  onSearch={onSearchUser}
+                />
               </Form.Item>
-            </Col>
+            </Col> */}
             <Col>
               <Form.Item>
                 <Space>
@@ -124,56 +143,25 @@ export const UserView = observer(() => {
         dataSource={store.list}
         columns={[
           {
-            title: '用户名',
-            dataIndex: 'username',
+            title: '会话',
+            dataIndex: ['session', 'name'],
           },
           {
-            title: '邮箱',
-            dataIndex: 'email',
+            title: '用户',
+            dataIndex: ['user', 'username'],
+          },
+          {
+            title: '角色',
+            dataIndex: 'role',
+          },
+          {
+            title: '内容',
+            dataIndex: 'content',
           },
           {
             title: '创建时间',
             dataIndex: 'createdAt',
-          },
-          {
-            title: '邮箱是否验证',
-            dataIndex: 'emailVerified',
-            render: (v, row) => (
-              <Switch
-                checked={v}
-                onChange={async (value) => {
-                  await ajaxClient.put(`/api/admin/user/${row.id}`, {
-                    emailVerified: value,
-                  })
-                  await refresh()
-                }}
-              />
-            ),
-          },
-          {
-            title: '是否禁用',
-            dataIndex: 'disabled',
-            render: (v, row) => (
-              <Switch
-                checked={v}
-                onChange={async (value) => {
-                  await ajaxClient.put(`/api/admin/user/${row.id}`, {
-                    disabled: value,
-                  })
-                  await refresh()
-                }}
-              />
-            ),
-          },
-          {
-            title: '操作',
-            render: (_, row) => (
-              <Space>
-                <Button type={'link'} onClick={() => router.push(`/message?keyword=${row.username}`)}>
-                  查看消息
-                </Button>
-              </Space>
-            ),
+            render: (v) => dayjs(v).format('YYYY-MM-DD HH:mm:ss'),
           },
         ]}
         pagination={store.config}
@@ -192,4 +180,4 @@ export const UserView = observer(() => {
   )
 })
 
-export default UserView
+export default MessageView
