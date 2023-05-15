@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest'
-import { chatStream } from '..'
+import { chatStream } from '../chatStream'
 
 it('chatStream', async () => {
   const s = chatStream([{ role: 'user', content: '你是谁？' }], process.env.OPENAI_API_KEY!, 'rxliuli')

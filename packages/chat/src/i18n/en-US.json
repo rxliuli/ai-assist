@@ -14,6 +14,7 @@
   "message.stopGenerate": "Stop generate",
   "message.code.copy": "Copy code",
   "message.code.copied": "Copied",
+  "message.error.OPENAI_API_KEY_REQUIRE": "OpenAI API Key is not set or has expired, please go to set",
   "setting.title": "Settings",
   "setting.back": "Back",
   "setting.home": "Home",

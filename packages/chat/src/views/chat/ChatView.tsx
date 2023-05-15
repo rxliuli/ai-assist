@@ -25,6 +25,7 @@ import { ajaxClient } from '../../constants/ajax'
 import { ReactSwal } from '../../constants/swal'
 import ToastContainer, { ToastContainerRef } from './components/SwalToast'
 import { version } from '../../../package.json'
+import { ServerError } from '../../utils/error'
 
 function sliceMessages(
   messages: Pick<Message, 'role' | 'content'>[],
@@ -145,6 +146,12 @@ export const ChatMessages = observer(function (props: {
             msg: resp.statusText,
           },
         })
+        const err = (await resp.json()) as ServerError
+        if (err.code === 'OPENAI_API_KEY_REQUIRE') {
+          ReactSwal.fire(t('message.error.OPENAI_API_KEY_REQUIRE'))
+          router.push('/setting/open-api-key')
+          return
+        }
         ReactSwal.fire(t('message.error.network'))
         return
       }
@@ -223,6 +230,11 @@ export const ChatMessages = observer(function (props: {
     if (store.loading) {
       return
     }
+    if (!localStorage.getItem('OPENAI_API_KEY')) {
+      ReactSwal.fire(t('message.error.OPENAI_API_KEY_REQUIRE'))
+      router.push('/setting/open-api-key')
+      return
+    }
     if (msg.trim().length === 0) {
       return
     }
@@ -232,6 +244,11 @@ export const ChatMessages = observer(function (props: {
   }
 
   async function onPrompt(title: string, systemContent: string) {
+    if (!localStorage.getItem('OPENAI_API_KEY')) {
+      ReactSwal.fire(t('message.error.OPENAI_API_KEY_REQUIRE'))
+      router.push('/setting/open-api-key')
+      return
+    }
     const session = await props.onCreateSession({
       name: title,
     })
@@ -273,6 +290,11 @@ export const ChatMessages = observer(function (props: {
   }
   async function onRegenerate() {
     if (store.loading) {
+      return
+    }
+    if (!localStorage.getItem('OPENAI_API_KEY')) {
+      ReactSwal.fire(t('message.error.OPENAI_API_KEY_REQUIRE'))
+      router.push('/setting/open-api-key')
       return
     }
     if (props.messages.length === 0) {

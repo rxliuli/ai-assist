@@ -3,9 +3,9 @@ import cors from '@koa/cors'
 import Router from '@koa/router'
 import bodyParser from 'koa-bodyparser'
 import { ChatCompletionRequestMessage } from 'openai'
-import { chat } from './services/chat'
+import { chat } from './services/chat/chat'
 import { httpLogger, logger } from './constants/logger'
-import { chatStream } from './services/chat-stream'
+import { chatStream } from './services/chat/chatStream'
 import { getRegionAndToken } from './services/speak'
 import serve from 'koa-static'
 import path from 'path'
@@ -42,14 +42,15 @@ import { ResetPasswordReq, resetPassword, sendResetPasswordEmail } from './servi
 import { listUser, switchUserDisabled, switchUserEmailValidate } from './services/admin/user'
 import { adminAuth, adminSignIn } from './services/admin/adminAuth'
 import { messages } from './services/admin/message'
+import { checkOpenAIApiKey } from './services/chat/checkOpenAIApiKey'
 
 const app = new Application()
 const router = new Router()
 router.get('/api/ping', (ctx) => {
   ctx.body = 'pong'
 })
-
 router.post('/api/chat', async (ctx) => {
+  checkOpenAIApiKey(ctx)
   const params = ctx.request.body as Array<ChatCompletionRequestMessage>
   if (!Array.isArray(params)) {
     ctx.status = 400
@@ -61,6 +62,7 @@ router.post('/api/chat', async (ctx) => {
   ctx.body = r
 })
 router.post('/api/chat-stream', async (ctx) => {
+  checkOpenAIApiKey(ctx)
   const params = ctx.request.body as Array<ChatCompletionRequestMessage>
   const token = ctx.get('Authorization')
   const userId = await getUserIdByToken(token)

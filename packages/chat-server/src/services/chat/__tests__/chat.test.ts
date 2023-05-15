@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest'
-import { chat } from '..'
+import { chat } from '../chat'
 
 it('chat', async () => {
   const r = await chat(
