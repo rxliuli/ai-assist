@@ -1,0 +1,38 @@
+{
+  "name": "@ai-assist/placeholder-image-generator-gpt-plugin",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/main.js",
+  "private": true,
+  "scripts": {
+    "dev": "tsup-node --watch & tsx watch dist/main.js",
+    "build": "tsup",
+    "start": "node dist/main.cjs"
+  },
+  "devDependencies": {
+    "@koa/cors": "^4.0.0",
+    "@koa/router": "^12.0.0",
+    "@types/jsdom": "^21.1.1",
+    "@types/koa": "^2.13.5",
+    "@types/koa-static": "^4.0.2",
+    "@types/koa__cors": "^3.3.1",
+    "@types/koa__router": "^12.0.0",
+    "@types/lodash-es": "^4.17.7",
+    "@types/mustache": "^4.2.2",
+    "@types/node": "^20.1.4",
+    "dotenv": "^16.0.3",
+    "esbuild": "^0.17.19",
+    "joi": "^17.9.2",
+    "koa": "^2.14.1",
+    "koa-static": "^5.0.0",
+    "lodash-es": "^4.17.21",
+    "mustache": "^4.2.0",
+    "tsup": "^6.7.0",
+    "tsx": "^3.12.7",
+    "typescript": "^5.0.4",
+    "vite": "^4.3.5",
+    "vitest": "^0.31.0",
+    "wrangler": "^2.16.0",
+    "zx": "^7.2.0"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "PlaceholderImageGenerator",
+  "name_for_model": "PlaceholderImageGenerator",
+  "description_for_human": "Generate a random image of the specified size for the placeholder",
+  "description_for_model": "Generate a random image of the specified size for the placeholder",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "{{{baseUrl}}}/openapi.json",
+    "is_user_authenticated": false
+  },
+  "logo_url": "{{{baseUrl}}}/logo.jpg",
+  "contact_email": "rxliuli@gmail.com",
+  "legal_info_url": "{{{baseUrl}}}/legal",
+  "HttpAuthorizationType": "basic"
+}

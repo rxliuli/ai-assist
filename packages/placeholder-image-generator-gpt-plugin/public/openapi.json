@@ -1,0 +1,113 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Image Generator API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/generate": {
+      "get": {
+        "operationId": "generate",
+        "summary": "Generate a random image",
+        "parameters": [
+          {
+            "name": "width",
+            "in": "query",
+            "description": "The width of the image",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "height",
+            "in": "query",
+            "description": "The height of the image",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The id of the image",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "seed",
+            "in": "query",
+            "description": "The seed for generating the image",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "grayscale",
+            "in": "query",
+            "description": "Whether the image should be in grayscale",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "blur",
+            "in": "query",
+            "description": "The blur level of the image (can be a boolean or a number)",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "integer",
+                  "format": "int32",
+                  "minimum": 1,
+                  "maximum": 10
+                }
+              ]
+            }
+          },
+          {
+            "name": "ext",
+            "in": "query",
+            "description": "The extension of the image",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["jpg", "webp"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri",
+                      "description": "The URL of the generated image"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
