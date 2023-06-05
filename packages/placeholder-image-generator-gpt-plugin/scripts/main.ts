@@ -5,7 +5,7 @@ import { execSync } from 'child_process'
 import { pick } from 'lodash-es'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const c = parse(await fs.readFile(path.resolve(__dirname, '../.env'), 'utf-8'))
+const c = parse(await fs.readFile(path.resolve(__dirname, '../.env.local'), 'utf-8'))
 
 const name = 'placeholder-image-generator-gpt-plugin'
 
