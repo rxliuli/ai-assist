@@ -1,6 +1,6 @@
 {
   "name": "@ai-assist/placeholder-image-generator-gpt-plugin",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "main": "dist/main.js",
   "private": true,
@@ -12,6 +12,7 @@
   "devDependencies": {
     "@koa/cors": "^4.0.0",
     "@koa/router": "^12.0.0",
+    "@liuli-util/vite-plugin-node": "^0.1.1",
     "@rollup/pluginutils": "^5.0.2",
     "@types/jsdom": "^21.1.1",
     "@types/koa": "^2.13.5",
